@@ -1,0 +1,35 @@
+{
+  "issues": [
+    {
+      "id": "ISSUE-1",
+      "title": "通用选项",
+      "description": "用户无法登录系统",
+      "submit_time": "2024-01-01T10:00:00",
+      "status": "已解决",
+      "duration": 661,
+      "submitter_name": "匿名用户",
+      "submitter_email": "未提供",
+      "name": "通用选项"
+    },
+    {
+      "id": "ISSUE-2",
+      "title": "fov_builder",
+      "description": "1. 初始化页面无法选中和移动传感器\n2. 保存的2D图，车模位置不正确",
+      "submit_time": "2025-10-24T01:48:23.510Z",
+      "status": "待处理",
+      "duration": 0,
+      "submitter_name": "匿名用户",
+      "submitter_email": "未提供"
+    }
+  ],
+  "statistics": {
+    "total_issues": 2,
+    "solved_issues": 1,
+    "pending_issues": 1,
+    "in_progress_issues": 0,
+    "current_month_solved": 0,
+    "last_month_solved": 0,
+    "solve_increase_percent": 0,
+    "last_updated": "2025-10-24T09:50:37.494205"
+  }
+}

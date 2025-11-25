@@ -1,0 +1,25 @@
+{
+  "advice": [
+    {
+      "id": "ADVICE-1",
+      "title": "通用选项",
+      "description": "用户无法登录系统",
+      "submit_time": "2024-01-01T10:00:00",
+      "status": "已采纳",
+      "duration": 661,
+      "submitter_name": "匿名用户",
+      "submitter_email": "未提供",
+      "name": "通用选项"
+    }
+  ],
+  "statistics": {
+    "total_advice": 1,
+    "solved_advice": 0,
+    "pending_advice": 0,
+    "in_progress_advice": 0,
+    "current_month_solved": 0,
+    "last_month_solved": 0,
+    "solve_increase_percent": 0,
+    "last_updated": "2025-10-24T09:26:22.430760"
+  }
+}

@@ -1,0 +1,24 @@
+{
+  "issues": [
+    {
+      "id": "User-1",
+      "name": "宋嘉玮",
+      "submit_time": "2024-01-01T10:00:00",
+      "status": "已解决",
+      "duration": 661,
+      "submitter_email": "song-jiawei@outlook.com"
+    }
+  ],
+  "statistics": {
+    "total_users": 1
+  },
+  "users": [
+    {
+      "id": "USER-1",
+      "name": "xiaoxiao",
+      "submit_time": "2025-11-21T07:20:39.027Z",
+      "duration": 0,
+      "submitter_email": "1273880613@qq.com"
+    }
+  ]
+}
