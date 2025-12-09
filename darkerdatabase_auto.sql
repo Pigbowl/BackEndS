@@ -2172,7 +2172,7 @@ CREATE TABLE `release_content` (
 
 LOCK TABLES `release_content` WRITE;
 /*!40000 ALTER TABLE `release_content` DISABLE KEYS */;
-INSERT INTO `release_content` VALUES (1,'发布\"功能星球”板块业务，提供ADAS用户功能知识信息','2025-12-11','ALPHA-25-12-1','已上线','功能星球','2025-12-07 05:20:30','creation','NO-1'),(2,'发布\"硬件星球”板块业务，提供ADAS用户功能知识信息','2025-12-07','','规划中','硬件星球','2025-12-07 05:21:49','creation','NO-2'),(3,'发布“知识网络”功能，通过交互式网络图提供ADAS学习的脉络和方法','2025-12-07','','开发中','知识网络','2025-12-07 15:09:42','creation','NO-3'),(4,'发布“传感器星球”功能','2025-12-08','','完成_待上线','传感器星球','2025-12-07 15:10:48','creation','NO-4'),(5,'发布“环境生成器”功能','2025-11-29','','已上线','环境生成器','2025-12-07 15:11:24','creation','NO-5'),(6,'发布“传感器配置器”功能，自行定义，快速绘制你的传感器配置图','2025-12-06','ALPHA-25-12-1','开发中','传感器配置器','2025-12-07 15:34:06','creation','NO-6'),(9,'lllll','2025-12-12',NULL,'规划中','产品配置器','2025-12-08 06:14:44','bug_fix','27'),(10,'3D预览功能无法使用','2025-12-13','','完成_待上线','环境生成器','2025-12-08 06:21:57','bug_fix','28'),(26,'111','2025-12-20',NULL,'开发中','知识网络','2025-12-08 07:50:31','creation','NO-26');
+INSERT INTO `release_content` VALUES (1,'发布\"功能星球”板块业务，提供ADAS用户功能知识信息','2025-12-11','ALPHA-25-12-2','已上线','功能星球','2025-12-07 05:20:30','creation','NO-1'),(2,'发布\"硬件星球”板块业务，提供ADAS用户功能知识信息','2025-12-07','ALPHA-25-12-2','已上线','硬件星球','2025-12-07 05:21:49','creation','NO-2'),(3,'发布“知识网络”功能，通过交互式网络图提供ADAS学习的脉络和方法','2025-12-07','','开发中','知识网络','2025-12-07 15:09:42','creation','NO-3'),(4,'发布“传感器星球”功能','2025-12-08','','完成_待上线','传感器星球','2025-12-07 15:10:48','creation','NO-4'),(5,'发布“环境生成器”功能','2025-11-29','','已上线','环境生成器','2025-12-07 15:11:24','creation','NO-5'),(6,'发布“传感器配置器”功能，自行定义，快速绘制你的传感器配置图','2025-12-06','ALPHA-25-12-1','开发中','传感器配置器','2025-12-07 15:34:06','creation','NO-6'),(9,'lllll','2025-12-12',NULL,'规划中','产品配置器','2025-12-08 06:14:44','bug_fix','27'),(10,'3D预览功能无法使用','2025-12-13','','完成_待上线','环境生成器','2025-12-08 06:21:57','bug_fix','28'),(26,'111','2025-12-20',NULL,'开发中','知识网络','2025-12-08 07:50:31','creation','NO-26');
 /*!40000 ALTER TABLE `release_content` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -2996,7 +2996,7 @@ CREATE TABLE `version_management` (
   PRIMARY KEY (`ID`),
   UNIQUE KEY `ID_UNIQUE` (`ID`),
   UNIQUE KEY `Version_UNIQUE` (`Version`)
-) ENGINE=InnoDB AUTO_INCREMENT=73 DEFAULT CHARSET=utf8mb3;
+) ENGINE=InnoDB AUTO_INCREMENT=74 DEFAULT CHARSET=utf8mb3;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -3005,7 +3005,7 @@ CREATE TABLE `version_management` (
 
 LOCK TABLES `version_management` WRITE;
 /*!40000 ALTER TABLE `version_management` DISABLE KEYS */;
-INSERT INTO `version_management` (`ID`, `Major_Version`, `Minor_Version_Year`, `Temp_Version`, `Version_Time`, `Minor_Version_Month`) VALUES (1,'ALPHA',25,1,'2025-12-06 15:52:29',11),(72,'ALPHA',25,1,'2025-12-09 15:57:17',12);
+INSERT INTO `version_management` (`ID`, `Major_Version`, `Minor_Version_Year`, `Temp_Version`, `Version_Time`, `Minor_Version_Month`) VALUES (1,'ALPHA',25,1,'2025-12-06 15:52:29',11),(72,'ALPHA',25,1,'2025-12-09 15:57:17',12),(73,'ALPHA',25,2,'2025-12-09 16:10:24',12);
 /*!40000 ALTER TABLE `version_management` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -3117,4 +3117,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2025-12-09 23:57:28
+-- Dump completed on 2025-12-10  0:10:29
