@@ -1,17 +1,23 @@
+from ast import main
 from enum import Flag
 from nt import access
 from operator import is_
+from pipes import quote
 from re import T
 from sqlite3 import Row
+from xml.etree.ElementTree import tostring
 from matplotlib import table
+from numpy import concat
+from numpy.polynomial.legendre import legline
 from pandas._libs.groupby import group_any_all
 import pymysql
 import csv
 import json
 from typing import List, Dict, Any, Optional
-
-from pymysql.cursors import DictCursorMixin
+from Python_S.emailing import send_single_email
 from Python_S.sql_operations import SQLOperations
+from pymysql.cursors import DictCursorMixin
+
 from collections import Counter
 
 
@@ -257,7 +263,6 @@ def export_table_columns_with_foreign_key() -> List[Dict[str, str]]:
                                         table_values.append(lib_row[0])
                             
                             lib_tables_data[referenced_table] = table_values
-                            # print(f"  提取了枚举表{referenced_table}的数据，共{len(table_values)}条")
                         except Exception as e:
                             print(f"  提取枚举表{referenced_table}数据时出错：{str(e)}")
 
@@ -290,11 +295,10 @@ def export_table_columns_with_foreign_key() -> List[Dict[str, str]]:
                                         table_values.append(lib_row[0])
                             
                             lib_tables_data[referenced_table] = table_values
-                            # print(f"  提取了枚举表{referenced_table}的数据，共{len(table_values)}条")
                         except Exception as e:
                             print(f"  提取枚举表{referenced_table}数据时出错：{str(e)}")
 
-            # 不再需要处理tables_object，直接继续后续操作
+
         # output_file = "database_table_structure.csv"
         # try:
         #     with open(output_file, 'w', newline='', encoding='utf-8-sig') as csvfile:
@@ -333,13 +337,6 @@ def export_table_columns_with_foreign_key() -> List[Dict[str, str]]:
             cursor.close()
         if conn and conn.open:
             conn.close()
-        # print("\n数据库连接已关闭")
-    
-    # 输出表格关系信息
-
-    # if foreign_key_relations:
-        # print(f"\n成功建立了{len(foreign_key_relations)}个表格间的父子关系")
-        # print(f"\n成功处理了 {len(processed_results)} 条数据")    
 
     global TargetDict
     TargetDict = db.read_data('objects')
@@ -400,8 +397,12 @@ def generate_colum_value(data_type, colum_attribute, referenced_table, type, lib
             return referenced_column
         elif extra_data[0].get(column_name):
             return extra_data[0].get(column_name)
+        elif extra_data[0].get(column_name)==0:
+            return 0
         else:
             return " "
+
+
 
 def generate_colum_option(data_type,colum_attribute,referenced_table,type,lib_tables_data,referenced_column):
     if data_type == "varchar":
@@ -581,6 +582,90 @@ def generate_new_object_data_structure(processed_results,lib_tables_data,target_
     
     return json.dumps(object_data, ensure_ascii=False, indent=2)
 
+def generate_new_object_data_structure_layer(processed_results,lib_tables_data,target_table):
+    """
+    生成类似object_data.json格式的数据结构
+    
+    Args:
+        processed_results: 处理后的数据库表结构信息
+        target_table: 主表名称
+        lib_tables_data: 包含_lib/_enum表数据的字典
+    """
+    # 创建基础数据结构——
+    object_data = {
+        "id": target_table + "_creation",
+        "itemlevel": "object",
+        "children": []
+    }
+    extra_data = [" ", " "]
+    # 1. 处理主表数据
+    main_table_rows = [row for row in processed_results if row['表名'] == target_table]
+    
+    if main_table_rows:
+        # 创建主表对象
+        main_table_object = generate_table_object(target_table,type="main",generate_type="new",itemlevel="row")
+        # 处理主表的每一列
+        for row in main_table_rows:
+            column_object = generate_colunm_data(row,target_table,lib_tables_data,"new",processed_results,extra_data,is_template=False)
+            main_table_object["children"].append(column_object)        
+        # 将主表对象添加到children数组
+        object_data["children"].append(main_table_object)
+    
+    # 2. 查找并处理关联到主表的子表
+    child_tables = set()
+    for row in processed_results:
+        if row['是否外键'] == '是' and row['关联主表名'] == target_table and row['关联主表列名']=="ID":
+            child_tables.add(row['表名'])
+    
+    # 处理每个子表
+    for child_table in child_tables:
+        child_table_rows = [row for row in processed_results if row['表名'] == child_table]
+        # 创建子表格结构体
+        child_table_object = generate_table_object(child_table,type="child",generate_type="new",itemlevel="table")
+        # 创建子表格 模板行数据结构
+        template_row = generate_table_object(child_table,type="template",generate_type="new",itemlevel="row")
+        extra_data = [" ", " "]
+        # 处理子表的每一列
+        for row in child_table_rows:
+            column_object = generate_colunm_data(row,target_table,lib_tables_data,"new",processed_results,extra_data,is_template=True)
+            template_row["children"].append(column_object)
+        
+        # 将模板行添加到子表对象
+        child_table_object["children"].append(template_row)
+        
+        # 3. 查找并处理关联到当前子表的孙表
+        grandchild_tables = set()
+        for row in processed_results:
+            if row['是否外键'] == '是' and row['关联主表名'] == child_table and row['关联主表列名']=="ID":
+                grandchild_tables.add(row['表名'])
+        
+        # 处理每个孙表
+        for grandchild_table in grandchild_tables:
+            grandchild_table_rows = [row for row in processed_results if row['表名'] == grandchild_table]
+            # 创建孙表格结构体
+            grandchild_table_object = generate_table_object(grandchild_table,type="child",generate_type="new",itemlevel="table")
+            # 创建孙表格 模板行数据结构
+            grandchild_template_row = generate_table_object(grandchild_table,type="template",generate_type="new",itemlevel="row")
+            extra_data = [" ", " "]
+            # 处理孙表的每一列
+            for row in grandchild_table_rows:
+                column_object = generate_colunm_data(row,target_table,lib_tables_data,"new",processed_results,extra_data,is_template=True)
+                grandchild_template_row["children"].append(column_object)
+            
+            # 将孙表模板行添加到孙表对象
+            grandchild_table_object["children"].append(grandchild_template_row)
+            # 将孙表对象添加到子表对象的children中
+            child_table_object["children"].append(grandchild_table_object)
+        
+        # 将子表对象添加到主数据结构
+        object_data["children"].append(child_table_object)
+    
+    # # 保存生成的数据结构到JSON文件
+    # with open("generated_object_data.json", 'w', encoding='utf-8') as json_file:
+    #     json.dump(object_data, json_file, ensure_ascii=False, indent=2)
+    
+    return json.dumps(object_data, ensure_ascii=False, indent=2)
+
 def _load_id_columns_info(self):
     """从objects表加载各表的ID列名信息"""
     try:
@@ -598,7 +683,11 @@ def fetch_db_summary():
         包含所有表列信息的列表
     """
     db = SQLOperations()
-    return db.read_data('objects')
+    result = {}
+    result['顶层对象'] = db.read_data('objects')
+    result['独立非顶层对象']= db.read_data('subobjects')
+    result['辅助数据']= db.read_data('supportobjects')
+    return result
 
 def fetch_table_sumary(input_data):
     """
@@ -654,78 +743,87 @@ def generate_targetted_object_data_fordisplay(processed_results,lib_tables_data,
     Returns:
         包含主表和递归子表数据的元组
     """
-
     db = SQLOperations()
-    
+
     # 递归提取表格数据的内部函数
-    def fetch_table_data_recursive(table_name,colunm_name,parent_id):
-        attached_rows = db.read_data(table_name, {colunm_name: parent_id})
-        if attached_rows == ():
-            attached_rows = []
-        if (table_name in child_tables_data):
-            child_tables_data[table_name].extend(attached_rows)
-        else:
-            child_tables_data[table_name]=attached_rows
-        child_tables_foreign_key_column[table_name] = colunm_name
-        for row in processed_results:
-            if row["是否外键"]=="是" and not row['关联主表名'].endswith("_enum") and not row['关联主表名'].endswith("_lib") and not row['关联主表名'].endswith("_enum_sub"):
-                # 使用字典更新而不是直接赋值，保留多个外键列信息
-                if row['表名'] not in import_tables_data:
-                    import_tables_data[row['表名']] = {}
-                import_tables_data[row['表名']].update({row['列名']:{
-                    "关联主表名": row['关联主表名'],
-                    "关联主表列名": row['关联主表列名']
-                }})
-            if row['是否外键'] == '是' and row['关联主表名'] == table_name and row['关联主表列名'] == "ID":
-                for attached_row in attached_rows:
-                    current_row_id = attached_row['ID']
-                    fetch_table_data_recursive(row['表名'],row['列名'],current_row_id)
+    def fetch_table_data_recursive(table_name,colunm_name,parent_id,child_tables_data):
+        child_tables_data[table_name] = []                                                  #为该表格创建子表格对象,类型为空数组
+        attached_rows = db.read_data(table_name, {colunm_name: parent_id})                  #获取子表格中，从属于父表格的所有信息
+        table_rows = [row for row in processed_results if row['表名'] == table_name]        #获取当前表格所有所有列的信息
+        index = 0                                                                           #创建index
+        for row in attached_rows:                                                           #在返回的数组中提取字典成员
+            child_tables_data[table_name].append(row)                                       #为子表格添加当前成员
+            current_row = row                                                               #fetch the row information as current row, as row is used as indexing name everywhere
+            for row in table_rows: #在当前表格的所有列中查找是否有外键引用  
+                if row["是否外键"]=="是" and not row['关联主表名'].endswith("_enum") and not row['关联主表名'].endswith("_lib") and not row['关联主表名'].endswith("_enum_sub") and not row['关联主表列名']=="ID":  #判断当前表格的引用表格，如果是引用表格
+                    if not current_row[row['列名']] =="":
+                        replacement = db.read_data(row['关联主表名'],{row['关联主表列名']:current_row[row['列名']]})[0]
+                        child_tables_data[table_name][index][row['列名']]=replacement
+                    quote_key = row['列名']
+                    quote_table_name = row['关联主表名']
+                    quote_table_rows = [row for row in processed_results if row['表名'] == quote_table_name]
+
+                    for subrow_2 in quote_table_rows:
+                        if subrow_2["是否外键"]=="是" and not subrow_2['关联主表名'].endswith("_enum") and not subrow_2['关联主表名'].endswith("_lib") and not subrow_2['关联主表名'].endswith("_enum_sub") and not subrow_2['关联主表列名']=="ID":  #判断当前表格的引用表格，如果是引用表格
+                            subreplacement = db.read_data(subrow_2['关联主表名'],{"Name":child_tables_data[table_name][index][row['列名']][subrow_2['列名']]})[0]
+                            child_tables_data[table_name][index][row['列名']][subrow_2['列名']]=subreplacement
+
+                    for subrow in processed_results: #寻找应用的表格中的关联件信息
+                        if subrow['是否外键'] == '是' and subrow['关联主表名'] == quote_table_name and subrow['关联主表列名'] == "ID":
+                            sub_child_tables_data = child_tables_data[table_name][index]
+                            new_parent_id = db.read_data(quote_table_name,{"Name":current_row[quote_key]['Name']})[0]["ID"]
+                            fetch_table_data_recursive(subrow['表名'],subrow['列名'],new_parent_id,sub_child_tables_data)
 
 
-                
-    # 1. 查找主表中匹配目标项的记录
-    # main_row = None
-    # main_row_index = None
+            for row in processed_results:
+                if row['是否外键'] == '是' and row['关联主表名'] == table_name and row['关联主表列名'] == "ID":
+                    current_row_id = current_row['ID']
+                    fetch_table_data_recursive(row['表名'],row['列名'],current_row_id,child_tables_data[table_name][index])
+            index += 1
+
     main_table_rows = [row for row in processed_results if row['表名'] == target_table]
     import_tables_data = {}
-    if main_table_rows:
-        # 处理主表的每一列
-        for row in main_table_rows:
-            if row['键类型（PRI_UNI_MUL）'] == 'PRI':
-                main_row_key = row['列名']
-            
-            if row["是否外键"]=="是" and not row['关联主表名'].endswith("_enum") and not row['关联主表名'].endswith("_lib") and not row['关联主表名'].endswith("_enum_sub"):
-                # 确保表名键存在，再向其中添加列名键值对
-                if row['表名'] not in import_tables_data:
-                    import_tables_data[row['表名']] = {}
-                    
-                import_tables_data[row['表名']].update({row['列名']:{
-                    "关联主表名": row['关联主表名'],
-                    "关联主表列名": row['关联主表列名']
-                }})
-
-
-
-    read_data = db.read_data(target_table)
-    for row in read_data:
-        for key, value in row.items():
-            if key == column_name and value == target_item:
-                main_row = row
-                main_row_index = row[main_row_key]
-                break
-    
+    main_row = db.read_data(target_table,{column_name:target_item})[0]
     if main_row is None:
         print(f"未找到 {column_name} 为 {target_item} 的行")
         return None
+    main_row_key = "ID"
+    main_row_index = main_row[main_row_key]
 
     child_tables_data = {}
     child_tables_foreign_key_column = {}
 
-    for row in processed_results:
-        if row['是否外键'] == '是' and row['关联主表名'] == target_table and row['关联主表列名'] == "ID":
-            fetch_table_data_recursive(row['表名'],row["列名"],main_row_index)
+    if main_table_rows:
+        # 处理主表的每一列
+        for row in main_table_rows:            
+            if row["是否外键"]=="是" and not row['关联主表名'].endswith("_enum") and not row['关联主表名'].endswith("_lib") and not row['关联主表名'].endswith("_enum_sub") and not row['关联主表列名']=="ID":  #判断当前表格的引用表格，如果是引用表格
+                if main_row[row['列名']] is not None and not main_row[row['列名']]=="":
+                    replacement = db.read_data(row['关联主表名'],{'Name':main_row[row['列名']]})[0]
+                    main_row[row['列名']] = replacement
+                quote_key = row['列名']
+                quote_table_name = row['关联主表名']
+                quote_table_rows = [row for row in processed_results if row['表名'] == quote_table_name]
+                for subrow_2 in quote_table_rows:
+                    if subrow_2["是否外键"]=="是" and not subrow_2['关联主表名'].endswith("_enum") and not subrow_2['关联主表名'].endswith("_lib") and not subrow_2['关联主表名'].endswith("_enum_sub") and not subrow_2['关联主表列名']=="ID":  #判断当前表格的引用表格，如果是引用表格
+                        subreplacement = db.read_data(subrow_2['关联主表名'],{"Name":main_row[row['列名']][subrow_2['列名']]})[0]
+                        main_row[row['列名']][subrow_2['列名']]=subreplacement
+
+                for subrow in processed_results: #寻找应用的表格中的关联件信息
+                    if subrow['是否外键'] == '是' and subrow['关联主表名'] == quote_table_name and subrow['关联主表列名'] == "ID":
+                        newparentid= main_row[quote_key][subrow['关联主表列名']]
+                        fetch_table_data_recursive(subrow['表名'],subrow['列名'],newparentid,main_row[row['列名']])
+
+
+    for row in processed_results:  
+        if row['是否外键'] == '是' and row['关联主表名'] == target_table and row['关联主表列名'] == "ID":    #row['表名']表格为被查询表格的子表格，进行递归处理
+            fetch_table_data_recursive(row['表名'],row["列名"],main_row_index,child_tables_data)
+
+
+    # with open("generated_object_data.json", 'w', encoding='utf-8') as json_file:
+    #     json.dump(child_tables_data, json_file, ensure_ascii=False, indent=2)
     
-    return main_row_key, main_row_index, main_row, child_tables_data, main_table_rows, lib_tables_data, processed_results, child_tables_foreign_key_column, import_tables_data
+    # print(f"\n已生成类似object_data.json格式的数据结构，保存到 generated_object_data.json")
+    return main_row,child_tables_data,lib_tables_data
 
 
 def generate_targetted_object_data(processed_results,lib_tables_data,target_table: str,target_item: str,column_name: str):
@@ -775,7 +873,6 @@ def generate_targetted_object_data(processed_results,lib_tables_data,target_tabl
     for table_tuple in child_tables:
         # 将元组 table_tuple 解包成两个变量：子表名 和 外键列名
         child_table_name, foreign_key_column = table_tuple
-        # print(f"子表名: {child_table_name}, 外键列名: {foreign_key_column}",main_row_index)
         attached_row = db.read_data(child_table_name, {foreign_key_column: main_row_index})
 
         child_tables_data[child_table_name] = attached_row
@@ -826,7 +923,7 @@ def generate_target_object_data_structure(processed_results,lib_tables_data,targ
     name_tag = next((item['NAME'] for item in TargetDict if item['OBJECT'] == target_table), None)
     # 创建基础数据结构
     object_data = {
-        "id": target_table+ "_showing",
+        "id": target_table + "_" +main_row['Name'] + "_showing",
         "itemlevel": "object",
         "children": []
     }
@@ -854,11 +951,8 @@ def generate_target_object_data_structure(processed_results,lib_tables_data,targ
     # 处理每个子表
     for child_table in child_tables:
         child_table_rows = [row for row in processed_results if row['表名'] == child_table]
-
         child_table_object = generate_table_object(child_table,type="child",generate_type="modify",itemlevel="table")
-
         template_row = generate_table_object(child_table,type="template",generate_type="new",itemlevel="row")
-
         extra_data = [" "," "]
         # 处理子表的每一列
         for row in child_table_rows:
@@ -891,12 +985,167 @@ def generate_target_object_data_structure(processed_results,lib_tables_data,targ
 
     return json.dumps(object_data, ensure_ascii=False, indent=2)
 
+def fetch_regulation_list(processed_results,lib_tables_data,target_table: str,target_item: list,column_name: str):
+    db = SQLOperations()
+    regulation_dict = {}
+    regulation_list = []
+    region_list = []
+    for country in target_item:
+        table_data = extract_single_item(processed_results,lib_tables_data,target_table,country,column_name)
+        new_regions = json.loads(table_data)[country]["region_group"]
+        for region in new_regions:
+            if region not in regulation_dict:
+                regulation_dict[region] = {}
+                regulation_dict[region]["country"] = []
+                regulation_dict[region]["regulation"] = []
+
+            regulation_dict[region]["country"].append(country)
+            regulation_dict[region]["regulation"]=(db.read_data("regulation",{"Region_Name":region}))
+
+    return json.dumps(regulation_dict, ensure_ascii=False, indent=2)
+
 def extract_single_item(processed_result,lib_tables_data,target_table: str,target_item: str,column_name: str):
     result = {}
-    
-    _,_,main_row,child_tables_data,_,lib_tables_data,_,_, import_tables_data = generate_targetted_object_data_fordisplay(processed_result,lib_tables_data,target_table,target_item,column_name)
-    db = SQLOperations()
-    if target_table == "work":
+    searchkeyname = ""
+    main_row,child_tables_data,lib_tables_data = generate_targetted_object_data_fordisplay(processed_result,lib_tables_data,target_table,target_item,column_name)
+
+    searchkeyname = main_row['Name']
+    if child_tables_data == {}:
+        result = {searchkeyname:main_row}
+    else:
+        for key,value in child_tables_data.items():
+            if value == ():
+                print("Impossible, but yet it's there")
+            else:
+                main_row[key] = value
+
+            result = {searchkeyname:main_row}
+
+            
+    def recursivelooking(data,checkkey,container):
+        if not isinstance(data, dict):
+            return
+        for row,value in data.items():
+            if row ==checkkey:
+                if isinstance(value, list):
+                    container.extend(value)
+                elif isinstance(value, dict):
+                    container.append(value)
+            else:
+                if isinstance(value, list):
+                    for element in value:
+                        recursivelooking(element,checkkey,container)
+                elif isinstance(value, dict):
+                    recursivelooking(value,checkkey,container)
+    def dataregroup(target_group):
+        if not target_group == []:
+            group = {}
+            for target in target_group:
+                for key,value in target.items():    
+                    if key == "Type":
+                        if value not in group:
+                            group[value] = []
+                        group[value].append(target)
+            return group
+        else:
+            return None
+
+    def dealwithsolution(main_row):
+
+        db = SQLOperations()
+        main_row["briefing"]={}
+        sensor_set =""
+        browsing_list = ["camera_input","radar_input","lidar_input","ultrasonic_input"]
+        sensor_short_cut =['V','R','L','U']
+        for sensor_type in browsing_list:
+            sensor_kit = []
+            recursivelooking(main_row,sensor_type,sensor_kit)
+            sensor_set = sensor_set + str(len(sensor_kit))+sensor_short_cut[browsing_list.index(sensor_type)] if len(sensor_kit) != 0 else sensor_set
+        main_row["briefing"]["sensor_set"] = sensor_set
+
+        calculator_kit = []
+        calculator_group = []
+        calculator_number = []
+        recursivelooking(main_row,"calculator_Name",calculator_kit)
+        for item in calculator_kit:
+            if item["Name"] not in calculator_group:
+                calculator_group.append(item["Name"])
+                calculator_number.append(1)
+            elif item["Name"] in calculator_group:
+                calculator_number[calculator_group.index(item["Name"])] = calculator_number[calculator_group.index(item["Name"])] + 1
+                
+        main_row["briefing"]["calculator_group"] = calculator_group
+        # 构造 calculator_sum 数组：每个元素为 calculator_group[index] + "*" + str(calculator_number[index])
+        main_row["briefing"]["calculator_sum"] = [
+            f"{group}*{num}" for group, num in zip(calculator_group, calculator_number)
+        ]
+
+        
+        ecu_kit=[]
+        ecu_group = []
+        recursivelooking(main_row,"ECU_Name",ecu_kit)
+        for item in ecu_kit:
+            if item["Name"] not in ecu_group:
+                ecu_group.append(item["Name"])
+        main_row["briefing"]["ecu_group"] = ecu_group
+
+        tag_kit=[]
+        tag_group = []
+        recursivelooking(main_row,"tags_Tag",tag_kit)
+        for item in tag_kit:
+            if item["Tag"] not in tag_group:
+                tag_group.append(item["Tag"])
+        main_row["briefing"]["tags"] = tag_group
+        
+        algo_kit=[]
+        algorithm_group = []
+        recursivelooking(main_row,"Algo_Name",algo_kit)
+        for item in algo_kit:
+            if item["Name"] not in algorithm_group:
+                algorithm_group.append(item["Name"])
+        main_row["briefing"]["algorithm_group"] = algorithm_group
+
+        interface_kit=[]
+        interface_group = []
+        recursivelooking(main_row,"solution_interface",interface_kit)
+        for item in interface_kit:
+            if item["SubType"] not in interface_group:
+                interface_group.append(item["SubType"])
+        main_row["briefing"]["interface_group"] = interface_group
+
+        total_tops_power = 0.0
+        total_cpu_power = 0.0
+        total_gpu_power= 0.0
+
+        processor_kit = []
+        recursivelooking(main_row,"processor",processor_kit)
+        for processor in processor_kit:
+            if processor["Unit"] == "TOPS":
+                total_tops_power = total_tops_power + float(processor["Power"])
+            if processor["Unit"]=="KDMIPS":
+                total_cpu_power = total_cpu_power + float(processor["Power"])
+            if processor["Unit"] == "GFLOPS":
+                total_gpu_power = total_gpu_power + float(processor["Power"])
+        
+        main_row["briefing"]["AI_RESOURCE"] = str(total_tops_power)+" TOPS"
+        main_row["briefing"]["CPU_RESOURCE"] = str(total_cpu_power)+" KDMIPS"
+        main_row["briefing"]["GPU_RESOURCE"] = str(total_gpu_power)+" GFLOPS"
+        
+        # euf_list = db.read_data("euf")
+        level = "L0"
+        level_array = []
+        level_vector = ["L0","L1","L2","L2+","L2++","L3","L4","L5"]
+        for item in main_row["solution_euf_group"][0]:
+            if (not item == "id" and not item.endswith("ID")) and main_row["solution_euf_group"][0][item] == 1:
+                level = db.read_data("euf",{"Name":item})[0]["SAE"]
+                level_array.append(level_vector.index(level))
+
+        main_row["briefing"]["SAE"] = level_vector[max(level_array)]
+
+
+
+    if target_table =="work":
+        db = SQLOperations()
         main_row["to"]=[]
         main_row["from"]=[]
         connections = db.read_data("work_from")
@@ -907,67 +1156,67 @@ def extract_single_item(processed_result,lib_tables_data,target_table: str,targe
                 main_row["to"].append(db.read_data("work",{"ID":connection['work_ID']})[0]['Name'])
             if connection['work_ID'] == current_id:
                 main_row["from"].append(connection['isFROM'])
-    
-    if target_table in import_tables_data:
-        for column in main_row:
-            if column in import_tables_data[target_table]:
-                replacecontent = db.read_data(import_tables_data[target_table][column]['关联主表名'],{import_tables_data[target_table][column]['关联主表列名']:main_row[column]})
-                if replacecontent:
-                    main_row[column] = replacecontent[0]
+    elif target_table == "euf":
+        """
+        for end user function, we need to extract and summerizing sensor set: 1. extract all the sensors to a new array, name as sensor_group,sort and merge according to the shit
+        """
+        sensor_group = []
+        recursivelooking(child_tables_data,"sensors_equipement",sensor_group)
+        sensor_count = {"V":0,"R": 0,"L": 0,"U": 0}
+        sensor_summary = None
+        group = dataregroup(sensor_group)
+        if group != None:
+            for key,value in group.items():
+                group[key] = merge_dicts_by_keys(value)
+                if key =="Camera_PH" or key =="Camera_FE":
+                    sensor_count["V"] = sensor_count["V"] + len(group[key])
+                elif key == "Radar":
+                    sensor_count["R"] = sensor_count["R"] + len(group[key])
+                elif key =="Lidar":
+                    sensor_count["L"] = sensor_count["L"] + len(group[key])
+                elif key == "Ultrasonic_Sensor":
+                    sensor_count["U"] = sensor_count["U"] + len(group[key]) 
+        
+        sensor_summary = generate_param_string(sensor_count["V"],sensor_count["R"],sensor_count["L"],sensor_count["U"]) 
+        main_row["sensor_summary"] = sensor_summary
+        main_row["sensors_equipement"] = group
 
-    if child_tables_data == {}:
+    elif target_table == "calculator":
+        interface_group=[]
+        recursivelooking(child_tables_data,"interface",interface_group)
+        grouped_interface = dataregroup(interface_group)
+        main_row["interface_group"] = grouped_interface
 
-        result = {main_row['Name']:main_row}
-    else:
-        for key,value in child_tables_data.items():
-            if value == ():
-                print("Impossible, but yet it's there")
-            else:
-                if target_table == "calculator":
-                    if isinstance(value, list) and any("Type" in item for item in value):
-                        grouped = {}
-                        for item in value:
-                            t = item.get("Type")
-                            if t not in grouped:
-                                grouped[t] = []
-                            grouped[t].append(item)
-                        main_row[key] = grouped
-                    else:
-                        main_row[key] = value
+        processor_group = []
+        recursivelooking(child_tables_data,"processor",processor_group)
+        grouped_processor = dataregroup(processor_group)
+        main_row["processor_group"] = grouped_processor
+    elif target_table == "country":
+        region_group=[]
+        recursivelooking(child_tables_data,"Region_Name",region_group)
+        region_list = []
+        for item in region_group:
+            if item["Name"] not in region_list:
+                region_list.append(item["Name"])
+        # grouped_region = dataregroup(region_group)
+        main_row["region_group"] = region_list
 
-                # elif target_table == "work":
-                elif target_table == "euf":
-                    V = 0
-                    R = 0
-                    L = 0
-                    U = 0
-                    if isinstance(value, list) and any("Type" in item for item in value):
-                        grouped = {} #创建group结构体
-                        for item in value:
-                            t = item.get("Type")
-                            if t not in grouped:
-                                grouped[t] = []
-                            grouped[t].append(item)
-                        if key == "sensors_equipement":
-                            for item in grouped:
-                                grouped[item] = merge_dicts_by_keys(grouped[item])
-                                if item =="Camera_PH" or item =="Camera_FE":
-                                    V = V + len(grouped[item])
-                                elif item == "Radar":
-                                    R = R + len(grouped[item])
-                                elif item =="Lidar":
-                                    L = L + len(grouped[item])
-                                elif item == "Ultrasonic_Sensor":
-                                    U = U + len(grouped[item])
+    elif target_table == "vehiclemodel":
+        dealwithsolution(result[searchkeyname]["Adas_Solution"])
 
-                        sensor_summary = generate_param_string(V,R,L,U)
-                        main_row[key] = grouped
-                        main_row['sensor_set'] = sensor_summary
-                    else:
-                        main_row[key] = value
-                else:
-                    main_row[key] = value
-            result = {main_row['Name']:main_row}
+        # brand_kit = []
+        # recursivelooking(main_row,"brand",brand_kit)
+        # main_row["briefing"]["brand_group"] = brand_kit
+
+
+
+
+    elif target_table == "system_solution":
+        """
+        summerize sensor set
+        """
+        dealwithsolution(result[searchkeyname])
+
     return json.dumps(result, ensure_ascii=False, indent=2)
 
 def generate_param_string(V, R, L, U):
@@ -1029,6 +1278,153 @@ def merge_dicts_by_keys(arr, key_fields=('POSITION', 'Type', 'SubType'), priorit
     # 3. 提取合并后的字典，返回列表（顺序与原始列表中首次出现的分组顺序一致）
     return list(merged_dict.values())
 
+def initiate_configurator(processed_results,lib_tables_data):
+    Result = {}
+    # Item_group = 
+    Result["calculator"]=json.loads(extract_item_group(processed_results,lib_tables_data,"calculator","hardware"))
+    Result["euf"]=json.loads(extract_item_group(processed_results,lib_tables_data,"euf","function"))
+    Result["sensors"] = {}
+    Result["sensors"]["camera"]=json.loads(extract_item_group(processed_results,lib_tables_data,"camera","hardware"))
+    Result["sensors"]["radar"]=json.loads(extract_item_group(processed_results,lib_tables_data,"radar","hardware"))
+    Result["sensors"]["lidar"]=json.loads(extract_item_group(processed_results,lib_tables_data,"lidar","hardware"))
+    Result["sensors"]["uss"]=json.loads(extract_item_group(processed_results,lib_tables_data,"uss","hardware"))
+
+    return json.dumps(Result, ensure_ascii=False, indent=2)
+
+def config_searching(processed_results,lib_tables_data,search_condition):
+    function_check = False
+    calculator_check = False
+    calculator_supplier_check = False
+    sensor_type_check = False
+    sensor_subtype_check = False
+    comply_solution = []
+    ## determiner the effecitve function verification condition
+    func_checklist = []
+    function_condition = search_condition["function"]
+    if function_condition == {}:
+        print("No function condition")
+    else:
+        function_check = True
+        for euf in function_condition:
+            func_checklist.append(euf)
+
+    cal_supplier_checklist = []
+    cal_checklist = []
+    calculator_condition = search_condition["calculators"]
+    if calculator_condition == {}:
+        print("No calculator condition")
+    else:
+        for calculator in calculator_condition:
+            if calculator_condition[calculator] == ["all"]:
+                cal_supplier_checklist.append(calculator)
+                calculator_supplier_check = True
+            else:
+                cal_checklist.extend(calculator_condition[calculator])
+                calculator_check = True
+
+
+    sensor_condition = search_condition["sensors"]
+
+    sensor_type_checklist = []
+    sensor_subtype_checklist = []
+    if sensor_condition == {}:
+        print("No sensor condition")
+    else:
+        for sensor in sensor_condition:
+            if sensor_condition[sensor] == ["all"]:
+                sensor_type_checklist.append(sensor)
+                sensor_type_check = True
+            else:
+                sensor_subtype_checklist.extend(sensor_condition[sensor])
+                sensor_subtype_check = True
+
+    print("function_check:",function_check)
+    print("calculator_check:",calculator_check)
+    print("calculator_supplier_check:",calculator_supplier_check)
+    print("sensor_type_check:",sensor_type_check)
+    print("sensor_subtype_check:",sensor_subtype_check)
+
+    solution_list = extract_item_group(processed_results,lib_tables_data,"system_solution","solution")
+    solution_list = json.loads(solution_list)["Catalogue"]
+    sensordict = {"camera_input":["Camera_Name","camera"],"radar_input":["Radar_Name","radar"],"lidar_input":["Lidar_Name","lidar"],"Uss_input":["Uss_Name","uss"]}
+    # with open("generated_object_data.json", 'w', encoding='utf-8') as json_file:
+    #     json.dump(solution_list, json_file, ensure_ascii=False, indent=2)
+    # print(f"\n已生成类似object_data.json格式的数据结构，保存到 generated_object_data.json")
+
+    for solution in solution_list:
+        solution_calculator_supplier_list = []
+        solution_calculator_list = []
+        solution_euf_list = []
+        solution_sensor_type_list = []
+        solution_sensor_subtype_list = []
+        # print(solution_list[solution]["ecu_input"])
+        for ecu in solution_list[solution]["ecu_input"]:
+            for calculator in (ecu["calculator_ecu_input"]):  #获取当前solution calculator的所有信息
+                solution_calculator_supplier_list.append(calculator["calculator_Name"]['Supplier_Name']['Name'])
+                solution_calculator_list.append(calculator["calculator_Name"]["Name"])
+        for euf in (solution_list[solution]["solution_euf_group"][0]):
+            if solution_list[solution]["solution_euf_group"][0][euf] == 1 and not euf == "id" :
+                solution_euf_list.append(euf)
+        for sensortype in solution_list[solution]:
+            if sensortype in sensordict and not solution_list[solution][sensortype] == []:
+                solution_sensor_type_list.append(sensordict[sensortype][1])
+                for sensor in solution_list[solution][sensortype]:
+                    if sensor[sensordict[sensortype][0]]['Type'] not in solution_sensor_subtype_list:
+                        solution_sensor_subtype_list.append(sensor[sensordict[sensortype][0]]['Type'])
+
+
+        if function_check:
+            function_confirm = all(item in solution_euf_list for item in func_checklist)
+        else:
+            function_confirm = True
+
+        if calculator_check:
+            calculator_confirm = all(item in solution_calculator_list for item in cal_checklist)
+        else:
+            calculator_confirm = True
+
+        if calculator_supplier_check:
+            calculator_supplier_confirm = all(item in solution_calculator_supplier_list for item in cal_supplier_checklist)
+        else:
+            calculator_supplier_confirm = True
+
+        if sensor_type_check:
+            sensor_type_confirm = all(item in solution_sensor_subtype_list for item in sensor_type_checklist)
+        else:
+            sensor_type_confirm = True
+
+        if sensor_subtype_check:
+            sensor_subtype_confirm = all(item in solution_sensor_subtype_list for item in sensor_subtype_checklist)
+        else:
+            sensor_subtype_confirm = True
+
+        # 统一检查
+        solution_confirm = all([
+            function_confirm,
+            calculator_confirm,
+            calculator_supplier_confirm,
+            sensor_type_confirm,
+            sensor_subtype_confirm
+        ])
+
+        # 收集未通过的项
+        failed_checks = []
+        if not function_confirm:
+            failed_checks.append("function_confirm")
+        if not calculator_confirm:
+            failed_checks.append("calculator_confirm")
+        if not calculator_supplier_confirm:
+            failed_checks.append("calculator_supplier_confirm")
+        if not sensor_type_confirm:
+            failed_checks.append("sensor_type_confirm")
+        if not sensor_subtype_confirm:
+            failed_checks.append("sensor_subtype_confirm")
+
+        if solution_confirm:
+            comply_solution.append(solution_list[solution])
+        
+    return json.dumps(comply_solution,ensure_ascii=False, indent=2)
+
 def extract_item_group(processed_results,lib_tables_data,target_table: str,category):
     db = SQLOperations()
     Item_group = {}
@@ -1039,7 +1435,11 @@ def extract_item_group(processed_results,lib_tables_data,target_table: str,categ
         Item_group["Type"]={}
         if target_table == "calculator":
             Item_group["Domain"]={}
-
+    elif category == "vehicle":
+        Item_group["Brand"]=[]
+        Item_group["OEM"]=[]
+        Item_group["Year"]=[]
+        Item_group["PowerType"]=[]
     TargetLines = db.read_data(target_table)
     for line in TargetLines:
         result = extract_single_item(processed_results,lib_tables_data,target_table,line['Name'],'Name')
@@ -1058,12 +1458,10 @@ def extract_item_group(processed_results,lib_tables_data,target_table: str,categ
                 if line['Domain'] not in Item_group["Domain"]:
                     Item_group["Domain"][line['Domain']] = 0
                 Item_group["Domain"][line['Domain']] += 1
-
-
                 # 新增：遍历Item_group中每一个line下的processor数组，提取Unit为TOPS的Power并累加
                 total_tops_power = 0.0
                 total_cpu_power = 0.0
-                processors = result_dict[line['Name']]["processor"]
+                processors = result_dict[line['Name']]["processor_group"]
 
                 for processor in processors:
                     for item in (processors[processor]):
@@ -1071,16 +1469,23 @@ def extract_item_group(processed_results,lib_tables_data,target_table: str,categ
                             total_tops_power = total_tops_power + float(item["Power"])
                         if item["Unit"]=="KDMIPS":
                             total_cpu_power = total_cpu_power + float(item["Power"])
-                # for processor in processors:
-                #     if processors[processor] == "DMIPS":
-                #         total_cpu_power += float(processor["CPU_Power"])
-                
                 result_dict[line['Name']]["AI_RESOURCE"] = str(total_tops_power)+" TOPS"
                 result_dict[line["Name"]]["CPU_RESOURCE"] = str(total_cpu_power)+" KDMIPS"
                 # Item_group["total_tops_power"] = total_tops_power
                 Item_group["Catalogue"][line['Name']]=result_dict[line['Name']]
-        # else:
-        #     Item_group["Catalogue"][line['Name']]=result_dict[line['Name']]
+        elif category == "vehicle":
+            # print(line)
+            if line['Brand'] not in Item_group["Brand"]:
+                Item_group["Brand"].append(line['Brand'])
+                for item in result_dict[line['Name']]["Brand"]["corperate_input"]:
+                    if item['Corperate_Name']["Name"] not in Item_group["OEM"]:
+                        Item_group["OEM"].append(item['Corperate_Name']["Name"])
+
+            if line['Launch_Time'] not in Item_group["Year"]:
+                Item_group["Year"].append(line['Launch_Time'])
+            if line["PowerType"] not in Item_group["PowerType"]:
+                Item_group["PowerType"].append(line["PowerType"])
+                        
 
     #     # 保存生成的数据结构到JSON文件
     # with open("generated_object_data.json", 'w', encoding='utf-8') as json_file:
@@ -1116,15 +1521,16 @@ def add_users(data):
     db = SQLOperations()
             
     userdata = {"Name": data['name'], "email": data["submitter_email"], "isSubscribe": True}
-    
+
     # 尝试插入数据
     result = db.insert_data("user", userdata)
     if isinstance(result, int) and result > 0:
+        send_single_email(userdata["email"], "subscription_confirm")
         return {"status": True, "insert_id": result}
     else:
         if "email" in result:
             exist_name = db.read_data("user",{"email":userdata["email"]})[0]["Name"]
-            if exist_name == userdata['name']:
+            if exist_name == userdata['Name']:
                 return {"status": False, "error": 1}
             else:
                 return {"status": False, "error": 2,"name":exist_name}
@@ -1168,14 +1574,13 @@ def manage_login(data):
     result = db.read_data("manager_account",{"Name":data["name"]})
 
     if not result:
-        print("User Name doesn't exist")
+
         return {"status": False, "error": 1}
     else:
         if result[0]["Password"] == data["password"]:
-            print("Bonjour monsieur manager",result[0])
+
             return {"status": True, "error": 0,"access":{"allright":result[0]["isAllRight"],"modification":result[0]["isModification"],"adding":result[0]["isAdding"]}}
         else:
-            print("Get lost you fake imposter")
             return {"status": False, "error": 2}
 
 def convert_datetime_to_str(obj):
@@ -1231,10 +1636,44 @@ def fetch_advice_recording():
         except:
             pass
 
+def fetch_siteproduct_info():
+    db = SQLOperations()
+    Result = {}
+    product_features = db.read_data("productfeatures")
+    
+    # 按Category列进行分类
+    categorized_features = {}
+    for feature in product_features:
+        category = feature.get("Category", "未分类")
+        if category not in categorized_features:
+            categorized_features[category] = []
+        categorized_features[category].append(feature)
+    
+    # 添加Result结果
+    Result["productfeatures"] = product_features
+    Result["categorized_features"] = categorized_features
+    
+    # 保留原有的status枚举量
+    Status_info = db.read_data("online_status_enum")
+    Result["status"] = []
+    for item in Status_info:
+        Result["status"].append(item["Status"])
+
+    Feedback = {"status": True, "error": 0,"Result":Result}
+    return json.dumps(Feedback, ensure_ascii=False, indent=2)
+
 def update_recordings(data,id):
     db = SQLOperations()
     row=db.update_data("issuesandadvice", data,{"ID": id})
     Result = fetch_advice_recording()
+    Feedback = {"status": True, "error": 0,"Result":json.loads(Result)}
+
+    return json.dumps(Feedback, ensure_ascii=False, indent=2)
+
+def update_productStatus(data,id):
+    db = SQLOperations()
+    row=db.update_data("productfeatures", data,{"ID": id})
+    Result = fetch_siteproduct_info()
     Feedback = {"status": True, "error": 0,"Result":json.loads(Result)}
 
     return json.dumps(Feedback, ensure_ascii=False, indent=2)
@@ -1253,6 +1692,46 @@ def get_user_info():
     users = db.read_data("user")
     Result["user"] = users
     Result["user_count"] = len(users)
+    Result = convert_datetime_to_str(Result)
+    Feedback = {"status": True, "error": 0,"Result":Result}
+    
+    return json.dumps(Feedback, ensure_ascii=False, indent=2)
+
+def create_task(data):
+    db = SQLOperations()
+    Result = db.insert_data("release_content",data)
+    if data["Content_Type"]=="creation":
+        db.update_data("release_content",{"Bug_ID": "NO-"+str(Result)},{"ID":Result})
+        # db.update_data("release_content",{"ID":Result},{"Bug_ID": "No-"+tostring(Result)})
+
+
+    Feedback = {"status": True, "error": 0,"Result":Result}
+    return json.dumps(Feedback, ensure_ascii=False, indent=2)
+
+def update_task(data):
+    db = SQLOperations()
+    print(data["table"])
+    if data["table"] == "task":
+        id = data["content"]["Task_ID"]
+        columns = data["content"]["Column"]
+        value = data["content"]["Value"]
+
+    elif data["table"] == "bug_fix":
+        id = db.read_data("release_content",{"Bug_ID":data["content"]["Task_ID"]})[0]["ID"]
+        columns = data["content"]["Column"]
+        value = data["content"]["Value"]
+    
+
+    row=db.update_data("release_content",{columns:value},{"ID": id})
+    Feedback = {"status": True, "error": 0,"Result":row}
+    return json.dumps(Feedback, ensure_ascii=False, indent=2)
+
+def get_task_tobepub():
+    db = SQLOperations()
+    Result = {}
+    content = db.read_data("release_content")
+    Result["content"] = content
+    Result["content_count"] = sum(1 for item in content if item.get("Item_Status") != "已上线")
     Result = convert_datetime_to_str(Result)
     Feedback = {"status": True, "error": 0,"Result":Result}
     

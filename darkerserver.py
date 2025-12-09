@@ -14,11 +14,11 @@ import logging
 # from Python_S.search_function_by_input import fuzzy_search
 # from Python_S.showall import show_functions_main
 # import subprocess
+# from Python_S.function_config_initiator import search_init_main
 
 from Python_S.fuzzysearchs import fuzzy_search
 from urllib.parse import urlparse  # 新增：用于解析GET请求路径
 from Python_S.path_utils import resource_path
-from Python_S.function_config_initiator import search_init_main
 from Python_S.solution_finding import solution_hunting
 from Python_S.FBS_SEARCHING import fbsfindg, fbsbaseinit
 from Python_S.cache_manager import check_and_update_cache
@@ -26,9 +26,13 @@ from Python_S.parse_adas_benchmark import benchmarkinfofetch
 from Python_S.AutoScene3D_height_onefunc import process_map_data
 from Python_S.read_part_catalogue import create_part_catalogue
 from Python_S.json_to_sql_processor import database_manipulate
+from Python_S.emailing import send_batch_email, send_single_email
 from Python_S.sql_operations import deploy_mode  # 导入全局变量
 from Python_S.ReadDBAndGenerateProtocol import (
+    config_searching,
+    create_task,
     extract_item_group,
+    fetch_siteproduct_info,
     export_table_columns_with_foreign_key,
     extract_entire_network,
     add_users,
@@ -36,6 +40,7 @@ from Python_S.ReadDBAndGenerateProtocol import (
     manage_login,
     fetch_advice_recording,
     update_recordings,
+    update_productStatus,
     delete_recordings,
     get_user_info,
     visit_management,
@@ -45,7 +50,11 @@ from Python_S.ReadDBAndGenerateProtocol import (
     generate_target_object_data_structure,
     fetch_db_summary,
     fetch_table_sumary,
+    fetch_regulation_list,
     extract_single_item,
+    initiate_configurator,
+    get_task_tobepub,
+    update_task,
 )
 
 # 配置日志记录
@@ -140,7 +149,13 @@ class MyHandler(BaseHTTPRequestHandler):
             return
 
         # 原有所有POST路径处理（保持不变）
-        if self.path == '/deploy_information':
+
+        if self.path =='/get_regulation':
+            processed_results, lib_tables_data = export_table_columns_with_foreign_key()
+            countries = data.get('countries')
+            resulting = fetch_regulation_list(processed_results,lib_tables_data,"country",countries,"Name")
+            self._send_response({'success': True, 'output': resulting})
+        elif self.path == '/deploy_information':
             # 将deploy_mode的值赋给全局变量
             if 'deploy_mode' in data:
                 from Python_S.sql_operations import deploy_mode  # 再次导入以修改其值
@@ -153,8 +168,8 @@ class MyHandler(BaseHTTPRequestHandler):
             resulting = fuzzy_search(processed_results,lib_tables_data,data.get('table_name'),data.get('searchtext'), float(0.8))
             self._send_response({'success': True, 'output': resulting})
         elif self.path == '/init_config_func':
-            table_path = resource_path(r"DataStorage/database.xlsx")
-            resulting = search_init_main(table_path)
+            processed_results, lib_tables_data = export_table_columns_with_foreign_key()
+            resulting = initiate_configurator(processed_results,lib_tables_data)
             self._send_response({'success': True, 'output': resulting})
         elif self.path == '/get_function_list':   # 获取用户功能列表
             processed_results, lib_tables_data = export_table_columns_with_foreign_key()
@@ -164,9 +179,13 @@ class MyHandler(BaseHTTPRequestHandler):
             processed_results, lib_tables_data = export_table_columns_with_foreign_key()
             resulting = extract_entire_network(processed_results,lib_tables_data,'work')
             self._send_response({'success': True, 'output': resulting})
-        elif self.path == '/config_searching':   # 配置搜索
-            table_path = resource_path(r"DataStorage/database.xlsx")
-            resulting = solution_hunting(data.get('input_data'), table_path)
+        elif self.path == '/get_solution_list':   # 配置搜索
+            processed_results, lib_tables_data = export_table_columns_with_foreign_key()
+            resulting = extract_item_group(processed_results,lib_tables_data,data.get('table_name'),data.get('item_cate'))
+            self._send_response({'success': True, 'output': resulting}) 
+        elif self.path =='/config_searching':   # 配置搜索
+            processed_results, lib_tables_data = export_table_columns_with_foreign_key()
+            resulting = config_searching(processed_results,lib_tables_data,data.get('search_condition'))
             self._send_response({'success': True, 'output': resulting}) 
         elif self.path == '/fbssearching':   # FBS搜索
             fbs_input = data.get('intputdata')
@@ -181,10 +200,6 @@ class MyHandler(BaseHTTPRequestHandler):
             table_address = resource_path(r"DataStorage/database.xlsx")
             resulting = create_part_catalogue(table_address)
             self._send_response({'success': True, 'output': resulting}) 
-        elif self.path == '/launchtrying':
-            table_address = resource_path(r"DataStorage/ADAS_BENCHMARK.xlsx")
-            resulting = benchmarkinfofetch(table_address)
-            self._send_response({'success': True, 'output': resulting})
         elif self.path == '/add_issue':
             resulting = submit_issue(data.get('issue'))
             self._send_response({'success': True, 'output': resulting})
@@ -194,12 +209,18 @@ class MyHandler(BaseHTTPRequestHandler):
         elif self.path == '/update_recordings':
             resulting = update_recordings(data.get('to_update'),data.get('ID'))
             self._send_response({'success': True, 'output': resulting})
+        elif self.path == '/update_productStatus':
+            resulting = update_productStatus(data.get('to_update'),data.get('ID'))
+            self._send_response({'success': True, 'output': resulting})
         elif self.path == '/delete_recordings':
             resulting = delete_recordings(data.get('ID'))
             self._send_response({'success': True, 'output': resulting})
         elif self.path == '/get_all_recording':
             resulting = fetch_advice_recording()
             self._send_response({'success': True, 'output': resulting}) 
+        elif self.path =='/get_siteproduct_info':
+            resulting = fetch_siteproduct_info()
+            self._send_response({'success': True, 'output': resulting})
         elif self.path == '/get_user_info':
             resulting = get_user_info()
             self._send_response({'success': True, 'output': resulting})
@@ -216,9 +237,18 @@ class MyHandler(BaseHTTPRequestHandler):
             visit = data.get('data')
             resulting = visit_management(visit)
             self._send_response({'success': True, 'output': resulting})
+        elif self.path == '/update_tasks':
+            resulting = update_task(data)
+            self._send_response({'success': True, 'output': resulting})
         elif self.path == '/get_visit_stat':
             resulting = visit_statistic()
             self._send_response({'success': True, 'output': resulting}) 
+        elif self.path == '/get_tasks_tobepub':
+            resulting = get_task_tobepub()
+            self._send_response({'success': True, 'output': resulting})
+        elif self.path == '/create_new_tasks':
+            resulting = create_task(data)
+            self._send_response({'success': True, 'output': resulting})
         elif self.path == '/extract_item_group':
             processed_results, lib_tables_data = export_table_columns_with_foreign_key()
             resulting = extract_item_group(processed_results,lib_tables_data,data.get('table_name'),data.get('item_cate'))
@@ -230,9 +260,8 @@ class MyHandler(BaseHTTPRequestHandler):
             resulting = fetch_table_sumary(data)
             self._send_response({'success': True, 'output': resulting})
         elif self.path == '/generate_new_item':
-            tablename = data['tablename']
             processed_results,lib_tables_data = export_table_columns_with_foreign_key()
-            resulting = generate_new_object_data_structure(processed_results,lib_tables_data,tablename)
+            resulting = generate_new_object_data_structure(processed_results,lib_tables_data,data['tablename'])
             self._send_response({'success': True, 'output': resulting})
         elif self.path == '/createnewsql':
             try:
@@ -245,28 +274,20 @@ class MyHandler(BaseHTTPRequestHandler):
                 self._send_response({'success': False, "message": f"服务器内部错误: {str(e)}"})  
         elif self.path == '/modifyitems':
             """处理修改项目的请求"""
-            tablename = data['tablename']
             first_key, first_value = next(iter(data['rowdata'].items()))
             processed_results,lib_tables_data = export_table_columns_with_foreign_key()
-            resulting = generate_target_object_data_structure(processed_results,lib_tables_data,tablename,first_value,first_key)
+            resulting = generate_target_object_data_structure(processed_results,lib_tables_data,data['tablename'],first_value,first_key)
             self._send_response({'success': True, 'output': resulting})
         elif self.path == '/deleteitem':
             """处理删除项目的请求"""
-            tablename = data['tablename']   
             first_key, first_value = next(iter(data['rowdata'].items()))
             processed_results, lib_tables_data = export_table_columns_with_foreign_key()
-            resulting = perform_group_delete_operation(processed_results, lib_tables_data,tablename,first_value,first_key) 
+            resulting = perform_group_delete_operation(processed_results, lib_tables_data,data['tablename'],first_value,first_key) 
             self._send_response({'success': True, 'output': resulting})
         elif self.path == '/extract_item':
-            tablename = data['tablename']
             first_key, first_value = next(iter(data['rowdata'].items()))
             processed_results, lib_tables_data = export_table_columns_with_foreign_key()
-            resulting = extract_single_item(processed_results,lib_tables_data,tablename,first_value,first_key)
-            self._send_response({'success': True, 'output': resulting})
-        elif self.path == '/extract_item_group':
-            tablename = data['tablename']
-            processed_results, lib_tables_data = export_table_columns_with_foreign_key()
-            resulting = extract_item_group(processed_results,lib_tables_data,tablename,first_value,first_key)
+            resulting = extract_single_item(processed_results,lib_tables_data,data['tablename'],first_value,first_key)
             self._send_response({'success': True, 'output': resulting})
         else:
             self._send_response({'error': '未知路径'}, 404)
@@ -295,10 +316,11 @@ def main():
     # 初始化缓存
     cache_dir = check_and_update_cache()
     logging.info(f"使用缓存目录: {cache_dir}")
-    server_address = ('localhost', 5000)
-
-    # 创建服务器，绑定到所有接口的5000端口
-    # server_address = ('0.0.0.0', 5000)
+    deploy_mode = "full"
+    if deploy_mode == "test":
+        server_address = ('localhost', 5000)
+    elif deploy_mode == "full":
+        server_address = ('0.0.0.0', 5000)
     httpd = ThreadingHTTPServer(server_address, MyHandler)
     print('Starting DarkerTech backend server on port 5000...')  # 修正端口显示（原代码写的80，实际是5000）
     print('Server is ready to accept requests from frontend.')
@@ -315,27 +337,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-        # elif self.path == '/component_list_get':
-        #     table_address = resource_path(r"DataStorage/database.xlsx")
-        #     resulting = create_chipset_catalogue(table_address)
-        #     self._send_response({'success': True, 'output': resulting}) 
-        # elif self.path == '/sensor_list_get':
-        #     table_address = resource_path(r"DataStorage/database.xlsx")
-        #     resulting = create_sensor_catalogue(table_address)
-                # self._send_response({'success': True, 'output': resulting}) 
-        # elif self.path == '/get_all_issue':
-        #     result = get_all_issues()
-        #     self._send_response({'success': True, 'output': result})
-                # elif self.path == '/get_issue_number':
-        #     result = get_issue_number()
-        #     self._send_response({'success': True, 'output': result})
-                # elif self.path == '/add_advice':
-        #     new_advice = data.get('advice')
-        #     result = add_advice(new_advice)
-        #     self._send_response({'success': True, 'output': result})
-        # elif self.path == '/get_advice_number':
-        #     result = get_advice_number()
-        #     self._send_response({'success': True, 'output': result})
-                # elif self.path == '/manage_advice':
-        #     result = manage_advice(data)
-        #     self._send_response({'success': True, 'output': result})

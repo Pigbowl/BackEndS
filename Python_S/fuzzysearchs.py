@@ -30,12 +30,7 @@ def fuzzy_search(
     top_n: int = None):
     try:
         
-        db = SQLOperations(
-            host='localhost',
-            user='root',
-            password='12345678',
-            database='darkerdatabase'
-        )
+        db = SQLOperations()
         Item_group = {}
         Item_group["type"]=table_name
         Item_group["Catalogue"]={}

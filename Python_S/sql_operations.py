@@ -123,6 +123,9 @@ class SQLOperations:
             result = cursor.fetchall()
             
             cursor.close()
+            if result == ():
+                # print("it's empty,ther anwer is ",result)
+                result = []
             return result
             
         except Exception as e:

@@ -1,0 +1,80 @@
+2025-11-25 22:54:11,747 - INFO - 正在连接到服务器 47.99.204.97:22...
+2025-11-25 22:54:11,818 - INFO - Connected (version 2.0, client OpenSSH_for_Windows_9.5)
+2025-11-25 22:54:11,981 - INFO - Authentication (password) failed.
+2025-11-25 22:54:11,981 - ERROR - 认证失败，请检查用户名和密码
+2025-11-25 22:59:42,867 - INFO - 正在连接到服务器 47.99.204.97:22...
+2025-11-25 22:59:42,936 - INFO - Connected (version 2.0, client OpenSSH_for_Windows_9.5)
+2025-11-25 22:59:43,094 - INFO - Authentication (password) successful!
+2025-11-25 22:59:43,095 - INFO - 成功连接到服务器 47.99.204.97
+2025-11-25 22:59:43,097 - INFO - 正在执行命令: git --version
+2025-11-25 22:59:43,510 - INFO - 命令执行完成，退出码: 0
+2025-11-25 22:59:43,511 - INFO - Git已安装: git version 2.51.1.windows.1
+2025-11-25 22:59:43,511 - INFO - 正在执行命令: mkdir -p C:\Users\Administrator
+2025-11-25 22:59:43,659 - ERROR - 执行命令时发生错误: 'utf-8' codec can't decode byte 0xd7 in position 0: invalid continuation byte
+2025-11-25 22:59:43,661 - ERROR - 创建目录 C:\Users\Administrator 失败
+2025-11-25 22:59:43,661 - INFO - SSH连接已关闭
+2025-11-25 23:06:15,851 - INFO - 正在连接到服务器 47.99.204.97:22...
+2025-11-25 23:06:15,925 - INFO - Connected (version 2.0, client OpenSSH_for_Windows_9.5)
+2025-11-25 23:06:16,050 - INFO - Authentication (password) successful!
+2025-11-25 23:06:16,050 - INFO - 成功连接到服务器 47.99.204.97
+2025-11-25 23:06:16,050 - INFO - 正在执行命令: git --version
+2025-11-25 23:06:16,316 - INFO - 命令执行完成，退出码: 0
+2025-11-25 23:06:16,316 - INFO - Git已安装: git version 2.51.1.windows.1
+2025-11-25 23:06:16,316 - INFO - 正在执行命令: mkdir -p C:\Users\Administrator\Desktop
+2025-11-25 23:06:16,440 - ERROR - 执行命令时发生错误: 'utf-8' codec can't decode byte 0xd7 in position 0: invalid continuation byte
+2025-11-25 23:06:16,440 - ERROR - 创建目录 C:\Users\Administrator\Desktop 失败
+2025-11-25 23:06:16,440 - INFO - SSH连接已关闭
+2025-11-25 23:06:56,671 - INFO - 正在连接到服务器 47.99.204.97:22...
+2025-11-25 23:06:56,751 - INFO - Connected (version 2.0, client OpenSSH_for_Windows_9.5)
+2025-11-25 23:06:56,948 - INFO - Authentication (password) successful!
+2025-11-25 23:06:56,948 - INFO - 成功连接到服务器 47.99.204.97
+2025-11-25 23:06:56,948 - INFO - 正在执行命令: git --version
+2025-11-25 23:06:57,219 - INFO - 命令执行完成，退出码: 0
+2025-11-25 23:06:57,220 - INFO - Git已安装: git version 2.51.1.windows.1
+2025-11-25 23:06:57,220 - INFO - 正在执行命令: powershell -Command "if(!(Test-Path 'C:\Users\Administrator\Desktop\darkerback')) { New-Item -ItemType Directory -Force -Path 'C:\Users\Administrator\Desktop\darkerback' }"
+2025-11-25 23:07:01,014 - INFO - 命令执行完成，退出码: 0
+2025-11-25 23:07:01,014 - INFO - 正在执行命令: git clone https://github.com/Pigbowl/BackEndS.git 'C:\Users\Administrator\Desktop\darkerback'
+2025-11-25 23:07:01,269 - INFO - 命令执行完成，退出码: 128
+2025-11-25 23:07:01,270 - ERROR - 克隆仓库失败: fatal: could not create leading directories of ''C:\Users\Administrator\Desktop\darkerback'': Invalid argument
+
+2025-11-25 23:07:01,270 - INFO - SSH连接已关闭
+2025-11-25 23:08:47,613 - INFO - 正在连接到服务器 47.99.204.97:22...
+2025-11-25 23:08:47,678 - INFO - Connected (version 2.0, client OpenSSH_for_Windows_9.5)
+2025-11-25 23:08:47,807 - INFO - Authentication (password) successful!
+2025-11-25 23:08:47,807 - INFO - 成功连接到服务器 47.99.204.97
+2025-11-25 23:08:47,807 - INFO - 正在执行命令: git --version
+2025-11-25 23:08:48,087 - INFO - 命令执行完成，退出码: 0
+2025-11-25 23:08:48,087 - INFO - Git已安装: git version 2.51.1.windows.1
+2025-11-25 23:08:48,087 - INFO - 正在执行命令: powershell -Command "if(!(Test-Path 'C:\Users\Administrator\Desktop\darkerback')) { New-Item -ItemType Directory -Force -Path 'C:\Users\Administrator\Desktop\darkerback' }"
+2025-11-25 23:08:48,590 - INFO - 命令执行完成，退出码: 0
+2025-11-25 23:08:48,590 - INFO - 正在执行命令: git clone https://github.com/Pigbowl/BackEndS.git C:\Users\Administrator\Desktop\darkerback
+2025-11-25 23:09:03,290 - INFO - 命令执行完成，退出码: 0
+2025-11-25 23:09:03,290 - INFO - 成功克隆仓库 https://github.com/Pigbowl/BackEndS.git 到 C:\Users\Administrator\Desktop\darkerback
+2025-11-25 23:09:03,291 - INFO - SSH连接已关闭
+2025-11-25 23:09:26,318 - INFO - 正在连接到服务器 47.99.204.97:22...
+2025-11-25 23:09:26,384 - INFO - Connected (version 2.0, client OpenSSH_for_Windows_9.5)
+2025-11-25 23:09:26,545 - INFO - Authentication (password) successful!
+2025-11-25 23:09:26,545 - INFO - 成功连接到服务器 47.99.204.97
+2025-11-25 23:09:26,545 - INFO - 正在执行命令: git --version
+2025-11-25 23:09:26,833 - INFO - 命令执行完成，退出码: 0
+2025-11-25 23:09:26,833 - INFO - Git已安装: git version 2.51.1.windows.1
+2025-11-25 23:09:26,833 - INFO - 正在执行命令: powershell -Command "if(!(Test-Path 'C:\Users\Administrator\Desktop\darkerback')) { New-Item -ItemType Directory -Force -Path 'C:\Users\Administrator\Desktop\darkerback' }"
+2025-11-25 23:09:27,395 - INFO - 命令执行完成，退出码: 0
+2025-11-25 23:09:27,396 - INFO - 正在执行命令: git clone https://github.com/Pigbowl/BackEndS.git C:\Users\Administrator\Desktop\darkerback
+2025-11-25 23:09:27,613 - INFO - 命令执行完成，退出码: 128
+2025-11-25 23:09:27,614 - ERROR - 克隆仓库失败: fatal: destination path 'C:\Users\Administrator\Desktop\darkerback' already exists and is not an empty directory.
+
+2025-11-25 23:09:27,614 - INFO - SSH连接已关闭
+2025-11-25 23:10:52,919 - INFO - 正在连接到服务器 47.99.204.97:22...
+2025-11-25 23:10:52,983 - INFO - Connected (version 2.0, client OpenSSH_for_Windows_9.5)
+2025-11-25 23:10:53,149 - INFO - Authentication (password) successful!
+2025-11-25 23:10:53,149 - INFO - 成功连接到服务器 47.99.204.97
+2025-11-25 23:10:53,149 - INFO - 正在执行命令: powershell -Command "Test-Path "C:\Users\Administrator\Desktop\darkerback\.git""
+2025-11-25 23:10:53,808 - INFO - 命令执行完成，退出码: 0
+2025-11-25 23:10:53,808 - INFO - 正在执行命令: git --version
+2025-11-25 23:10:54,031 - INFO - 命令执行完成，退出码: 0
+2025-11-25 23:10:54,033 - INFO - Git已安装: git version 2.51.1.windows.1
+2025-11-25 23:10:54,033 - INFO - 正在执行命令: cd C:\Users\Administrator\Desktop\darkerback && git pull
+2025-11-25 23:10:55,441 - INFO - 命令执行完成，退出码: 0
+2025-11-25 23:10:55,442 - INFO - 成功更新仓库 C:\Users\Administrator\Desktop\darkerback
+2025-11-25 23:10:55,442 - INFO - SSH连接已关闭
