@@ -78,3 +78,30 @@
 2025-11-25 23:10:55,441 - INFO - 命令执行完成，退出码: 0
 2025-11-25 23:10:55,442 - INFO - 成功更新仓库 C:\Users\Administrator\Desktop\darkerback
 2025-11-25 23:10:55,442 - INFO - SSH连接已关闭
+2025-12-09 23:07:46,494 - INFO - 正在连接到服务器 47.99.204.97:22...
+2025-12-09 23:07:46,545 - INFO - Connected (version 2.0, client OpenSSH_for_Windows_9.5)
+2025-12-09 23:07:46,669 - INFO - Authentication (password) successful!
+2025-12-09 23:07:46,670 - INFO - 成功连接到服务器 47.99.204.97
+2025-12-09 23:07:46,670 - INFO - 正在执行命令: powershell -Command "Test-Path "C:\Users\Administrator\Desktop\darkerback\.git""
+2025-12-09 23:07:47,063 - INFO - 命令执行完成，退出码: 0
+2025-12-09 23:07:47,063 - INFO - 正在执行命令: git --version
+2025-12-09 23:07:47,200 - INFO - 命令执行完成，退出码: 0
+2025-12-09 23:07:47,200 - INFO - Git已安装: git version 2.51.1.windows.1
+2025-12-09 23:07:47,200 - INFO - 正在执行命令: cd C:\Users\Administrator\Desktop\darkerback && git pull
+2025-12-09 23:08:08,474 - INFO - 命令执行完成，退出码: 1
+2025-12-09 23:08:08,475 - ERROR - 更新仓库失败: fatal: unable to access 'https://github.com/Pigbowl/BackEndS.git/': Failed to connect to github.com port 443 after 21076 ms: Could not connect to server
+
+2025-12-09 23:08:08,475 - INFO - SSH连接已关闭
+2025-12-09 23:11:03,756 - INFO - 正在连接到服务器 47.99.204.97:22...
+2025-12-09 23:11:03,814 - INFO - Connected (version 2.0, client OpenSSH_for_Windows_9.5)
+2025-12-09 23:11:03,972 - INFO - Authentication (password) successful!
+2025-12-09 23:11:03,972 - INFO - 成功连接到服务器 47.99.204.97
+2025-12-09 23:11:03,972 - INFO - 正在执行命令: powershell -Command "Test-Path "C:\Users\Administrator\Desktop\darkerback\.git""
+2025-12-09 23:11:04,389 - INFO - 命令执行完成，退出码: 0
+2025-12-09 23:11:04,390 - INFO - 正在执行命令: git --version
+2025-12-09 23:11:04,576 - INFO - 命令执行完成，退出码: 0
+2025-12-09 23:11:04,576 - INFO - Git已安装: git version 2.51.1.windows.1
+2025-12-09 23:11:04,577 - INFO - 正在执行命令: cd C:\Users\Administrator\Desktop\darkerback && git pull
+2025-12-09 23:11:06,580 - INFO - 命令执行完成，退出码: 0
+2025-12-09 23:11:06,581 - INFO - 成功更新仓库 C:\Users\Administrator\Desktop\darkerback
+2025-12-09 23:11:06,581 - INFO - SSH连接已关闭
