@@ -5,17 +5,6 @@ import sys
 import time
 import logging
 
-# from Python_S.read_chipset_catalogue import create_chipset_catalogue
-# from Python_S.read_sensor_catalogue import create_sensor_catalogue
-# from Python_S.IssueManagement import get_all_issues, add_issue, manage_issue, get_issue_number
-# from Python_S.AdviceManagement import get_all_advice, add_advice, manage_advice, get_advice_number
-# from Python_S.UserManagement import get_all_users, add_user, manage_user, get_user_number
-# from Python_S.Page_visit_management import add_visit, get_statistic
-# from Python_S.search_function_by_input import fuzzy_search
-# from Python_S.showall import show_functions_main
-# import subprocess
-# from Python_S.function_config_initiator import search_init_main
-
 from Python_S.fuzzysearchs import fuzzy_search
 from urllib.parse import urlparse  # 新增：用于解析GET请求路径
 from Python_S.path_utils import resource_path
@@ -134,6 +123,9 @@ class MyHandler(BaseHTTPRequestHandler):
 
     def do_POST(self):
         """处理POST请求（保留原有所有功能）"""
+        # 调试日志：打印请求路径
+        print(f"接收到POST请求，路径: {self.path}")
+        
         content_length = int(self.headers['Content-Length'])
         post_data = self.rfile.read(content_length)
 
@@ -155,6 +147,8 @@ class MyHandler(BaseHTTPRequestHandler):
             countries = data.get('countries')
             resulting = fetch_regulation_list(processed_results,lib_tables_data,"country",countries,"Name")
             self._send_response({'success': True, 'output': resulting})
+        elif self.path == '/knockknock':
+            self._send_response({'success': True, 'output': 'HelloThere'})
         elif self.path == '/deploy_information':
             # 将deploy_mode的值赋给全局变量
             if 'deploy_mode' in data:
@@ -289,6 +283,22 @@ class MyHandler(BaseHTTPRequestHandler):
             processed_results, lib_tables_data = export_table_columns_with_foreign_key()
             resulting = extract_single_item(processed_results,lib_tables_data,data['tablename'],first_value,first_key)
             self._send_response({'success': True, 'output': resulting})
+        elif self.path == '/stopserver':
+            # 关闭服务器逻辑
+            self._send_response({'success': True, 'output': 'Server is shutting down...'})
+            # 导入全局变量httpd
+            global httpd
+            # 发送响应后关闭服务器
+            import threading
+            def shutdown_server():
+                # 延迟执行，确保响应已发送
+                time.sleep(1)
+                print('\nShutting down server...')
+                httpd.shutdown()
+                httpd.server_close()
+                print('Server stopped.')
+            # 在新线程中执行关闭操作
+            threading.Thread(target=shutdown_server).start()
         else:
             self._send_response({'error': '未知路径'}, 404)
 
@@ -312,7 +322,11 @@ def wait_for_file_creation(file_path: str) -> bool:
         time.sleep(CHECK_INTERVAL)
     return False
 
+# 全局变量，用于存储服务器实例
+httpd = None
+
 def main():
+    global httpd
     # 初始化缓存
     cache_dir = check_and_update_cache()
     logging.info(f"使用缓存目录: {cache_dir}")
@@ -324,13 +338,18 @@ def main():
     httpd = ThreadingHTTPServer(server_address, MyHandler)
     print('Starting DarkerTech backend server on port 5000...')  # 修正端口显示（原代码写的80，实际是5000）
     print('Server is ready to accept requests from frontend.')
-    print('To stop the server, press Ctrl+C')
+    print('To stop the server, press Ctrl+C or send a POST request to /stopserver')
     
     try:
         httpd.serve_forever()
     except KeyboardInterrupt:
         print('\nShutting down server...')
         httpd.server_close()
+        print('Server stopped.')
+    except Exception as e:
+        print(f'\nServer error: {str(e)}')
+        if httpd:
+            httpd.server_close()
         print('Server stopped.')
 
 
