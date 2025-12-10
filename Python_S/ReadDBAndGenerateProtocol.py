@@ -1,22 +1,22 @@
-from ast import main
-from enum import Flag
-from nt import access
-from operator import is_
-from pipes import quote
-from re import T
-from sqlite3 import Row
-from xml.etree.ElementTree import tostring
-from matplotlib import table
-from numpy import concat
-from numpy.polynomial.legendre import legline
-from pandas._libs.groupby import group_any_all
-import pymysql
-import csv
+# from ast import main
+# from enum import Flag
+# from nt import access
+# from operator import is_
+# from pipes import quote
+# from re import T
+# from sqlite3 import Row
+# from xml.etree.ElementTree import tostring
+# from matplotlib import table
+# from numpy import concat
+# from numpy.polynomial.legendre import legline
+# from pandas._libs.groupby import group_any_all
+# import pymysql
+# import csv
 import json
 from typing import List, Dict, Any, Optional
 from Python_S.emailing import send_single_email
 from Python_S.sql_operations import SQLOperations
-from pymysql.cursors import DictCursorMixin
+# from pymysql.cursors import DictCursorMixin
 
 from collections import Counter
 
