@@ -280,3 +280,8 @@
 2025-12-10 10:43:07,713 - INFO - 使用缓存目录: C:\Users\宋嘉玮\AppData\Local\Configurator\cache
 2025-12-10 10:43:34,203 - INFO - 使用缓存目录: C:\Users\宋嘉玮\AppData\Local\Configurator\cache
 2025-12-10 10:44:11,482 - INFO - 使用缓存目录: C:\Users\宋嘉玮\AppData\Local\Configurator\cache
+2025-12-10 12:16:06,647 - INFO - 使用缓存目录: C:\Users\宋嘉玮\AppData\Local\Configurator\cache
+2025-12-10 13:05:16,436 - INFO - 准备发送邮件，模式: single, 类型: subscription_confirm, 主要收件人: Walt.1992@163.com, BCC收件人数量: 0
+2025-12-10 13:05:16,449 - INFO - 准备发送邮件到以下收件人：主要收件人 - Walt.1992@163.com, BCC收件人 - 无
+2025-12-10 13:05:19,425 - INFO - 邮件发送成功！已发送到 1 个收件人
+2025-12-10 14:20:07,601 - INFO - 使用缓存目录: C:\Users\宋嘉玮\AppData\Local\Configurator\cache
