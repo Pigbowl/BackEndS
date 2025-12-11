@@ -1930,7 +1930,7 @@ CREATE TABLE `productfeatures` (
 
 LOCK TABLES `productfeatures` WRITE;
 /*!40000 ALTER TABLE `productfeatures` DISABLE KEYS */;
-INSERT INTO `productfeatures` VALUES (1,'FunctionHall','知识宇宙','提供应用层功能知识','功能星球','正式版本上线'),(2,'SensorHall','知识宇宙','提供传感器知识和数据库','传感器星球','正式版本上线'),(3,'HardWareHall','知识宇宙','提供硬件知识和数据库','硬件星球','正式版本上线'),(4,'Knowledgenet','知识网络','提供硬件知识和数据库','知识网络','正式版本上线'),(5,'RegulationMap','知识宇宙','提供法规相关知识','法规/标准星球','测试版本上线'),(6,'ArchitectureBuild','知识宇宙','提供架构开发的相关知识','架构星球','未上线'),(7,'AdasBenchmark','行业纵横','提供ADAS对标库','车型矩阵','测试版本上线'),(8,'Configurator','智驾军火库','ADAS方案配置工具','产品配置器','测试版本上线'),(9,'RoadBuilder','智驾军火库','环境绘制生成工具','环境生成器','测试版本上线'),(10,'FoV_build','智驾军火库','定制传感器乌龟图','传感器配置器','测试版本上线'),(11,'SensorInspector','智驾军火库','在3D环境下检查传感器视角功能','传感器仿真','新产品上线'),(12,'SimulationPlatform','智驾军火库','完整的仿真平台','仿真平台','未上线'),(13,'PhyArchiTool','智驾军火库','提供生成标准物理架构的工具','物理架构工具','未上线'),(14,'solutionbenchmark','行业纵横','提供ADAS系统方案级别的陈列以及对比','方案矩阵','未上线'),(15,'comparison','行业纵横','提供整车级别,方案级别等的对比工具以及报告输出','方案角斗场','未上线'),(16,'markettrend','行业纵横','提供行业分析','市场通','未上线'),(17,'eco-system net','行业纵横','提供行业内不同公司的合作关系','生态网络','未上线'),(18,'Forum','智驾论坛','提供智能驾驶行业信息交流的空间','智驾论坛','未上线'),(19,'General','通用信息','辅助网站工作','通用信息','未上线');
+INSERT INTO `productfeatures` VALUES (1,'FunctionHall','知识宇宙','提供应用层功能知识','功能星球','测试版本上线'),(2,'SensorHall','知识宇宙','提供传感器知识和数据库','传感器星球','测试版本上线'),(3,'HardWareHall','知识宇宙','提供硬件知识和数据库','硬件星球','测试版本上线'),(4,'Knowledgenet','知识网络','提供硬件知识和数据库','知识网络','测试版本上线'),(5,'RegulationMap','知识宇宙','提供法规相关知识','法规/标准星球','测试版本上线'),(6,'ArchitectureBuild','知识宇宙','提供架构开发的相关知识','架构星球','未上线'),(7,'AdasBenchmark','行业纵横','提供ADAS对标库','车型矩阵','测试版本上线'),(8,'Configurator','智驾军火库','ADAS方案配置工具','产品配置器','测试版本上线'),(9,'RoadBuilder','智驾军火库','环境绘制生成工具','环境生成器','测试版本上线'),(10,'FoV_build','智驾军火库','定制传感器乌龟图','传感器配置器','测试版本上线'),(11,'SensorInspector','智驾军火库','在3D环境下检查传感器视角功能','传感器仿真','新产品上线'),(12,'SimulationPlatform','智驾军火库','完整的仿真平台','仿真平台','未上线'),(13,'PhyArchiTool','智驾军火库','提供生成标准物理架构的工具','物理架构工具','未上线'),(14,'solutionbenchmark','行业纵横','提供ADAS系统方案级别的陈列以及对比','方案矩阵','未上线'),(15,'comparison','行业纵横','提供整车级别,方案级别等的对比工具以及报告输出','方案角斗场','未上线'),(16,'markettrend','行业纵横','提供行业分析','市场通','未上线'),(17,'eco-system net','行业纵横','提供行业内不同公司的合作关系','生态网络','未上线'),(18,'Forum','智驾论坛','提供智能驾驶行业信息交流的空间','智驾论坛','未上线'),(19,'General','通用信息','辅助网站工作','通用信息','未上线');
 /*!40000 ALTER TABLE `productfeatures` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -2172,7 +2172,7 @@ CREATE TABLE `release_content` (
 
 LOCK TABLES `release_content` WRITE;
 /*!40000 ALTER TABLE `release_content` DISABLE KEYS */;
-INSERT INTO `release_content` VALUES (1,'发布\"功能星球”板块业务，提供ADAS用户功能知识信息','2025-12-11','Alpha-25-12-4','已上线','功能星球','2025-12-07 05:20:30','creation','NO-1'),(2,'发布\"硬件星球”板块业务，提供ADAS用户功能知识信息','2025-12-07','','规划中','硬件星球','2025-12-07 05:21:49','creation','NO-2'),(3,'发布“知识网络”功能，通过交互式网络图提供ADAS学习的脉络和方法','2025-12-07','','开发中','知识网络','2025-12-07 15:09:42','creation','NO-3'),(4,'发布“传感器星球”功能','2025-12-08','','规划中','传感器星球','2025-12-07 15:10:48','creation','NO-4'),(5,'发布“环境生成器”功能','2025-11-29','Alpha-25-12-5','已上线','环境生成器','2025-12-07 15:11:24','creation','NO-5'),(6,'发布“传感器配置器”功能，自行定义，快速绘制你的传感器配置图','2025-12-06','ALPHA-25-12-1','开发中','传感器配置器','2025-12-07 15:34:06','creation','NO-6'),(9,'lllll','2025-12-12',NULL,'规划中','产品配置器','2025-12-08 06:14:44','bug_fix','27'),(10,'3D预览功能无法使用','2025-12-13','','已上线','环境生成器','2025-12-08 06:21:57','bug_fix','28'),(26,'111','2025-12-20',NULL,'开发中','知识网络','2025-12-08 07:50:31','creation','NO-26'),(27,'替换后台服务器数据库','2025-12-06','','开发中','通用修改','2025-12-10 01:58:42','creation','NO-27'),(28,'服务器无法连接-返回fail-to-fetch','2025-12-17',NULL,'完成_待上线','通用信息','2025-12-10 02:27:27','bug_fix','29');
+INSERT INTO `release_content` VALUES (1,'发布\"功能星球”板块业务，提供ADAS用户功能知识信息','2025-12-11','Beta-25-12-6','已上线','功能星球','2025-12-07 05:20:30','creation','NO-1'),(2,'发布\"硬件星球”板块业务，提供ADAS用户功能知识信息','2025-12-07','Beta-25-12-6','已上线','硬件星球','2025-12-07 05:21:49','creation','NO-2'),(3,'发布“知识网络”功能，通过交互式网络图提供ADAS学习的脉络和方法','2025-12-07','Beta-25-12-6','已上线','知识网络','2025-12-07 15:09:42','creation','NO-3'),(4,'发布“传感器星球”功能','2025-12-08','Beta-25-12-6','已上线','传感器星球','2025-12-07 15:10:48','creation','NO-4'),(5,'发布“环境生成器”功能','2025-11-29','Beta-25-12-6','已上线','环境生成器','2025-12-07 15:11:24','creation','NO-5'),(6,'发布“传感器配置器”功能，自行定义，快速绘制你的传感器配置图','2025-12-06','Beta-25-12-6','已上线','传感器配置器','2025-12-07 15:34:06','creation','NO-6'),(9,'lllll','2025-12-12',NULL,'规划中','产品配置器','2025-12-08 06:14:44','bug_fix','27'),(10,'3D预览功能无法使用','2025-12-13','','已上线','环境生成器','2025-12-08 06:21:57','bug_fix','28'),(26,'111','2025-12-20',NULL,'开发中','知识网络','2025-12-08 07:50:31','creation','NO-26'),(27,'替换后台服务器数据库','2025-12-06','Beta-25-12-6','已上线','通用修改','2025-12-10 01:58:42','creation','NO-27'),(28,'服务器无法连接-返回fail-to-fetch','2025-12-17','Beta-25-12-6','已上线','通用信息','2025-12-10 02:27:27','bug_fix','29');
 /*!40000 ALTER TABLE `release_content` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -2971,7 +2971,7 @@ CREATE TABLE `version_management` (
   PRIMARY KEY (`ID`),
   UNIQUE KEY `ID_UNIQUE` (`ID`),
   UNIQUE KEY `Version_UNIQUE` (`Version`)
-) ENGINE=InnoDB AUTO_INCREMENT=95 DEFAULT CHARSET=utf8mb3;
+) ENGINE=InnoDB AUTO_INCREMENT=96 DEFAULT CHARSET=utf8mb3;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -2980,7 +2980,7 @@ CREATE TABLE `version_management` (
 
 LOCK TABLES `version_management` WRITE;
 /*!40000 ALTER TABLE `version_management` DISABLE KEYS */;
-INSERT INTO `version_management` (`ID`, `Major_Version`, `Minor_Version_Year`, `Temp_Version`, `Version_Time`, `Minor_Version_Month`, `Release_Status`, `BackEndToGit`, `GitToServer`, `DarkerToGit`) VALUES (1,'ALPHA',25,1,'2025-12-06 15:52:29',11,'Done','Done','Done','Done'),(2,'Alpha',25,1,'2025-12-11 06:33:27',12,'Done','Done','Done','Done'),(90,'Alpha',25,2,'2025-12-11 06:48:08',12,'Done','Done','Done','Done'),(91,'Alpha',25,3,'2025-12-11 07:31:39',12,'Done','Done','Done','Done'),(92,'Alpha',25,4,'2025-12-11 08:03:48',12,'Done','Done','Done','Done'),(94,'Alpha',25,5,'2025-12-11 08:23:06',12,'Done','Done','Done','Done');
+INSERT INTO `version_management` (`ID`, `Major_Version`, `Minor_Version_Year`, `Temp_Version`, `Version_Time`, `Minor_Version_Month`, `Release_Status`, `BackEndToGit`, `GitToServer`, `DarkerToGit`) VALUES (1,'ALPHA',25,1,'2025-12-06 15:52:29',11,'Done','Done','Done','Done'),(2,'Alpha',25,1,'2025-12-11 06:33:27',12,'Done','Done','Done','Done'),(90,'Alpha',25,2,'2025-12-11 06:48:08',12,'Done','Done','Done','Done'),(91,'Alpha',25,3,'2025-12-11 07:31:39',12,'Done','Done','Done','Done'),(92,'Alpha',25,4,'2025-12-11 08:03:48',12,'Done','Done','Done','Done'),(94,'Alpha',25,5,'2025-12-11 08:23:06',12,'Done','Done','Done','Done'),(95,'Beta',25,6,'2025-12-11 09:22:07',12,'Done','Done','Done','Done');
 /*!40000 ALTER TABLE `version_management` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -3064,4 +3064,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2025-12-11 16:23:36
+-- Dump completed on 2025-12-11 17:22:51
