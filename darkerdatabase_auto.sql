@@ -2172,7 +2172,7 @@ CREATE TABLE `release_content` (
 
 LOCK TABLES `release_content` WRITE;
 /*!40000 ALTER TABLE `release_content` DISABLE KEYS */;
-INSERT INTO `release_content` VALUES (1,'发布\"功能星球”板块业务，提供ADAS用户功能知识信息','2025-12-11','PUB1-25-12-5','已上线','功能星球','2025-12-07 05:20:30','creation','NO-1'),(2,'发布\"硬件星球”板块业务，提供ADAS用户功能知识信息','2025-12-07','','规划中','硬件星球','2025-12-07 05:21:49','creation','NO-2'),(3,'发布“知识网络”功能，通过交互式网络图提供ADAS学习的脉络和方法','2025-12-07','','开发中','知识网络','2025-12-07 15:09:42','creation','NO-3'),(4,'发布“传感器星球”功能','2025-12-08','PUB2-25-12-12','已上线','传感器星球','2025-12-07 15:10:48','creation','NO-4'),(5,'发布“环境生成器”功能','2025-11-29','','已上线','环境生成器','2025-12-07 15:11:24','creation','NO-5'),(6,'发布“传感器配置器”功能，自行定义，快速绘制你的传感器配置图','2025-12-06','ALPHA-25-12-1','开发中','传感器配置器','2025-12-07 15:34:06','creation','NO-6'),(9,'lllll','2025-12-12',NULL,'规划中','产品配置器','2025-12-08 06:14:44','bug_fix','27'),(10,'3D预览功能无法使用','2025-12-13','','完成_待上线','环境生成器','2025-12-08 06:21:57','bug_fix','28'),(26,'111','2025-12-20',NULL,'开发中','知识网络','2025-12-08 07:50:31','creation','NO-26'),(27,'替换后台服务器数据库','2025-12-06',NULL,'完成_待上线','通用修改','2025-12-10 01:58:42','creation','NO-27'),(28,'服务器无法连接-返回fail-to-fetch','2025/12/17',NULL,'完成_待上线','通用信息','2025-12-10 02:27:27','bug_fix','29');
+INSERT INTO `release_content` VALUES (1,'发布\"功能星球”板块业务，提供ADAS用户功能知识信息','2025-12-11','Alpha-25-12-2','已上线','功能星球','2025-12-07 05:20:30','creation','NO-1'),(2,'发布\"硬件星球”板块业务，提供ADAS用户功能知识信息','2025-12-07','','规划中','硬件星球','2025-12-07 05:21:49','creation','NO-2'),(3,'发布“知识网络”功能，通过交互式网络图提供ADAS学习的脉络和方法','2025-12-07','','开发中','知识网络','2025-12-07 15:09:42','creation','NO-3'),(4,'发布“传感器星球”功能','2025-12-08','','规划中','传感器星球','2025-12-07 15:10:48','creation','NO-4'),(5,'发布“环境生成器”功能','2025-11-29','','完成_待上线','环境生成器','2025-12-07 15:11:24','creation','NO-5'),(6,'发布“传感器配置器”功能，自行定义，快速绘制你的传感器配置图','2025-12-06','ALPHA-25-12-1','开发中','传感器配置器','2025-12-07 15:34:06','creation','NO-6'),(9,'lllll','2025-12-12',NULL,'规划中','产品配置器','2025-12-08 06:14:44','bug_fix','27'),(10,'3D预览功能无法使用','2025-12-13','','已上线','环境生成器','2025-12-08 06:21:57','bug_fix','28'),(26,'111','2025-12-20',NULL,'开发中','知识网络','2025-12-08 07:50:31','creation','NO-26'),(27,'替换后台服务器数据库','2025-12-06','','开发中','通用修改','2025-12-10 01:58:42','creation','NO-27'),(28,'服务器无法连接-返回fail-to-fetch','2025-12-17',NULL,'完成_待上线','通用信息','2025-12-10 02:27:27','bug_fix','29');
 /*!40000 ALTER TABLE `release_content` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -2964,10 +2964,14 @@ CREATE TABLE `version_management` (
   `Version` varchar(45) GENERATED ALWAYS AS (concat(`Major_Version`,_utf8mb3'-',`Minor_Version_Year`,_utf8mb3'-',`Minor_Version_Month`,_utf8mb3'-',`Temp_Version`)) VIRTUAL,
   `Version_Time` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   `Minor_Version_Month` int NOT NULL,
+  `Release_Status` varchar(45) DEFAULT NULL,
+  `BackEndToGit` varchar(45) DEFAULT NULL,
+  `GitToServer` varchar(45) DEFAULT NULL,
+  `DarkerToGit` varchar(45) DEFAULT NULL,
   PRIMARY KEY (`ID`),
   UNIQUE KEY `ID_UNIQUE` (`ID`),
   UNIQUE KEY `Version_UNIQUE` (`Version`)
-) ENGINE=InnoDB AUTO_INCREMENT=90 DEFAULT CHARSET=utf8mb3;
+) ENGINE=InnoDB AUTO_INCREMENT=91 DEFAULT CHARSET=utf8mb3;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -2976,7 +2980,7 @@ CREATE TABLE `version_management` (
 
 LOCK TABLES `version_management` WRITE;
 /*!40000 ALTER TABLE `version_management` DISABLE KEYS */;
-INSERT INTO `version_management` (`ID`, `Major_Version`, `Minor_Version_Year`, `Temp_Version`, `Version_Time`, `Minor_Version_Month`) VALUES (1,'ALPHA',25,1,'2025-12-06 15:52:29',11),(79,'ALPHA',25,1,'2025-12-10 01:49:52',12),(80,'ALPHA',25,2,'2025-12-10 01:52:19',12),(81,'BETA',25,3,'2025-12-10 01:55:57',12),(82,'PUB1',25,4,'2025-12-10 04:11:01',12),(83,'PUB1',25,5,'2025-12-10 04:12:39',12),(84,'PUB1',25,6,'2025-12-10 06:01:54',12),(85,'PUB1',25,7,'2025-12-10 06:05:00',12),(86,'PUB1',25,8,'2025-12-10 06:06:34',12),(87,'PUB1',25,9,'2025-12-10 06:11:05',12),(88,'PUB1',25,10,'2025-12-10 06:13:01',12),(89,'PUB1',25,11,'2025-12-10 06:14:22',12);
+INSERT INTO `version_management` (`ID`, `Major_Version`, `Minor_Version_Year`, `Temp_Version`, `Version_Time`, `Minor_Version_Month`, `Release_Status`, `BackEndToGit`, `GitToServer`, `DarkerToGit`) VALUES (1,'ALPHA',25,1,'2025-12-06 15:52:29',11,'Done','Done','Done','Done'),(2,'Alpha',25,1,'2025-12-11 06:33:27',12,'Done','Done','Done','Done'),(90,'Alpha',25,2,'2025-12-11 06:48:08',12,NULL,NULL,NULL,NULL);
 /*!40000 ALTER TABLE `version_management` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -3060,4 +3064,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2025-12-10 23:21:33
+-- Dump completed on 2025-12-11 14:57:03
