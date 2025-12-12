@@ -303,15 +303,137 @@ class EmailSender:
         </html>
         """
         return email_content
+        
+    def get_admin_notification_content(self, user_data):
+        """
+        生成管理员提醒邮件内容
+        """
+        current_time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        
+        email_content = f"""
+        <html>
+        <head>
+            <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+            <style>
+                body {{
+                    font-family: 'Microsoft YaHei', Arial, sans-serif;
+                    line-height: 1.6;
+                    color: #333;
+                    max-width: 600px;
+                    margin: 0 auto;
+                    padding: 20px;
+                    background-color: #f8f9fa;
+                }}
+                .container {{
+                    background-color: white;
+                    border-radius: 8px;
+                    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+                    padding: 30px;
+                }}
+                .header {{
+                    text-align: center;
+                    padding-bottom: 20px;
+                    border-bottom: 2px solid #e7f0fd;
+                    margin-bottom: 20px;
+                }}
+                .logo {{
+                    width: 80px;
+                    height: 80px;
+                    margin-bottom: 15px;
+                }}
+                h2 {{
+                    color: #1a73e8;
+                    margin-top: 0;
+                }}
+                .user-info {{
+                    background-color: #f0f4f8;
+                    padding: 15px;
+                    border-radius: 4px;
+                    margin: 20px 0;
+                }}
+                .info-item {{
+                    margin-bottom: 10px;
+                }}
+                .info-label {{
+                    font-weight: bold;
+                    color: #555;
+                    display: inline-block;
+                    width: 80px;
+                }}
+                .footer {{
+                    margin-top: 30px;
+                    font-size: 12px;
+                    color: #666;
+                    text-align: center;
+                }}
+                .time-info {{
+                    font-size: 12px;
+                    color: #666;
+                    text-align: right;
+                    margin-top: 20px;
+                }}
+            </style>
+        </head>
+        <body>
+            <div class="container">
+                <div class="header">
+                    <!-- 使用SVG作为公司标志 -->
+                    <svg class="logo" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                        <rect width="100" height="100" rx="10" fill="#1a73e8"/>
+                        <path d="M25,40 L75,40 L75,60 L25,60 Z" fill="white" rx="3"/>
+                        <circle cx="50" cy="50" r="15" fill="#1a73e8"/>
+                        <path d="M35,50 L65,50" stroke="white" stroke-width="6" stroke-linecap="round"/>
+                    </svg>
+                    <h2>【新用户提醒】有人订阅了达客科技服务</h2>
+                </div>
+                
+                <p>管理员您好，</p>
+                
+                <p>有新用户订阅了达客科技服务，以下是用户信息：</p>
+                
+                <div class="user-info">
+                    <div class="info-item">
+                        <span class="info-label">用户名：</span>
+                        <span>{user_data['Name']}</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">邮箱：</span>
+                        <span>{user_data['email']}</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">订阅时间：</span>
+                        <span>{current_time}</span>
+                    </div>
+                </div>
+                
+                <p>请及时查看并处理。</p>
+                
+                <div class="time-info">
+                    <p>发送时间：{current_time}</p>
+                    <p>发件人：{self.sender_name}</p>
+                </div>
+                
+                <hr>
+                <div class="footer">
+                    <p>此邮件由达客科技系统自动发送，请勿回复。</p>
+                </div>
+            </div>
+        </body>
+        </html>
+        """
+        return email_content
     
-    def send_email(self, mode="single", recipient_email=None, email_type="product_update"):
+    def send_email(self, mode="single", recipient_email=None, email_type="product_update", user_data=None):
         """
         发送邮件
         
         Args:
             mode: 发送模式，"single"表示单发，"batch"表示群发
             recipient_email: 单发模式下的收件人邮箱
-            email_type: 邮件类型，"product_update"表示产品上线提醒，"subscription_confirm"表示订阅确认
+            email_type: 邮件类型，"product_update"表示产品上线提醒，"subscription_confirm"表示订阅确认，"admin_notification"表示管理员通知
+            custom_content: 自定义邮件内容（HTML格式），如果提供则忽略email_type
+            custom_subject: 自定义邮件主题，如果提供则忽略email_type
+            user_data: 用户数据，用于管理员通知邮件
             
         Returns:
             bool: 发送是否成功
@@ -359,15 +481,24 @@ class EmailSender:
             
             bcc_recipients = valid_bcc
             
-            # 准备邮件内容
+            # 准备邮件内容和主题
             if email_type == "product_update":
                 email_content = self.get_product_update_content()
                 subject = Header("【更新提示】达客智驾领航员更新了", 'utf-8')
             elif email_type == "subscription_confirm":
                 email_content = self.get_subscription_confirm_content()
                 subject = Header("【订阅确认】达客科技", 'utf-8')
+            elif email_type == "admin_notification":
+                print(user_data)
+                if not user_data:
+                    error_msg = "admin_notification类型邮件必须提供user_data参数"
+                    logging.error(error_msg)
+                    print(f"错误: {error_msg}")
+                    return False
+                email_content = self.get_admin_notification_content(user_data)
+                subject = Header("【新用户提醒】有人订阅了达客科技服务", 'utf-8')
             else:
-                error_msg = f"无效的邮件类型: {email_type}，支持的类型为'product_update'和'subscription_confirm'"
+                error_msg = f"无效的邮件类型: {email_type}，支持的类型为'product_update'、'subscription_confirm'和'admin_notification'"
                 logging.error(error_msg)
                 print(f"错误: {error_msg}")
                 return False
@@ -433,18 +564,26 @@ def send_batch_email(email_type="product_update"):
     """
     return sender.send_email(mode="batch", email_type=email_type)
 
-def send_single_email(recipient_email, email_type="product_update"):
+def send_single_email(recipient_email, email_type="product_update",user_data=None):
     """
     单发邮件接口
     
     Args:
         recipient_email: 收件人邮箱
-        email_type: 邮件类型，"product_update"表示产品上线提醒，"subscription_confirm"表示订阅确认
+        email_type: 邮件类型，"product_update"表示产品上线提醒，"subscription_confirm"表示订阅确认，"admin_notification"表示管理员通知
+        custom_content: 自定义邮件内容（HTML格式），如果提供则忽略email_type
+        custom_subject: 自定义邮件主题，如果提供则忽略email_type
+        user_data: 用户数据，用于管理员通知邮件
         
     Returns:
         bool: 发送是否成功
     """
-    return sender.send_email(mode="single", recipient_email=recipient_email, email_type=email_type)
+    return sender.send_email(
+        mode="single", 
+        recipient_email=recipient_email, 
+        email_type=email_type,
+        user_data=user_data
+    )
 
 if __name__ == "__main__":
     # 测试代码

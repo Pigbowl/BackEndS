@@ -13,6 +13,7 @@
 # import pymysql
 # import csv
 import json
+from datetime import datetime
 from typing import List, Dict, Any, Optional
 from Python_S.emailing import send_single_email
 from Python_S.sql_operations import SQLOperations
@@ -1525,7 +1526,30 @@ def add_users(data):
     # 尝试插入数据
     result = db.insert_data("user", userdata)
     if isinstance(result, int) and result > 0:
+        # 向用户发送订阅确认邮件
         send_single_email(userdata["email"], "subscription_confirm")
+        
+        # 向管理员发送新用户提醒邮件
+        admin_email = "darkerassistance@thedarker-tech.com"
+        
+        # 发送管理员提醒邮件，使用新的admin_notification邮件类型
+        send_single_email(
+            recipient_email=admin_email,
+            email_type="admin_notification",
+            user_data=userdata
+        )
+        
+        # # 构建管理员提醒邮件内容
+        # current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        # admin_subject = "【新用户提醒】有人订阅了达客科技服务"
+        
+        # # 发送管理员提醒邮件
+        # send_single_email(
+        #     recipient_email=admin_email,
+        #     custom_content=admin_content,
+        #     custom_subject=admin_subject
+        # )
+        
         return {"status": True, "insert_id": result}
     else:
         if "email" in result:

@@ -4,6 +4,7 @@ import os
 import sys
 import time
 import logging
+import requests
 
 from Python_S.fuzzysearchs import fuzzy_search
 from urllib.parse import urlparse  # 新增：用于解析GET请求路径
@@ -17,6 +18,7 @@ from Python_S.read_part_catalogue import create_part_catalogue
 from Python_S.json_to_sql_processor import database_manipulate
 from Python_S.emailing import send_batch_email, send_single_email
 from Python_S.sql_operations import deploy_mode  # 导入全局变量
+
 from Python_S.ReadDBAndGenerateProtocol import (
     config_searching,
     create_task,
@@ -330,7 +332,7 @@ def main():
     # 初始化缓存
     cache_dir = check_and_update_cache()
     logging.info(f"使用缓存目录: {cache_dir}")
-    deploy_mode = "full"
+    deploy_mode = "test"
     if deploy_mode == "test":
         server_address = ('localhost', 5000)
     elif deploy_mode == "full":

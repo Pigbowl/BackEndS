@@ -285,3 +285,38 @@
 2025-12-10 13:05:16,449 - INFO - 准备发送邮件到以下收件人：主要收件人 - Walt.1992@163.com, BCC收件人 - 无
 2025-12-10 13:05:19,425 - INFO - 邮件发送成功！已发送到 1 个收件人
 2025-12-10 14:20:07,601 - INFO - 使用缓存目录: C:\Users\宋嘉玮\AppData\Local\Configurator\cache
+2025-12-11 23:49:06,394 - INFO - 使用缓存目录: C:\Users\宋嘉玮\AppData\Local\Configurator\cache
+2025-12-11 23:50:16,755 - INFO - 准备发送邮件，模式: single, 类型: subscription_confirm, 主要收件人: damien920613@gmail.com, BCC收件人数量: 0
+2025-12-11 23:50:16,783 - INFO - 准备发送邮件到以下收件人：主要收件人 - damien920613@gmail.com, BCC收件人 - 无
+2025-12-11 23:50:19,216 - INFO - 邮件发送成功！已发送到 1 个收件人
+2025-12-11 23:50:19,250 - INFO - 正在获取新的企业微信access_token...
+2025-12-11 23:50:19,526 - INFO - 企业微信access_token获取成功，有效期至: 2025-12-12 01:50:19
+2025-12-11 23:50:19,722 - ERROR - 企业微信消息发送失败: not allow to access from your ip, hint: [1765468220596313554949837], from ip: 139.227.174.43, more info at https://open.work.weixin.qq.com/devtool/query?e=60020
+2025-12-12 00:26:42,329 - INFO - 准备发送邮件，模式: single, 类型: subscription_confirm, 主要收件人: jiawei.song@valeo.com, BCC收件人数量: 0
+2025-12-12 00:26:42,338 - INFO - 准备发送邮件到以下收件人：主要收件人 - jiawei.song@valeo.com, BCC收件人 - 无
+2025-12-12 00:26:44,890 - INFO - 邮件发送成功！已发送到 1 个收件人
+2025-12-12 00:26:45,135 - ERROR - 企业微信消息发送失败: not allow to access from your ip, hint: [1765470406022871586908512], from ip: 139.227.174.43, more info at https://open.work.weixin.qq.com/devtool/query?e=60020
+2025-12-12 00:27:13,139 - INFO - 使用缓存目录: C:\Users\宋嘉玮\AppData\Local\Configurator\cache
+2025-12-12 00:27:56,215 - INFO - 准备发送邮件，模式: single, 类型: subscription_confirm, 主要收件人: suibiangaoyige@shishi.com, BCC收件人数量: 0
+2025-12-12 00:27:56,233 - INFO - 准备发送邮件到以下收件人：主要收件人 - suibiangaoyige@shishi.com, BCC收件人 - 无
+2025-12-12 00:27:59,080 - INFO - 邮件发送成功！已发送到 1 个收件人
+2025-12-12 00:41:13,335 - INFO - 使用缓存目录: C:\Users\宋嘉玮\AppData\Local\Configurator\cache
+2025-12-12 00:42:27,480 - INFO - 使用缓存目录: C:\Users\宋嘉玮\AppData\Local\Configurator\cache
+2025-12-12 00:43:00,038 - INFO - 准备发送邮件，模式: single, 类型: subscription_confirm, 主要收件人: damien920613@gmail.com, BCC收件人数量: 0
+2025-12-12 00:43:00,044 - INFO - 准备发送邮件到以下收件人：主要收件人 - damien920613@gmail.com, BCC收件人 - 无
+2025-12-12 00:43:02,512 - INFO - 邮件发送成功！已发送到 1 个收件人
+2025-12-12 00:43:02,546 - ERROR - admin_notification类型邮件必须提供user_data参数
+2025-12-12 00:44:43,478 - INFO - 使用缓存目录: C:\Users\宋嘉玮\AppData\Local\Configurator\cache
+2025-12-12 00:45:00,557 - INFO - 准备发送邮件，模式: single, 类型: subscription_confirm, 主要收件人: jiawei.song@valeo.com, BCC收件人数量: 0
+2025-12-12 00:45:00,566 - INFO - 准备发送邮件到以下收件人：主要收件人 - jiawei.song@valeo.com, BCC收件人 - 无
+2025-12-12 00:45:03,154 - INFO - 邮件发送成功！已发送到 1 个收件人
+2025-12-12 00:45:03,188 - INFO - 准备发送邮件，模式: single, 类型: admin_notification, 主要收件人: 1273880613@qq.com, BCC收件人数量: 0
+2025-12-12 00:45:03,191 - INFO - 准备发送邮件到以下收件人：主要收件人 - 1273880613@qq.com, BCC收件人 - 无
+2025-12-12 00:45:05,623 - INFO - 邮件发送成功！已发送到 1 个收件人
+2025-12-12 00:47:34,404 - INFO - 使用缓存目录: C:\Users\宋嘉玮\AppData\Local\Configurator\cache
+2025-12-12 00:47:55,112 - INFO - 准备发送邮件，模式: single, 类型: subscription_confirm, 主要收件人: jiawei.song@valeo.com, BCC收件人数量: 0
+2025-12-12 00:47:55,120 - INFO - 准备发送邮件到以下收件人：主要收件人 - jiawei.song@valeo.com, BCC收件人 - 无
+2025-12-12 00:47:57,683 - INFO - 邮件发送成功！已发送到 1 个收件人
+2025-12-12 00:47:57,714 - INFO - 准备发送邮件，模式: single, 类型: admin_notification, 主要收件人: darkerassistance@thedarker-tech.com, BCC收件人数量: 0
+2025-12-12 00:47:57,720 - INFO - 准备发送邮件到以下收件人：主要收件人 - darkerassistance@thedarker-tech.com, BCC收件人 - 无
+2025-12-12 00:47:59,979 - INFO - 邮件发送成功！已发送到 1 个收件人
