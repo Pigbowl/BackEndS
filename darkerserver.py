@@ -332,7 +332,7 @@ def main():
     # 初始化缓存
     cache_dir = check_and_update_cache()
     logging.info(f"使用缓存目录: {cache_dir}")
-    deploy_mode = "test"
+    deploy_mode = "full"
     if deploy_mode == "test":
         server_address = ('localhost', 5000)
     elif deploy_mode == "full":

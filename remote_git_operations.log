@@ -105,3 +105,39 @@
 2025-12-09 23:11:06,580 - INFO - 命令执行完成，退出码: 0
 2025-12-09 23:11:06,581 - INFO - 成功更新仓库 C:\Users\Administrator\Desktop\darkerback
 2025-12-09 23:11:06,581 - INFO - SSH连接已关闭
+2025-12-12 15:21:39,340 - INFO - 正在连接到服务器 47.99.204.97:22...
+2025-12-12 15:21:39,496 - INFO - Connected (version 2.0, client OpenSSH_for_Windows_9.5)
+2025-12-12 15:21:39,798 - INFO - Authentication (password) successful!
+2025-12-12 15:21:39,798 - INFO - 成功连接到服务器 47.99.204.97
+2025-12-12 15:21:39,798 - INFO - 正在执行命令: powershell -Command "Test-Path "C:\Users\Administrator\Desktop\darkerback\.git""
+2025-12-12 15:21:43,693 - INFO - 命令执行完成，退出码: 0
+2025-12-12 15:21:43,695 - INFO - 正在执行命令: git --version
+2025-12-12 15:21:44,046 - INFO - 命令执行完成，退出码: 0
+2025-12-12 15:21:44,046 - INFO - Git已安装: git version 2.51.1.windows.1
+2025-12-12 15:21:44,046 - INFO - 正在执行命令: cd C:\Users\Administrator\Desktop\darkerback && git pull
+2025-12-12 15:21:47,230 - INFO - 命令执行完成，退出码: 1
+2025-12-12 15:21:47,231 - ERROR - 更新仓库失败: From https://github.com/Pigbowl/BackEndS
+   deb2637..1e56855  main       -> origin/main
+error: Your local changes to the following files would be overwritten by merge:
+	Python_S/__pycache__/ReadDBAndGenerateProtocol.cpython-39.pyc
+	Python_S/__pycache__/emailing.cpython-39.pyc
+	email_sender.log
+Please commit your changes or stash them before you merge.
+Aborting
+
+2025-12-12 15:21:47,232 - INFO - SSH连接已关闭
+2025-12-12 15:26:05,225 - INFO - 正在连接到服务器 47.99.204.97:22...
+2025-12-12 15:26:05,369 - INFO - Connected (version 2.0, client OpenSSH_for_Windows_9.5)
+2025-12-12 15:26:05,698 - INFO - Authentication (password) successful!
+2025-12-12 15:26:05,698 - INFO - 成功连接到服务器 47.99.204.97
+2025-12-12 15:26:05,698 - INFO - 正在执行命令: powershell -Command "Test-Path "C:\Users\Administrator\Desktop\darkerback\.git""
+2025-12-12 15:26:06,208 - INFO - 命令执行完成，退出码: 0
+2025-12-12 15:26:06,209 - INFO - 正在执行命令: git --version
+2025-12-12 15:26:06,661 - INFO - 命令执行完成，退出码: 0
+2025-12-12 15:26:06,661 - INFO - Git已安装: git version 2.51.1.windows.1
+2025-12-12 15:26:06,661 - INFO - 正在执行命令: cd C:\Users\Administrator\Desktop\darkerback && git fetch origin main
+2025-12-12 15:26:08,032 - INFO - 命令执行完成，退出码: 0
+2025-12-12 15:26:08,033 - INFO - 正在执行命令: cd C:\Users\Administrator\Desktop\darkerback && git reset --hard origin/main
+2025-12-12 15:26:08,351 - INFO - 命令执行完成，退出码: 0
+2025-12-12 15:26:08,351 - INFO - 成功更新仓库 C:\Users\Administrator\Desktop\darkerback
+2025-12-12 15:26:08,351 - INFO - SSH连接已关闭
