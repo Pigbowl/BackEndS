@@ -6,8 +6,11 @@ import smtplib
 import ssl
 import re
 import logging
+import os
+import base64
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
+from email.mime.image import MIMEImage
 from email.header import Header
 from email.utils import formataddr
 import datetime
@@ -61,99 +64,51 @@ class EmailSender:
         current_time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         version = "2.3.5"
         
+        # 函数：将图片转换为base64数据URL
+        def image_to_base64(image_path):
+            try:
+                full_path = os.path.join('c:\\Users\\宋嘉玮\\OneDrive\\Desktop\\BackEndS', image_path)
+                if os.path.exists(full_path):
+                    with open(full_path, "rb") as img_file:
+                        # 读取图片文件并转换为base64
+                        img_base64 = base64.b64encode(img_file.read()).decode('utf-8')
+                        # 根据文件扩展名确定MIME类型
+                        ext = os.path.splitext(image_path)[1].lower()
+                        mime_type = f"image/{ext[1:]}" if ext else "image/png"
+                        return f"data:{mime_type};base64,{img_base64}"
+            except Exception as e:
+                print(f"转换图片 {image_path} 为base64时出错: {e}")
+            # 如果转换失败，返回空字符串
+            return ""
+        
+        # 转换图片为base64
+        logo_base64 = image_to_base64("logo.png")
+        darkerduck_base64 = image_to_base64("darkerduck.png")
+        
         email_content = f"""
         <html>
         <head>
             <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
             <style>
-                body {{
-                    font-family: 'Microsoft YaHei', Arial, sans-serif;
-                    line-height: 1.6;
-                    color: #333;
-                    max-width: 600px;
-                    margin: 0 auto;
-                    padding: 20px;
-                    background-color: #f8f9fa;
-                }}
-                .container {{
-                    background-color: white;
-                    border-radius: 8px;
-                    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-                    padding: 30px;
-                }}
-                .header {{
-                    text-align: center;
-                    padding-bottom: 20px;
-                    border-bottom: 2px solid #e7f0fd;
-                    margin-bottom: 20px;
-                }}
-                .logo {{
-                    width: 80px;
-                    height: 80px;
-                    margin-bottom: 15px;
-                }}
-                h2 {{
-                    color: #1a73e8;
-                    margin-top: 0;
-                }}
-                h3 {{
-                    color: #333;
-                    border-left: 4px solid #1a73e8;
-                    padding-left: 10px;
-                }}
+                body {{ font-family: 'Microsoft YaHei', Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #f8f9fa; }}
+                .container {{ background-color: white; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); padding: 30px; }}
+                .header {{ text-align: center; padding-bottom: 20px; border-bottom: 2px solid #e7f0fd; margin-bottom: 20px; }}
+                .logo {{ width: 80px; height: 80px; margin-bottom: 15px; }}
+                h2 {{ color: #1a73e8; margin-top: 0; }}
+                h3 {{ color: #333; border-left: 4px solid #1a73e8; padding-left: 10px; }}
                 .version {{ color: #d93025; }}
-                ul {{
-                    padding-left: 20px;
-                }}
-                li {{
-                    margin-bottom: 8px;
-                    position: relative;
-                    padding-left: 5px;
-                }}
-                li:before {{
-                    content: '✓';
-                    color: #1a73e8;
-                    position: absolute;
-                    left: -18px;
-                }}
-                .action-button {{
-                    display: inline-block;
-                    background-color: #1a73e8;
-                    color: white;
-                    text-decoration: none;
-                    padding: 10px 20px;
-                    border-radius: 4px;
-                    margin: 15px 0;
-                    font-weight: bold;
-                    transition: background-color 0.3s;
-                }}
-                .action-button:hover {{
-                    background-color: #1557b0;
-                }}
-                .footer {{
-                    margin-top: 30px;
-                    font-size: 12px;
-                    color: #666;
-                    text-align: center;
-                }}
-                .time-info {{
-                    font-size: 12px;
-                    color: #666;
-                    text-align: right;
-                    margin-top: 20px;
-                }}
+                ul {{ padding-left: 20px; }}
+                li {{ margin-bottom: 8px; position: relative; padding-left: 5px; }}
+                li:before {{ content: '✓'; color: #1a73e8; position: absolute; left: -18px; }}
+                .footer {{ margin-top: 30px; font-size: 12px; color: #666; text-align: center; }}
+                .time-info {{ font-size: 12px; color: #666; text-align: right; margin-top: 20px; }}
             </style>
         </head>
         <body>
             <div class="container">
                 <div class="header">
-                    <!-- 使用SVG作为公司标志 -->
-                    <svg class="logo" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
-                        <rect width="100" height="100" rx="10" fill="#1a73e8"/>
-                        <path d="M25,40 L75,40 L75,60 L25,60 Z" fill="white" rx="3"/>
-                        <circle cx="50" cy="50" r="15" fill="#1a73e8"/>
-                        <path d="M35,50 L65,50" stroke="white" stroke-width="6" stroke-linecap="round"/>
-                    </svg>
+                    <!-- 使用base64数据URL嵌入图片 -->
+                    {f'<img src="{logo_base64}" alt="达客科技" class="logo" width="80" height="80"/>' if logo_base64 else '<h1 style="color: #1a73e8; margin: 0; font-size: 36px;">达客科技</h1>'}
                     <h2>【更新提示】达客智驾领航员更新了</h2>
                 </div>
                 
@@ -169,7 +124,13 @@ class EmailSender:
                 </ul>
                 
                 <p>查看完整更新说明：</p>
-                <a href="http://thedarker-tech.com" class="action-button">访问达客科技官网</a>
+                <!-- 添加带图片的导向按钮，使用base64数据URL或emoji -->
+                <div style="text-align: center; margin: 20px 0;">
+                    <a href="http://thedarker-tech.com" style="display: inline-flex; align-items: center; background-color: #1a73e8; color: white; text-decoration: none; padding: 12px 20px; border-radius: 4px; font-weight: bold; gap: 10px;">
+                        访问达客科技官网
+                        {f'<img src="{darkerduck_base64}" alt="达客鸭" style="width: 24px; height: 24px; vertical-align: middle;"/>' if darkerduck_base64 else '<span style="font-size: 18px;">🚀</span>'}
+                    </a>
+                </div>
                 
                 <div class="time-info">
                     <p>发送时间：{current_time}</p>
@@ -186,108 +147,75 @@ class EmailSender:
         """
         return email_content
     
-    def get_subscription_confirm_content(self):
+    def get_subscription_confirm_content(self,user_data):
         """
-        生成订阅确认邮件内容
+        生成订阅通知邮件内容
         """
         current_time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        # 函数：将图片转换为base64数据URL
+        def image_to_base64(image_path):
+            try:
+                full_path = os.path.join('c:\\Users\\宋嘉玮\\OneDrive\\Desktop\\BackEndS', image_path)
+                if os.path.exists(full_path):
+                    with open(full_path, "rb") as img_file:
+                        # 读取图片文件并转换为base64
+                        img_base64 = base64.b64encode(img_file.read()).decode('utf-8')
+                        # 根据文件扩展名确定MIME类型
+                        ext = os.path.splitext(image_path)[1].lower()
+                        mime_type = f"image/{ext[1:]}" if ext else "image/png"
+                        return f"data:{mime_type};base64,{img_base64}"
+            except Exception as e:
+                print(f"转换图片 {image_path} 为base64时出错: {e}")
+            # 如果转换失败，返回空字符串
+            return ""
+        
+        # 转换图片为base64
+        logo_base64 = image_to_base64("logo.png")
+        darkerduck_base64 = image_to_base64("darkerduck.png")
         
         email_content = f"""
         <html>
         <head>
             <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
             <style>
-                body {{
-                    font-family: 'Microsoft YaHei', Arial, sans-serif;
-                    line-height: 1.6;
-                    color: #333;
-                    max-width: 600px;
-                    margin: 0 auto;
-                    padding: 20px;
-                    background-color: #f8f9fa;
-                }}
-                .container {{
-                    background-color: white;
-                    border-radius: 8px;
-                    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-                    padding: 30px;
-                }}
-                .header {{
-                    text-align: center;
-                    padding-bottom: 20px;
-                    border-bottom: 2px solid #e7f0fd;
-                    margin-bottom: 20px;
-                }}
-                .logo {{
-                    width: 80px;
-                    height: 80px;
-                    margin-bottom: 15px;
-                }}
-                h2 {{
-                    color: #1a73e8;
-                    margin-top: 0;
-                }}
-                .action-button {{
-                    display: inline-block;
-                    background-color: #1a73e8;
-                    color: white;
-                    text-decoration: none;
-                    padding: 12px 25px;
-                    border-radius: 4px;
-                    margin: 20px 0;
-                    font-weight: bold;
-                    transition: background-color 0.3s;
-                    font-size: 16px;
-                }}
-                .action-button:hover {{
-                    background-color: #1557b0;
-                }}
-                .footer {{
-                    margin-top: 30px;
-                    font-size: 12px;
-                    color: #666;
-                    text-align: center;
-                }}
-                .time-info {{
-                    font-size: 12px;
-                    color: #666;
-                    text-align: right;
-                    margin-top: 20px;
-                }}
+                body {{ font-family: 'Microsoft YaHei', Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #f8f9fa; }}
+                .container {{ background-color: white; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); padding: 30px; }}
+                .header {{ text-align: center; padding-bottom: 20px; border-bottom: 2px solid #e7f0fd; margin-bottom: 20px; }}
+                .logo {{ width: 80px; height: 80px; margin-bottom: 15px; }}
+                h2 {{ color: #1a73e8; margin-top: 0; }}
+                .footer {{ margin-top: 30px; font-size: 12px; color: #666; text-align: center; }}
+                .time-info {{ font-size: 12px; color: #666; text-align: right; margin-top: 20px; }}
             </style>
         </head>
         <body>
             <div class="container">
                 <div class="header">
-                    <!-- 使用SVG作为公司标志 -->
-                    <svg class="logo" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
-                        <rect width="100" height="100" rx="10" fill="#1a73e8"/>
-                        <path d="M25,40 L75,40 L75,60 L25,60 Z" fill="white" rx="3"/>
-                        <circle cx="50" cy="50" r="15" fill="#1a73e8"/>
-                        <path d="M35,50 L65,50" stroke="white" stroke-width="6" stroke-linecap="round"/>
-                    </svg>
-                    <h2>【订阅确认】达客科技</h2>
+                    <!-- 使用base64数据URL嵌入图片 -->
+                    {f'<img src="{logo_base64}" alt="达客科技" class="logo" width="80" height="80"/>' if logo_base64 else '<h1 style="color: #1a73e8; margin: 0; font-size: 36px;">达客科技</h1>'}
+                    <h2>【订阅通知】达客科技</h2>
                 </div>
                 
-                <p>尊敬的用户：</p>
+                <p>尊敬的{user_data["Name"]}用户：</p>
                 
                 <p>感谢您订阅达客科技的最新动态！</p>
                 
-                <p>为了确保您能及时收到我们的产品更新、活动通知和行业资讯，请点击下方按钮完成订阅确认：</p>
+                <p>您已成功订阅我们的服务，将及时收到我们的产品更新、活动通知和行业资讯。</p>
                 
-                <center>
-                    <a href="http://thedarker-tech.com" class="action-button">确认订阅</a>
-                </center>
+                <!-- 添加带图片的导向按钮，使用base64数据URL或emoji -->
+                <div style="text-align: center; margin: 20px 0;">
+                    <a href="http://thedarker-tech.com" style="display: inline-flex; align-items: center; background-color: #1a73e8; color: white; text-decoration: none; padding: 12px 25px; border-radius: 4px; font-weight: bold; gap: 10px; font-size: 16px;">
+                        访问达客科技官网
+                        {f'<img src="{darkerduck_base64}" alt="达客鸭" style="width: 24px; height: 24px; vertical-align: middle;"/>' if darkerduck_base64 else '<span style="font-size: 18px;">✅</span>'}
+                    </a>
+                </div>
                 
-                <p>通过确认订阅，您将获得：</p>
+                <p>通过订阅，您将获得：</p>
                 <ul>
                     <li>第一时间了解达客科技产品更新</li>
                     <li>获取独家技术资讯和行业洞察</li>
                     <li>参与专属活动和用户调研</li>
                     <li>享受优先体验新功能的权利</li>
                 </ul>
-                
-                <p>如果您没有订阅我们的服务，或者这是一个误操作，请忽略此邮件。</p>
                 
                 <div class="time-info">
                     <p>发送时间：{current_time}</p>
@@ -304,92 +232,75 @@ class EmailSender:
         """
         return email_content
         
-    def get_admin_notification_content(self, user_data):
+    def get_admin_notification_content(self, user_data, notiftype="subscribe"):
         """
         生成管理员提醒邮件内容
+        
+        Args:
+            user_data: 用户数据，包含用户名和邮箱
+            notiftype: 通知类型，"subscribe"表示有人订阅，"registration"表示有人注册
         """
         current_time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        
+        # 函数：将图片转换为base64数据URL
+        def image_to_base64(image_path):
+            try:
+                full_path = os.path.join('c:\\Users\\宋嘉玮\\OneDrive\\Desktop\\BackEndS', image_path)
+                if os.path.exists(full_path):
+                    with open(full_path, "rb") as img_file:
+                        # 读取图片文件并转换为base64
+                        img_base64 = base64.b64encode(img_file.read()).decode('utf-8')
+                        # 根据文件扩展名确定MIME类型
+                        ext = os.path.splitext(image_path)[1].lower()
+                        mime_type = f"image/{ext[1:]}" if ext else "image/png"
+                        return f"data:{mime_type};base64,{img_base64}"
+            except Exception as e:
+                print(f"转换图片 {image_path} 为base64时出错: {e}")
+            # 如果转换失败，返回空字符串
+            return ""
+        
+        # 转换图片为base64
+        logo_base64 = image_to_base64("logo.png")
+        darkerduck_base64 = image_to_base64("darkerduck.png")
+        
+        # 根据通知类型设置标题和内容
+        if notiftype == "registration":
+            title = "有人注册"
+            action = "注册了"
+            subject = "【注册通知】有人注册了达客科技服务"
+        else:  # 默认subscribe
+            title = "有人订阅"
+            action = "订阅了"
+            subject = "【订阅通知】有人订阅了达客科技服务"
         
         email_content = f"""
         <html>
         <head>
             <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
             <style>
-                body {{
-                    font-family: 'Microsoft YaHei', Arial, sans-serif;
-                    line-height: 1.6;
-                    color: #333;
-                    max-width: 600px;
-                    margin: 0 auto;
-                    padding: 20px;
-                    background-color: #f8f9fa;
-                }}
-                .container {{
-                    background-color: white;
-                    border-radius: 8px;
-                    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-                    padding: 30px;
-                }}
-                .header {{
-                    text-align: center;
-                    padding-bottom: 20px;
-                    border-bottom: 2px solid #e7f0fd;
-                    margin-bottom: 20px;
-                }}
-                .logo {{
-                    width: 80px;
-                    height: 80px;
-                    margin-bottom: 15px;
-                }}
-                h2 {{
-                    color: #1a73e8;
-                    margin-top: 0;
-                }}
-                .user-info {{
-                    background-color: #f0f4f8;
-                    padding: 15px;
-                    border-radius: 4px;
-                    margin: 20px 0;
-                }}
-                .info-item {{
-                    margin-bottom: 10px;
-                }}
-                .info-label {{
-                    font-weight: bold;
-                    color: #555;
-                    display: inline-block;
-                    width: 80px;
-                }}
-                .footer {{
-                    margin-top: 30px;
-                    font-size: 12px;
-                    color: #666;
-                    text-align: center;
-                }}
-                .time-info {{
-                    font-size: 12px;
-                    color: #666;
-                    text-align: right;
-                    margin-top: 20px;
-                }}
+                body {{ font-family: 'Microsoft YaHei', Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #f8f9fa; }}
+                .container {{ background-color: white; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); padding: 30px; }}
+                .header {{ text-align: center; padding-bottom: 20px; border-bottom: 2px solid #e7f0fd; margin-bottom: 20px; }}
+                .logo {{ width: 80px; height: 80px; margin-bottom: 15px; }}
+                h2 {{ color: #1a73e8; margin-top: 0; }}
+                .user-info {{ background-color: #f0f4f8; padding: 15px; border-radius: 4px; margin: 20px 0; }}
+                .info-item {{ margin-bottom: 10px; }}
+                .info-label {{ font-weight: bold; color: #555; display: inline-block; width: 80px; }}
+                .footer {{ margin-top: 30px; font-size: 12px; color: #666; text-align: center; }}
+                .time-info {{ font-size: 12px; color: #666; text-align: right; margin-top: 20px; }}
             </style>
         </head>
         <body>
             <div class="container">
                 <div class="header">
-                    <!-- 使用SVG作为公司标志 -->
-                    <svg class="logo" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
-                        <rect width="100" height="100" rx="10" fill="#1a73e8"/>
-                        <path d="M25,40 L75,40 L75,60 L25,60 Z" fill="white" rx="3"/>
-                        <circle cx="50" cy="50" r="15" fill="#1a73e8"/>
-                        <path d="M35,50 L65,50" stroke="white" stroke-width="6" stroke-linecap="round"/>
-                    </svg>
-                    <h2>【新用户提醒】有人订阅了达客科技服务</h2>
+                    <!-- 使用base64数据URL嵌入图片 -->
+                    {f'<img src="{logo_base64}" alt="达客科技" class="logo" width="80" height="80"/>' if logo_base64 else '<h1 style="color: #1a73e8; margin: 0; font-size: 36px;">达客科技</h1>'}
+                    <h2>{subject}</h2>
                 </div>
                 
                 <p>管理员您好，</p>
                 
-                <p>有新用户订阅了达客科技服务，以下是用户信息：</p>
+                <p>有新用户{action}达客科技服务，以下是用户信息：</p>
                 
                 <div class="user-info">
                     <div class="info-item">
@@ -398,10 +309,10 @@ class EmailSender:
                     </div>
                     <div class="info-item">
                         <span class="info-label">邮箱：</span>
-                        <span>{user_data['email']}</span>
+                        <span>{user_data.get('email') or user_data.get('Email')}</span>
                     </div>
                     <div class="info-item">
-                        <span class="info-label">订阅时间：</span>
+                        <span class="info-label">时间：</span>
                         <span>{current_time}</span>
                     </div>
                 </div>
@@ -429,95 +340,49 @@ class EmailSender:
         """
         current_time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         
+        # 函数：将图片转换为base64数据URL
+        def image_to_base64(image_path):
+            try:
+                full_path = os.path.join('c:\\Users\\宋嘉玮\\OneDrive\\Desktop\\BackEndS', image_path)
+                if os.path.exists(full_path):
+                    with open(full_path, "rb") as img_file:
+                        # 读取图片文件并转换为base64
+                        img_base64 = base64.b64encode(img_file.read()).decode('utf-8')
+                        # 根据文件扩展名确定MIME类型
+                        ext = os.path.splitext(image_path)[1].lower()
+                        mime_type = f"image/{ext[1:]}" if ext else "image/png"
+                        return f"data:{mime_type};base64,{img_base64}"
+            except Exception as e:
+                print(f"转换图片 {image_path} 为base64时出错: {e}")
+            # 如果转换失败，返回空字符串
+            return ""
+        
+        # 转换图片为base64
+        logo_base64 = image_to_base64("logo.png")
+        darkerduck_base64 = image_to_base64("darkerduck.png")
+        
         email_content = f"""
         <html>
         <head>
             <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
             <style>
-                body {{
-                    font-family: 'Microsoft YaHei', Arial, sans-serif;
-                    line-height: 1.6;
-                    color: #333;
-                    max-width: 600px;
-                    margin: 0 auto;
-                    padding: 20px;
-                    background-color: #f8f9fa;
-                }}
-                .container {{
-                    background-color: white;
-                    border-radius: 8px;
-                    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-                    padding: 30px;
-                }}
-                .header {{
-                    text-align: center;
-                    padding-bottom: 20px;
-                    border-bottom: 2px solid #e7f0fd;
-                    margin-bottom: 20px;
-                }}
-                .logo {{
-                    width: 80px;
-                    height: 80px;
-                    margin-bottom: 15px;
-                }}
-                h2 {{
-                    color: #1a73e8;
-                    margin-top: 0;
-                }}
-                .login-info {{
-                    background-color: #f0f4f8;
-                    padding: 20px;
-                    border-radius: 4px;
-                    margin: 20px 0;
-                }}
-                .info-item {{
-                    margin-bottom: 15px;
-                }}
-                .info-label {{
-                    font-weight: bold;
-                    color: #555;
-                    display: inline-block;
-                    width: 100px;
-                }}
-                .action-button {{
-                    display: inline-block;
-                    background-color: #1a73e8;
-                    color: white;
-                    text-decoration: none;
-                    padding: 12px 25px;
-                    border-radius: 4px;
-                    margin: 20px 0;
-                    font-weight: bold;
-                    transition: background-color 0.3s;
-                    font-size: 16px;
-                }}
-                .action-button:hover {{
-                    background-color: #1557b0;
-                }}
-                .footer {{
-                    margin-top: 30px;
-                    font-size: 12px;
-                    color: #666;
-                    text-align: center;
-                }}
-                .time-info {{
-                    font-size: 12px;
-                    color: #666;
-                    text-align: right;
-                    margin-top: 20px;
-                }}
+                body {{ font-family: 'Microsoft YaHei', Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #f8f9fa; }}
+                .container {{ background-color: white; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); padding: 30px; }}
+                .header {{ text-align: center; padding-bottom: 20px; border-bottom: 2px solid #e7f0fd; margin-bottom: 20px; }}
+                .logo {{ width: 80px; height: 80px; margin-bottom: 15px; }}
+                h2 {{ color: #1a73e8; margin-top: 0; }}
+                .login-info {{ background-color: #f0f4f8; padding: 20px; border-radius: 4px; margin: 20px 0; }}
+                .info-item {{ margin-bottom: 15px; }}
+                .info-label {{ font-weight: bold; color: #555; display: inline-block; width: 100px; }}
+                .footer {{ margin-top: 30px; font-size: 12px; color: #666; text-align: center; }}
+                .time-info {{ font-size: 12px; color: #666; text-align: right; margin-top: 20px; }}
             </style>
         </head>
         <body>
             <div class="container">
                 <div class="header">
-                    <!-- 使用SVG作为公司标志 -->
-                    <svg class="logo" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
-                        <rect width="100" height="100" rx="10" fill="#1a73e8"/>
-                        <path d="M25,40 L75,40 L75,60 L25,60 Z" fill="white" rx="3"/>
-                        <circle cx="50" cy="50" r="15" fill="#1a73e8"/>
-                        <path d="M35,50 L65,50" stroke="white" stroke-width="6" stroke-linecap="round"/>
-                    </svg>
+                    <!-- 使用base64数据URL嵌入图片 -->
+                    {f'<img src="{logo_base64}" alt="达客科技" class="logo" width="80" height="80"/>' if logo_base64 else '<h1 style="color: #1a73e8; margin: 0; font-size: 36px;">达客科技</h1>'}
                     <h2>【注册成功】欢迎加入达客科技</h2>
                 </div>
                 
@@ -546,9 +411,13 @@ class EmailSender:
                 
                 <p>立即登录您的账户：</p>
                 
-                <center>
-                    <a href="http://thedarker-tech.com/login" class="action-button">登录达客科技</a>
-                </center>
+                <!-- 添加带图片的导向按钮，使用base64数据URL或emoji -->
+                <div style="text-align: center; margin: 20px 0;">
+                    <a href="http://thedarker-tech.com/login" style="display: inline-flex; align-items: center; background-color: #1a73e8; color: white; text-decoration: none; padding: 12px 25px; border-radius: 4px; font-weight: bold; gap: 10px; font-size: 16px;">
+                        登录达客科技
+                        {f'<img src="{darkerduck_base64}" alt="达客鸭" style="width: 24px; height: 24px; vertical-align: middle;"/>' if darkerduck_base64 else '<span style="font-size: 18px;">🔑</span>'}
+                    </a>
+                </div>
                 
                 <p>如果您在使用过程中遇到任何问题，请随时联系我们的客服团队。</p>
                 
@@ -568,17 +437,18 @@ class EmailSender:
         """
         return email_content
     
-    def send_email(self, mode="single", recipient_email=None, email_type="product_update", user_data=None):
+    def send_email(self, mode="single", recipient_email=None, email_type="product_update", user_data=None, notiftype="subscribe"):
         """
         发送邮件
         
         Args:
             mode: 发送模式，"single"表示单发，"batch"表示群发
             recipient_email: 单发模式下的收件人邮箱
-            email_type: 邮件类型，"product_update"表示产品上线提醒，"subscription_confirm"表示订阅确认，"admin_notification"表示管理员通知，"registration_confirmation"表示注册成功确认
+            email_type: 邮件类型，"product_update"表示产品上线提醒，"subscription_confirm"表示订阅通知，"admin_notification"表示管理员通知，"registration_confirmation"表示注册成功确认
             custom_content: 自定义邮件内容（HTML格式），如果提供则忽略email_type
             custom_subject: 自定义邮件主题，如果提供则忽略email_type
             user_data: 用户数据，用于管理员通知邮件和注册成功确认邮件
+            notiftype: 通知类型，"subscribe"表示有人订阅，"registration"表示有人注册，仅用于admin_notification类型
             
         Returns:
             bool: 发送是否成功
@@ -630,17 +500,21 @@ class EmailSender:
             if email_type == "product_update":
                 email_content = self.get_product_update_content()
                 subject = Header("【更新提示】达客智驾领航员更新了", 'utf-8')
-            elif email_type == "subscription_confirm":
-                email_content = self.get_subscription_confirm_content()
-                subject = Header("【订阅确认】达客科技", 'utf-8')
+            elif email_type == "subscription_notification":
+                email_content = self.get_subscription_confirm_content(user_data)
+                subject = Header("【订阅通知】达客科技", 'utf-8')
             elif email_type == "admin_notification":
                 if not user_data:
                     error_msg = "admin_notification类型邮件必须提供user_data参数"
                     logging.error(error_msg)
                     print(f"错误: {error_msg}")
                     return False
-                email_content = self.get_admin_notification_content(user_data)
-                subject = Header("【新用户提醒】有人订阅了达客科技服务", 'utf-8')
+                email_content = self.get_admin_notification_content(user_data, notiftype)
+                # 根据notiftype设置主题
+                if notiftype == "registration":
+                    subject = Header("【注册通知】有人注册了达客科技服务", 'utf-8')
+                else:
+                    subject = Header("【订阅通知】有人订阅了达客科技服务", 'utf-8')
             elif email_type == "registration_confirmation":
                 if not user_data:
                     error_msg = "registration_confirmation类型邮件必须提供user_data参数"
@@ -657,15 +531,50 @@ class EmailSender:
             
             logging.info(f"准备发送邮件，模式: {mode}, 类型: {email_type}, 主要收件人: {receiver_email}, BCC收件人数量: {len(bcc_recipients)}")
             
-            # 创建MIME多部分消息
-            message = MIMEMultipart()
+            # 创建MIME多部分消息，支持混合内容（HTML和图片）
+            message = MIMEMultipart('related')
             message["From"] = formataddr((str(Header(self.sender_name, 'utf-8')), self.sender_email))
             message["To"] = receiver_email
             message["Subject"] = subject
             
+            # 创建HTML容器
+            html_container = MIMEMultipart('alternative')
+            message.attach(html_container)
+            
             # 添加HTML格式的正文
             html_part = MIMEText(email_content, 'html', 'utf-8')
-            message.attach(html_part)
+            html_container.attach(html_part)
+            
+            # 定义需要嵌入的图片
+            images = [
+                ('logo.png', 'logo'),
+                ('darkerduck.png', 'darkerduck')
+            ]
+            
+            for image_path, cid in images:
+                # 检查图片文件是否存在
+                full_path = os.path.join('c:\\Users\\宋嘉玮\\OneDrive\\Desktop\\BackEndS', image_path)
+                if os.path.exists(full_path):
+                    try:
+                        # 读取图片文件并转换为base64
+                        with open(full_path, 'rb') as f:
+                            img_data = f.read()
+                        
+                        # 创建MIMEImage对象
+                        image = MIMEImage(img_data)
+                        
+                        # 设置Content-ID，用于HTML中引用
+                        image.add_header('Content-ID', f'<{cid}>')
+                        
+                        # 设置为内联图片
+                        image.add_header('Content-Disposition', f'inline; filename="{image_path}"')
+                        
+                        # 添加到邮件中
+                        message.attach(image)
+                    except Exception as e:
+                        logging.error(f"处理图片 {image_path} 时出错: {e}")
+                else:
+                    logging.warning(f"警告: 图片文件 {image_path} 不存在")
             
             # 创建SSL上下文
             context = ssl.create_default_context()
@@ -716,16 +625,17 @@ def send_batch_email(email_type="product_update"):
     """
     return sender.send_email(mode="batch", email_type=email_type)
 
-def send_single_email(recipient_email, email_type="product_update",user_data=None):
+def send_single_email(recipient_email, email_type="product_update",user_data=None, notiftype="subscribe"):
     """
     单发邮件接口
     
     Args:
         recipient_email: 收件人邮箱
-        email_type: 邮件类型，"product_update"表示产品上线提醒，"subscription_confirm"表示订阅确认，"admin_notification"表示管理员通知，"registration_confirmation"表示注册成功确认
+        email_type: 邮件类型，"product_update"表示产品上线提醒，"subscription_confirm"表示订阅通知，"admin_notification"表示管理员通知，"registration_confirmation"表示注册成功确认
         custom_content: 自定义邮件内容（HTML格式），如果提供则忽略email_type
         custom_subject: 自定义邮件主题，如果提供则忽略email_type
         user_data: 用户数据，用于管理员通知邮件和注册成功确认邮件
+        notiftype: 通知类型，"subscribe"表示有人订阅，"registration"表示有人注册，仅用于admin_notification类型
         
     Returns:
         bool: 发送是否成功
@@ -734,7 +644,8 @@ def send_single_email(recipient_email, email_type="product_update",user_data=Non
         mode="single", 
         recipient_email=recipient_email, 
         email_type=email_type,
-        user_data=user_data
+        user_data=user_data,
+        notiftype=notiftype
     )
 
 if __name__ == "__main__":

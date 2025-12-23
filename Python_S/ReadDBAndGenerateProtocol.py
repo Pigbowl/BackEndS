@@ -24,7 +24,14 @@ import paramiko
 # from pymysql.cursors import DictCursorMixin
 
 from collections import Counter
-
+# 从adminconfig.json加载remotecode
+with open('adminconfig.json', 'r', encoding='utf-8') as f:
+    code_data = json.load(f)
+    admin_email = code_data['admin_email']
+    server_code = code_data['server_code']
+    server_pseudo = code_data['server_pseudo']
+    server_ip = code_data['server_ip']
+    server_sshport = code_data['server_sshport']
 
 def export_table_columns_with_foreign_key(db) -> List[Dict[str, str]]:
     """
@@ -1704,13 +1711,13 @@ def add_subscribers(db,data):
     result = db.insert_data("user", userdata)
     if isinstance(result, int) and result > 0:
         # 向用户发送订阅确认邮件
-        send_single_email(userdata["email"], "subscription_confirm")
+        send_single_email(userdata["email"], "subscription_notification",userdata)
         
         # 向管理员发送新用户提醒邮件
-        admin_email = "darkerassistance@thedarker-tech.com"
+        # admin_email = "darkerassistance@thedarker-tech.com"
         
         # 发送管理员提醒邮件，使用新的admin_notification邮件类型
-        send_single_email(recipient_email=admin_email,email_type="admin_notification",user_data=userdata)
+        send_single_email(recipient_email=admin_email,email_type="admin_notification",user_data=userdata,notiftype="subscribe")
                 
         return {"status": True, "insert_id": result}
     else:
@@ -1917,16 +1924,17 @@ def manage_register(db,data,deploy_mode):
         template_name = "Template"
         
         if deploy_mode == "test":
-            ssh_host = "47.99.204.97"
-            ssh_port = 22
-            ssh_username = "Administrator"
-            ssh_password = "Sjw9@0613"
+            ssh_host = server_ip
+            ssh_port = server_sshport
+            ssh_username = server_pseudo
+            ssh_password = server_code
             create_folder_remote(ssh_host, ssh_port, ssh_username, ssh_password, base_path, template_name, current_id)
         else:
             # 本地模式：直接在本地创建文件夹
             create_folder_local(base_path, template_name, current_id)
 
         send_single_email(recipient_email=user_info["Email"],email_type="registration_confirmation",user_data=user_info)
+        send_single_email(recipient_email=admin_email,email_type="admin_notification",user_data=user_info,notiftype="registration")
         return {"status": True, "error": 0}
 
 

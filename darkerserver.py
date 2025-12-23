@@ -168,13 +168,13 @@ class MyHandler(BaseHTTPRequestHandler):
             db_product = SQLOperations(
                 host='localhost',    # MySQL主机地址
                 user='root',         # MySQL用户名
-                password='xxxxxx',         # MySQL密码
+                password='12345678',         # MySQL密码
                 database='darkerdatabase'   # MySQL数据库名
             )
             #若当前代码部署在服务器端，则运营数据写入服务器数据库（既相对的）
             db_operation = SQLOperations(
                 host='localhost',    # MySQL主机地址
-                user='centeruser',         # MySQL用户名
+                user='root',         # MySQL用户名
                 password='12345678',         # MySQL密码
                 database='operationdatabase'   # MySQL数据库名
             )
