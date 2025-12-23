@@ -3,11 +3,12 @@ from typing import Dict, List, Any
 from Python_S.sql_operations import SQLOperations
 
 class JSONToSQLmaintarget:
-    def __init__(self,data: dict = None):
+    def __init__(self,data: dict = None, database = None):
         self.data = data  # 直接使用传入的数据
-        self.db = None
+        self.db = database  # 使用外部传入的数据库实例
         self.id_columns_map = {}  # 存储各表的ID列名映射
         self.operation_records = []  # 存储操作记录的数组
+        self.external_db = True if database else False  # 标记是否使用外部传入的数据库实例
         
     def load_json_data(self):
         """加载JSON数据（如果数据未传入，则从文件加载）"""
@@ -17,7 +18,7 @@ class JSONToSQLmaintarget:
             return True
         
         # 否则从文件加载
-        if not self.json_file_path:
+        if not hasattr(self, 'json_file_path') or not self.json_file_path:
             print("未提供JSON文件路径，无法加载数据")
             return False
             
@@ -31,11 +32,18 @@ class JSONToSQLmaintarget:
             return False
     
     def connect_to_database(self):
-        """连接到数据库"""
+        """连接到数据库（如果使用外部传入的数据库实例，则跳过连接步骤）"""
         try:
-            # 使用sql_operations.py中的示例连接信息
-            self.db = SQLOperations(
-            )
+            # 如果已经有外部传入的数据库实例，则直接使用
+            if self.db:
+                print("使用外部传入的数据库实例")
+                # 加载objects表信息，获取各表的ID列名
+                self._load_id_columns_info()
+                return True
+            
+            # 否则创建新的数据库连接
+            print("未提供外部数据库实例，尝试创建新连接")
+            self.db = SQLOperations()
             print("成功连接到数据库")
             
             # 加载objects表信息，获取各表的ID列名
@@ -370,37 +378,44 @@ class JSONToSQLmaintarget:
             # print(f"提取到主键列 {id_column} 的值为: {row_id_value}")
             row_ids[f"{table_name}_{id_column}"] = row_id_value
     def close(self):
-        """关闭数据库连接"""
-        if self.db:
+        """关闭数据库连接（如果是外部传入的数据库实例，则不关闭）"""
+        if self.db and not self.external_db:
             self.db.close()
             print("数据库连接已关闭")
+        elif self.external_db:
+            print("使用的是外部传入的数据库实例，不关闭连接")
 
-def database_manipulate(input_data: dict = None):
+def database_manipulate(database,input_data: dict = None):
     """
     处理数据库操作
     
     Args:
+        database: 外部传入的数据库实例，所有数据库操作都使用该实例
         input_data: 外部传入的数据字典，如果为None则从默认文件加载
     
     Returns:
         dict: 包含操作状态的字典，格式为{"success": bool, "message": str}
     """
     try:
-        # 根据是否有传入数据创建处理器实例
+        # 根据是否有传入数据创建处理器实例，同时传入数据库实例
         if input_data is not None:
-            maintarget = JSONToSQLmaintarget(data=input_data)
+            maintarget = JSONToSQLmaintarget(data=input_data, database=database)
         else:
-            maintarget = JSONToSQLmaintarget('databasemanipinput.json')
+            maintarget = JSONToSQLmaintarget(database=database)
         
         # 加载JSON数据
         if not maintarget.load_json_data():
             return {"success": False, "message": "数据加载失败"}
         
-        # 连接数据库
-        if not maintarget.connect_to_database():
-            return {"success": False, "message": "数据库连接失败"}
+        # 处理数据并执行SQL操作（无需连接数据库，直接使用外部传入的实例）
+        if not maintarget.db:
+            print("未提供有效的数据库实例")
+            return {"success": False, "message": "未提供有效的数据库实例"}
         
-        # 处理数据并执行SQL操作
+        # 如果是外部传入的数据库实例，确保已加载ID列信息
+        if maintarget.external_db:
+            maintarget._load_id_columns_info()
+        
         success = maintarget.process_data()
         if success:
             print("\n数据处理完成！")
@@ -414,9 +429,10 @@ def database_manipulate(input_data: dict = None):
         print(f"处理过程中发生异常: {str(e)}")
         return {"success": False, "message": f"处理异常: {str(e)}"}
     finally:
-        # 关闭数据库连接
+        # 关闭数据库连接（如果是外部传入的数据库实例，则不会关闭）
         if 'maintarget' in locals():
             maintarget.close()
 
 if __name__ == "__main__":
-    database_manipulate()
+    # 主函数调用，不传入数据库实例时，内部会创建新的数据库连接
+    database_manipulate(input_data=None)

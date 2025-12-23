@@ -23,14 +23,14 @@ def parse_range(range_str: str) -> Tuple[int, int]:
         raise ValueError(f"解析列范围时出错: {e}")
 
 def fuzzy_search(
-    processed_results,lib_tables_data,
+    db,processed_results,lib_tables_data,
     table_name: str,
     search_keyword: str,
     thres: float = 0.7,
     top_n: int = None):
     try:
         
-        db = SQLOperations()
+        # db = SQLOperations()
         Item_group = {}
         Item_group["type"]=table_name
         Item_group["Catalogue"]={}

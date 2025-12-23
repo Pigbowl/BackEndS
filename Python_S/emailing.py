@@ -422,6 +422,151 @@ class EmailSender:
         </html>
         """
         return email_content
+        
+    def get_registration_confirmation_content(self, user_data):
+        """
+        生成用户注册成功确认邮件内容
+        """
+        current_time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        
+        email_content = f"""
+        <html>
+        <head>
+            <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+            <style>
+                body {{
+                    font-family: 'Microsoft YaHei', Arial, sans-serif;
+                    line-height: 1.6;
+                    color: #333;
+                    max-width: 600px;
+                    margin: 0 auto;
+                    padding: 20px;
+                    background-color: #f8f9fa;
+                }}
+                .container {{
+                    background-color: white;
+                    border-radius: 8px;
+                    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+                    padding: 30px;
+                }}
+                .header {{
+                    text-align: center;
+                    padding-bottom: 20px;
+                    border-bottom: 2px solid #e7f0fd;
+                    margin-bottom: 20px;
+                }}
+                .logo {{
+                    width: 80px;
+                    height: 80px;
+                    margin-bottom: 15px;
+                }}
+                h2 {{
+                    color: #1a73e8;
+                    margin-top: 0;
+                }}
+                .login-info {{
+                    background-color: #f0f4f8;
+                    padding: 20px;
+                    border-radius: 4px;
+                    margin: 20px 0;
+                }}
+                .info-item {{
+                    margin-bottom: 15px;
+                }}
+                .info-label {{
+                    font-weight: bold;
+                    color: #555;
+                    display: inline-block;
+                    width: 100px;
+                }}
+                .action-button {{
+                    display: inline-block;
+                    background-color: #1a73e8;
+                    color: white;
+                    text-decoration: none;
+                    padding: 12px 25px;
+                    border-radius: 4px;
+                    margin: 20px 0;
+                    font-weight: bold;
+                    transition: background-color 0.3s;
+                    font-size: 16px;
+                }}
+                .action-button:hover {{
+                    background-color: #1557b0;
+                }}
+                .footer {{
+                    margin-top: 30px;
+                    font-size: 12px;
+                    color: #666;
+                    text-align: center;
+                }}
+                .time-info {{
+                    font-size: 12px;
+                    color: #666;
+                    text-align: right;
+                    margin-top: 20px;
+                }}
+            </style>
+        </head>
+        <body>
+            <div class="container">
+                <div class="header">
+                    <!-- 使用SVG作为公司标志 -->
+                    <svg class="logo" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                        <rect width="100" height="100" rx="10" fill="#1a73e8"/>
+                        <path d="M25,40 L75,40 L75,60 L25,60 Z" fill="white" rx="3"/>
+                        <circle cx="50" cy="50" r="15" fill="#1a73e8"/>
+                        <path d="M35,50 L65,50" stroke="white" stroke-width="6" stroke-linecap="round"/>
+                    </svg>
+                    <h2>【注册成功】欢迎加入达客科技</h2>
+                </div>
+                
+                <p>尊敬的{user_data['Name']}先生/女士：</p>
+                
+                <p>恭喜您成功注册达客科技服务！</p>
+                
+                <p>以下是您的账户信息：</p>
+                
+                <div class="login-info">
+                    <div class="info-item">
+                        <span class="info-label">用户名：</span>
+                        <span>{user_data['Name']}</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">登录邮箱：</span>
+                        <span>{user_data['Email']}</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">登录密码：</span>
+                        <span>{user_data['Password']}</span>
+                    </div>
+                </div>
+                
+                <p>您可以使用<strong>用户名</strong>或<strong>邮箱地址</strong>进行登录。</p>
+                
+                <p>立即登录您的账户：</p>
+                
+                <center>
+                    <a href="http://thedarker-tech.com/login" class="action-button">登录达客科技</a>
+                </center>
+                
+                <p>如果您在使用过程中遇到任何问题，请随时联系我们的客服团队。</p>
+                
+                <div class="time-info">
+                    <p>发送时间：{current_time}</p>
+                    <p>发件人：{self.sender_name}</p>
+                </div>
+                
+                <hr>
+                <div class="footer">
+                    <p>此邮件由达客科技系统自动发送，请勿回复。</p>
+                    <p>© 2025 达客科技. 保留所有权利。</p>
+                </div>
+            </div>
+        </body>
+        </html>
+        """
+        return email_content
     
     def send_email(self, mode="single", recipient_email=None, email_type="product_update", user_data=None):
         """
@@ -430,10 +575,10 @@ class EmailSender:
         Args:
             mode: 发送模式，"single"表示单发，"batch"表示群发
             recipient_email: 单发模式下的收件人邮箱
-            email_type: 邮件类型，"product_update"表示产品上线提醒，"subscription_confirm"表示订阅确认，"admin_notification"表示管理员通知
+            email_type: 邮件类型，"product_update"表示产品上线提醒，"subscription_confirm"表示订阅确认，"admin_notification"表示管理员通知，"registration_confirmation"表示注册成功确认
             custom_content: 自定义邮件内容（HTML格式），如果提供则忽略email_type
             custom_subject: 自定义邮件主题，如果提供则忽略email_type
-            user_data: 用户数据，用于管理员通知邮件
+            user_data: 用户数据，用于管理员通知邮件和注册成功确认邮件
             
         Returns:
             bool: 发送是否成功
@@ -489,7 +634,6 @@ class EmailSender:
                 email_content = self.get_subscription_confirm_content()
                 subject = Header("【订阅确认】达客科技", 'utf-8')
             elif email_type == "admin_notification":
-                print(user_data)
                 if not user_data:
                     error_msg = "admin_notification类型邮件必须提供user_data参数"
                     logging.error(error_msg)
@@ -497,8 +641,16 @@ class EmailSender:
                     return False
                 email_content = self.get_admin_notification_content(user_data)
                 subject = Header("【新用户提醒】有人订阅了达客科技服务", 'utf-8')
+            elif email_type == "registration_confirmation":
+                if not user_data:
+                    error_msg = "registration_confirmation类型邮件必须提供user_data参数"
+                    logging.error(error_msg)
+                    print(f"错误: {error_msg}")
+                    return False
+                email_content = self.get_registration_confirmation_content(user_data)
+                subject = Header("【注册成功】欢迎加入达客科技", 'utf-8')
             else:
-                error_msg = f"无效的邮件类型: {email_type}，支持的类型为'product_update'、'subscription_confirm'和'admin_notification'"
+                error_msg = f"无效的邮件类型: {email_type}，支持的类型为'product_update'、'subscription_confirm'、'admin_notification'和'registration_confirmation'"
                 logging.error(error_msg)
                 print(f"错误: {error_msg}")
                 return False
@@ -570,10 +722,10 @@ def send_single_email(recipient_email, email_type="product_update",user_data=Non
     
     Args:
         recipient_email: 收件人邮箱
-        email_type: 邮件类型，"product_update"表示产品上线提醒，"subscription_confirm"表示订阅确认，"admin_notification"表示管理员通知
+        email_type: 邮件类型，"product_update"表示产品上线提醒，"subscription_confirm"表示订阅确认，"admin_notification"表示管理员通知，"registration_confirmation"表示注册成功确认
         custom_content: 自定义邮件内容（HTML格式），如果提供则忽略email_type
         custom_subject: 自定义邮件主题，如果提供则忽略email_type
-        user_data: 用户数据，用于管理员通知邮件
+        user_data: 用户数据，用于管理员通知邮件和注册成功确认邮件
         
     Returns:
         bool: 发送是否成功
@@ -604,5 +756,22 @@ if __name__ == "__main__":
     #     print("测试2成功！")
     # else:
     #     print("测试2失败！")
+    
+    # 测试3：测试注册成功确认邮件内容生成
+    print("\n测试3：生成注册成功确认邮件内容")
+    test_user_data = {
+        'Name': '测试用户',
+        'Email': 'test@example.com',
+        'Password': 'Test123456'
+    }
+    
+    # 测试邮件内容生成
+    try:
+        content = sender.get_registration_confirmation_content(test_user_data)
+        print("注册成功确认邮件内容生成成功！")
+        print("邮件内容预览：")
+        print(content[:500] + "...")  # 只显示前500个字符
+    except Exception as e:
+        print(f"生成注册成功确认邮件内容失败：{str(e)}")
     
     print("\n测试完成！")

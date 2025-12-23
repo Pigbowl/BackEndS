@@ -2,10 +2,15 @@ import pymysql
 from typing import Dict, List, Any, Optional
 
 # 全局变量：部署模式
-deploy_mode = "test"  # 用于存储部署模式信息
-
+deploy_mode_sql = "full"  # 用于存储部署模式信息
+print("It's there",deploy_mode_sql)
+type = "static"
 class SQLOperations:
-    def __init__(self):
+    def __init__(self,        
+        host="localhost",    # MySQL主机地址
+        user="root",         # MySQL用户名
+        password="12345678",       # MySQL密码
+        database="darkerdatabase"):   # MySQL数据库名)
         """
         初始化MySQL数据库连接
         
@@ -16,23 +21,34 @@ class SQLOperations:
             database: MySQL数据库名
         """
         # 保存数据库名作为实例变量
-        self.database = "darkerdatabase"
-        if deploy_mode == "local" or deploy_mode == "full":
-            host = '47.99.204.97'
-            user = 'root'
-            password = '12345678'
-        elif deploy_mode == "test":
-            host = 'localhost'
-            user = 'root'
-            password = '12345678'
-        else:
-            raise ValueError("无效的部署模式")
+        # self.database = "darkerdatabase"
+        # print(deploy_mode_sql)
+        # if type == "static":  #writting static info 
+        #     if deploy_mode_sql == "local" or deploy_mode_sql == "full": #if backend is on server, not allowed
+        #         host = '47.99.204.97'
+        #         user = 'root'
+        #         password = 'xxxxx'
+        #     elif deploy_mode_sql == "test": #if backend is on local, write into local MySql
+        #         host = 'localhost'
+        #         user = 'root'
+        #         password = '12345678'
+        # elif type == "dynamic": #writing dynamic
+        #     if deploy_mode_sql == "local" or deploy_mode_sql == "full": #if backend is on server, write into server(relative local)
+        #         host = 'localhost'
+        #         user = 'root'
+        #         password = '12345678'
+        #     elif deploy_mode_sql == "test": #if backend is on local, write into remtoe with IP
+        #         host = '47.99.204.97'
+        #         user = 'root'
+        #         password = '12345678'
+        # else:
+        #     raise ValueError("无效的部署模式")
         
         self.conn = pymysql.connect(
             host=host,
             user=user,
             password=password,
-            database=self.database,
+            database=database,
             charset='utf8mb4',
             cursorclass=pymysql.cursors.DictCursor
         )

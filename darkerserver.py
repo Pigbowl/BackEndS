@@ -4,21 +4,21 @@ import os
 import sys
 import time
 import logging
-import requests
+# import requests
+# from Python_S.emailing import send_batch_email, send_single_email
+# from Python_S.read_part_catalogue import create_part_catalogue
+# from Python_S.parse_adas_benchmark import benchmarkinfofetch
+# from Python_S.path_utils import resource_path
+# from Python_S.solution_finding import solution_hunting
+# from Python_S.FBS_SEARCHING import fbsfindg, fbsbaseinit
 
 from Python_S.fuzzysearchs import fuzzy_search
 from urllib.parse import urlparse  # 新增：用于解析GET请求路径
-from Python_S.path_utils import resource_path
-from Python_S.solution_finding import solution_hunting
-from Python_S.FBS_SEARCHING import fbsfindg, fbsbaseinit
 from Python_S.cache_manager import check_and_update_cache
-from Python_S.parse_adas_benchmark import benchmarkinfofetch
 from Python_S.AutoScene3D_height_onefunc import process_map_data
-from Python_S.read_part_catalogue import create_part_catalogue
 from Python_S.json_to_sql_processor import database_manipulate
-from Python_S.emailing import send_batch_email, send_single_email
-from Python_S.sql_operations import deploy_mode  # 导入全局变量
-
+from Python_S.sql_operations import deploy_mode_sql  # 导入全局变量
+from Python_S.sql_operations import SQLOperations
 from Python_S.ReadDBAndGenerateProtocol import (
     config_searching,
     create_task,
@@ -26,14 +26,15 @@ from Python_S.ReadDBAndGenerateProtocol import (
     fetch_siteproduct_info,
     export_table_columns_with_foreign_key,
     extract_entire_network,
-    add_users,
+    add_subscribers,
     submit_issue,
     manage_login,
     fetch_advice_recording,
     update_recordings,
     update_productStatus,
     delete_recordings,
-    get_user_info,
+    get_all_users,
+    manage_register,
     visit_management,
     visit_statistic,
     perform_group_delete_operation,
@@ -46,7 +47,11 @@ from Python_S.ReadDBAndGenerateProtocol import (
     initiate_configurator,
     get_task_tobepub,
     update_task,
+    extrac_function_breakdown_group,
+    extract_single_feature,
 )
+
+
 
 # 配置日志记录
 logging.basicConfig(
@@ -127,7 +132,6 @@ class MyHandler(BaseHTTPRequestHandler):
         """处理POST请求（保留原有所有功能）"""
         # 调试日志：打印请求路径
         print(f"接收到POST请求，路径: {self.path}")
-        
         content_length = int(self.headers['Content-Length'])
         post_data = self.rfile.read(content_length)
 
@@ -141,149 +145,179 @@ class MyHandler(BaseHTTPRequestHandler):
         except json.JSONDecodeError as e:
             self._send_response({'error': f'JSON解析错误: {str(e)}'}, 400)
             return
+        if 'datatype' not in data:
+            datamode = "product"
+        else:
+            datamode = data.get('datatype')
+        if deploy_mode == "test":
+            db_product = SQLOperations(
+                host='localhost',    # MySQL主机地址
+                user='root',         # MySQL用户名
+                password='12345678',         # MySQL密码
+                database='darkerdatabase'   # MySQL数据库名
+            )
 
-        # 原有所有POST路径处理（保持不变）
+            db_operation = SQLOperations(
+                host='47.99.204.97',    # MySQL主机地址
+                user='centeruser',         # MySQL用户名
+                password='12345678',         # MySQL密码
+                database='operationdatabase'   # MySQL数据库名
+            )
+        else:
+            #若当前代码部署在服务器端，则产品数据不允许写入，故意设置错误密码
+            db_product = SQLOperations(
+                host='localhost',    # MySQL主机地址
+                user='root',         # MySQL用户名
+                password='xxxxxx',         # MySQL密码
+                database='darkerdatabase'   # MySQL数据库名
+            )
+            #若当前代码部署在服务器端，则运营数据写入服务器数据库（既相对的）
+            db_operation = SQLOperations(
+                host='localhost',    # MySQL主机地址
+                user='centeruser',         # MySQL用户名
+                password='12345678',         # MySQL密码
+                database='operationdatabase'   # MySQL数据库名
+            )
 
-        if self.path =='/get_regulation':
-            processed_results, lib_tables_data = export_table_columns_with_foreign_key()
-            countries = data.get('countries')
-            resulting = fetch_regulation_list(processed_results,lib_tables_data,"country",countries,"Name")
+        if datamode =='product':
+            database = db_product
+        elif datamode =='operation':
+            database = db_operation
+
+        ####################################### PRODUCT DATA RELATED ##################################################
+        if self.path =='/get_regulation':  #根据国家列表获取法规列表 #Done
+            processed_results, lib_tables_data = export_table_columns_with_foreign_key(database)
+            resulting = fetch_regulation_list(database,processed_results,lib_tables_data,"country",data.get('countries'),"Name")
             self._send_response({'success': True, 'output': resulting})
-        elif self.path == '/knockknock':
+        elif self.path == '/knockknock': #验证服务器工作状态 #Done
             self._send_response({'success': True, 'output': 'HelloThere'})
-        elif self.path == '/deploy_information':
-            # 将deploy_mode的值赋给全局变量
-            if 'deploy_mode' in data:
-                from Python_S.sql_operations import deploy_mode  # 再次导入以修改其值
-                import Python_S.sql_operations
-                Python_S.sql_operations.deploy_mode = data.get('deploy_mode')
-                print(f"已设置全局部署模式: {Python_S.sql_operations.deploy_mode}")
-            self._send_response({'success': True, 'output': deploy_mode})
-        elif self.path == '/search_function':   # 模糊搜索函数
-            processed_results, lib_tables_data = export_table_columns_with_foreign_key()
-            resulting = fuzzy_search(processed_results,lib_tables_data,data.get('table_name'),data.get('searchtext'), float(0.8))
+        elif self.path == '/get_function_list':   # 获取用户功能列表  #Done
+            processed_results, lib_tables_data = export_table_columns_with_foreign_key(database)
+            resulting = extract_item_group(database,processed_results,lib_tables_data,data.get('table_name'),data.get('item_cate'))
             self._send_response({'success': True, 'output': resulting})
-        elif self.path == '/init_config_func':
-            processed_results, lib_tables_data = export_table_columns_with_foreign_key()
-            resulting = initiate_configurator(processed_results,lib_tables_data)
+        elif self.path == '/search_function':   # 模糊搜索函数  #Done
+            processed_results, lib_tables_data = export_table_columns_with_foreign_key(database)
+            resulting = fuzzy_search(database,processed_results,lib_tables_data,data.get('table_name'),data.get('searchtext'), float(0.8))
             self._send_response({'success': True, 'output': resulting})
-        elif self.path == '/get_function_list':   # 获取用户功能列表
-            processed_results, lib_tables_data = export_table_columns_with_foreign_key()
-            resulting = extract_item_group(processed_results,lib_tables_data,data.get('table_name'),data.get('item_cate'))
+        elif self.path == '/init_config_func':  #初始化产品配置器选项  #Done
+            processed_results, lib_tables_data = export_table_columns_with_foreign_key(database)
+            resulting = initiate_configurator(database,processed_results,lib_tables_data)
             self._send_response({'success': True, 'output': resulting})
-        elif self.path == '/extract_Know_net':   # 提取知识网络
-            processed_results, lib_tables_data = export_table_columns_with_foreign_key()
-            resulting = extract_entire_network(processed_results,lib_tables_data,'work')
-            self._send_response({'success': True, 'output': resulting})
-        elif self.path == '/get_solution_list':   # 配置搜索
-            processed_results, lib_tables_data = export_table_columns_with_foreign_key()
-            resulting = extract_item_group(processed_results,lib_tables_data,data.get('table_name'),data.get('item_cate'))
+        elif self.path =='/config_searching':   # 配置搜索 #Done
+            processed_results, lib_tables_data = export_table_columns_with_foreign_key(database)
+            resulting = config_searching(database,processed_results,lib_tables_data,data.get('search_condition'))
             self._send_response({'success': True, 'output': resulting}) 
-        elif self.path =='/config_searching':   # 配置搜索
-            processed_results, lib_tables_data = export_table_columns_with_foreign_key()
-            resulting = config_searching(processed_results,lib_tables_data,data.get('search_condition'))
+        elif self.path == '/extract_Know_net':   # 提取知识网络 #Done
+            processed_results, lib_tables_data = export_table_columns_with_foreign_key(database)
+            resulting = extract_entire_network(database,processed_results,lib_tables_data,'work')
+            self._send_response({'success': True, 'output': resulting})
+        elif self.path == '/get_solution_list':   # 配置搜索  ??????????????
+            processed_results, lib_tables_data = export_table_columns_with_foreign_key(database)
+            resulting = extract_item_group(database,processed_results,lib_tables_data,data.get('table_name'),data.get('item_cate'))
             self._send_response({'success': True, 'output': resulting}) 
-        elif self.path == '/fbssearching':   # FBS搜索
-            fbs_input = data.get('intputdata')
-            table_address = resource_path(r"DataStorage/database.xlsx")
-            resulting = fbsfindg(fbs_input, table_address)
+        elif self.path == '/fbssearching':   # FBS搜索 #Done
+            resulting = extract_single_feature(database,data.get('intputdata'))
             self._send_response({'success': True, 'output': resulting}) 
-        elif self.path == '/fbsnetinit':   # FBS网络初始化
-            table_address = resource_path(r"DataStorage/database.xlsx")
-            resulting = fbsbaseinit(table_address)
+        elif self.path == '/function_breakdown_full':   # 功能分解 #Done
+            processed_results, lib_tables_data = export_table_columns_with_foreign_key(database)
+            resulting = extrac_function_breakdown_group(database,processed_results,lib_tables_data," ",data.get('item_cate'))
             self._send_response({'success': True, 'output': resulting}) 
-        elif self.path == '/part_list_get':   # 获取零件列表
-            table_address = resource_path(r"DataStorage/database.xlsx")
-            resulting = create_part_catalogue(table_address)
-            self._send_response({'success': True, 'output': resulting}) 
-        elif self.path == '/add_issue':
-            resulting = submit_issue(data.get('issue'))
+        elif self.path == '/extract_item_group': # 提取数据组
+            processed_results, lib_tables_data = export_table_columns_with_foreign_key(database)
+            resulting = extract_item_group(database,processed_results,lib_tables_data,data.get('table_name'),data.get('item_cate'))
             self._send_response({'success': True, 'output': resulting})
-        elif self.path == '/manager_login':
-            resulting = manage_login(data.get('login'))
+        elif self.path == '/db_summary':  # 数据库摘要 #Done
+            resulting = fetch_db_summary(database)
             self._send_response({'success': True, 'output': resulting})
-        elif self.path == '/update_recordings':
-            resulting = update_recordings(data.get('to_update'),data.get('ID'))
+        elif self.path == '/table_summary':  # 表摘要 #Done
+            resulting = fetch_table_sumary(database,data.get('data'))
             self._send_response({'success': True, 'output': resulting})
-        elif self.path == '/update_productStatus':
-            resulting = update_productStatus(data.get('to_update'),data.get('ID'))
-            self._send_response({'success': True, 'output': resulting})
-        elif self.path == '/delete_recordings':
-            resulting = delete_recordings(data.get('ID'))
-            self._send_response({'success': True, 'output': resulting})
-        elif self.path == '/get_all_recording':
-            resulting = fetch_advice_recording()
-            self._send_response({'success': True, 'output': resulting}) 
-        elif self.path =='/get_siteproduct_info':
-            resulting = fetch_siteproduct_info()
-            self._send_response({'success': True, 'output': resulting})
-        elif self.path == '/get_user_info':
-            resulting = get_user_info()
-            self._send_response({'success': True, 'output': resulting})
-        elif self.path == '/process_map_data':
-            global GLB_FILENAME
-            GLB_FILENAME='3DModels/' + data.get('fileName')+'.glb';
-            resulting = process_map_data(data.get('mapdata'),GLB_FILENAME)
-            self._send_response({'success': True, 'output': resulting})
-        elif self.path == '/add_user':
-            new_user = data.get('user')
-            resulting = add_users(new_user)
-            self._send_response({'success': True, 'output': resulting})
-        elif self.path == '/add_visit':
-            visit = data.get('data')
-            resulting = visit_management(visit)
-            self._send_response({'success': True, 'output': resulting})
-        elif self.path == '/update_tasks':
-            resulting = update_task(data)
-            self._send_response({'success': True, 'output': resulting})
-        elif self.path == '/get_visit_stat':
-            resulting = visit_statistic()
-            self._send_response({'success': True, 'output': resulting}) 
-        elif self.path == '/get_tasks_tobepub':
-            resulting = get_task_tobepub()
-            self._send_response({'success': True, 'output': resulting})
-        elif self.path == '/create_new_tasks':
-            resulting = create_task(data)
-            self._send_response({'success': True, 'output': resulting})
-        elif self.path == '/extract_item_group':
-            processed_results, lib_tables_data = export_table_columns_with_foreign_key()
-            resulting = extract_item_group(processed_results,lib_tables_data,data.get('table_name'),data.get('item_cate'))
-            self._send_response({'success': True, 'output': resulting})
-        elif self.path == '/db_summary':
-            resulting = fetch_db_summary()
-            self._send_response({'success': True, 'output': resulting})
-        elif self.path == '/table_summary':
-            resulting = fetch_table_sumary(data)
-            self._send_response({'success': True, 'output': resulting})
-        elif self.path == '/generate_new_item':
-            processed_results,lib_tables_data = export_table_columns_with_foreign_key()
+        elif self.path == '/generate_new_item':  # 生成新项目 #Done
+            processed_results,lib_tables_data = export_table_columns_with_foreign_key(database)
             resulting = generate_new_object_data_structure(processed_results,lib_tables_data,data['tablename'])
             self._send_response({'success': True, 'output': resulting})
-        elif self.path == '/createnewsql':
-            try:
-                resulting = database_manipulate(data)
-                self._send_response({'success': True, 'output': resulting})
-            except Exception as e:
-                error_message = f"处理数据库操作错误: {str(e)}"
-                # print(error_message)
-                logging.error(error_message)
-                self._send_response({'success': False, "message": f"服务器内部错误: {str(e)}"})  
-        elif self.path == '/modifyitems':
-            """处理修改项目的请求"""
-            first_key, first_value = next(iter(data['rowdata'].items()))
-            processed_results,lib_tables_data = export_table_columns_with_foreign_key()
-            resulting = generate_target_object_data_structure(processed_results,lib_tables_data,data['tablename'],first_value,first_key)
+        elif self.path == '/modifyitems':  # 修改项目 #Done
+            data2 = data.get('data')
+            first_key, first_value = next(iter(data2['rowdata'].items()))
+            processed_results,lib_tables_data = export_table_columns_with_foreign_key(database)
+            resulting = generate_target_object_data_structure(database,processed_results,lib_tables_data,data2['tablename'],first_value,first_key)
             self._send_response({'success': True, 'output': resulting})
-        elif self.path == '/deleteitem':
-            """处理删除项目的请求"""
-            first_key, first_value = next(iter(data['rowdata'].items()))
-            processed_results, lib_tables_data = export_table_columns_with_foreign_key()
-            resulting = perform_group_delete_operation(processed_results, lib_tables_data,data['tablename'],first_value,first_key) 
+        elif self.path == '/deleteitem':  # 删除项目 #Done
+            data2 = data.get('data')
+            first_key, first_value = next(iter(data2['rowdata'].items()))
+            processed_results, lib_tables_data = export_table_columns_with_foreign_key(database)
+            resulting = perform_group_delete_operation(database,processed_results, lib_tables_data,data2['tablename'],first_value,first_key) 
             self._send_response({'success': True, 'output': resulting})
-        elif self.path == '/extract_item':
-            first_key, first_value = next(iter(data['rowdata'].items()))
-            processed_results, lib_tables_data = export_table_columns_with_foreign_key()
-            resulting = extract_single_item(processed_results,lib_tables_data,data['tablename'],first_value,first_key)
+        elif self.path == '/extract_item':  # 提取项目 #Done
+            data2 = data.get('data')
+            first_key, first_value = next(iter(data2['rowdata'].items()))
+            processed_results, lib_tables_data = export_table_columns_with_foreign_key(database)
+            resulting = extract_single_item(database,processed_results,lib_tables_data,data2['tablename'],first_value,first_key)
+            self._send_response({'success': True, 'output': resulting})    
+        elif self.path == '/createnewsql': #Done
+            if deploy_mode =='test':
+                try:
+                    resulting = database_manipulate(database,data.get('data'))
+                    self._send_response({'success': True, 'output': resulting})
+                except Exception as e:
+                    logging.error(f"处理数据库操作错误: {str(e)}")
+                    self._send_response({'success': False, "message": f"服务器内部错误: {str(e)}"})  
+            else:
+                self._send_response({'success': False, "message": f"服务器内部错误: 非测试模式下不允许创建新SQL"})  
+
+
+        ####################################### OPERATION DATA RELATED ##################################################
+        elif self.path == '/add_user':
+            resulting = add_subscribers(database,data.get('user'))
+            self._send_response({'success': True, 'output': resulting})
+        elif self.path == '/manage_login':
+            resulting = manage_login(database,data.get('login'))
+            self._send_response({'success': True, 'output': resulting})
+        elif self.path == '/manage_register':
+            resulting = manage_register(database,data.get('registration'),deploy_mode)
+            self._send_response({'success': True, 'output': resulting})
+        elif self.path == '/add_issue':
+            resulting = submit_issue(database,data.get('issue'))
+            self._send_response({'success': True, 'output': resulting})
+        elif self.path == '/update_recordings':
+            resulting = update_recordings(database,data.get('to_update'),data.get('ID'))
+            self._send_response({'success': True, 'output': resulting})
+        elif self.path == '/update_productStatus':
+            resulting = update_productStatus(database,data.get('to_update'),data.get('ID'))
+            self._send_response({'success': True, 'output': resulting})
+        elif self.path == '/delete_recordings':
+            resulting = delete_recordings(database,data.get('ID'))
+            self._send_response({'success': True, 'output': resulting})
+        elif self.path == '/get_all_recording':
+            resulting = fetch_advice_recording(database)
+            self._send_response({'success': True, 'output': resulting}) 
+        elif self.path =='/get_siteproduct_info':
+            resulting = fetch_siteproduct_info(database)
+            self._send_response({'success': True, 'output': resulting})
+        elif self.path == '/get_all_users':
+            resulting = get_all_users(database)
+            self._send_response({'success': True, 'output': resulting})
+        elif self.path == '/get_tasks_tobepub':
+            resulting = get_task_tobepub(database)
+            self._send_response({'success': True, 'output': resulting})
+        elif self.path == '/update_tasks':
+            resulting = update_task(database,data)
+            self._send_response({'success': True, 'output': resulting})
+        elif self.path == '/get_visit_stat':
+            resulting = visit_statistic(database)
+            self._send_response({'success': True, 'output': resulting}) 
+        elif self.path == '/create_new_tasks':
+            resulting = create_task(database,data.get('taskdata'))
+            self._send_response({'success': True, 'output': resulting})
+        elif self.path == '/add_visit':
+            resulting = visit_management(database,data.get('data'),data.get('uservisit'))
+            self._send_response({'success': True, 'output': resulting})
+
+        ####################################### NO DATABASED RELATED ##################################################
+        elif self.path == '/process_map_data':
+            global GLB_FILENAME
+            GLB_FILENAME='3DModels/' + data.get('fileName')+'.glb'
+            resulting = process_map_data(data.get('mapdata'),GLB_FILENAME)
             self._send_response({'success': True, 'output': resulting})
         elif self.path == '/stopserver':
             # 关闭服务器逻辑
@@ -304,7 +338,7 @@ class MyHandler(BaseHTTPRequestHandler):
         else:
             self._send_response({'error': '未知路径'}, 404)
 
-
+        database.close()
         
 def wait_for_file_creation(file_path: str) -> bool:
     MAX_WAIT_TIME = 5  # 5秒
@@ -332,11 +366,17 @@ def main():
     # 初始化缓存
     cache_dir = check_and_update_cache()
     logging.info(f"使用缓存目录: {cache_dir}")
+    global deploy_mode,db_operation,db_product
     deploy_mode = "full"
+    from Python_S.sql_operations import deploy_mode_sql  # 再次导入以修改其值
+    import Python_S.sql_operations
+    Python_S.sql_operations.deploy_mode_sql = deploy_mode
+    print(f"已设置全局部署模式: {Python_S.sql_operations.deploy_mode_sql}")
     if deploy_mode == "test":
         server_address = ('localhost', 5000)
     elif deploy_mode == "full":
         server_address = ('0.0.0.0', 5000)
+
     httpd = ThreadingHTTPServer(server_address, MyHandler)
     print('Starting DarkerTech backend server on port 5000...')  # 修正端口显示（原代码写的80，实际是5000）
     print('Server is ready to accept requests from frontend.')
@@ -358,3 +398,22 @@ def main():
 
 if __name__ == '__main__':
     main()
+
+
+                    # elif self.path == '/deploy_information':
+        #     print("Hello")
+        #     # # 将deploy_mode的值赋给全局变量
+        #     # if 'deploy_mode' in data:
+        #     #     from Python_S.sql_operations import deploy_mode  # 再次导入以修改其值
+        #     #     import Python_S.sql_operations
+        #     #     Python_S.sql_operations.deploy_mode = data.get('deploy_mode')
+        #     #     print(f"已设置全局部署模式: {Python_S.sql_operations.deploy_mode}")
+        #     # self._send_response({'success': True, 'output': deploy_mode})
+        # elif self.path == '/fbsnetinit':   # FBS网络初始化
+        #     table_address = resource_path(r"DataStorage/database.xlsx")
+        #     resulting = fbsbaseinit(table_address)
+        #     self._send_response({'success': True, 'output': resulting}) 
+        # elif self.path == '/part_list_get':   # 获取零件列表 
+        #     table_address = resource_path(r"DataStorage/database.xlsx")
+        #     resulting = create_part_catalogue(table_address)
+        #     self._send_response({'success': True, 'output': resulting}) 

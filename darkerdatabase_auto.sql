@@ -897,6 +897,35 @@ INSERT INTO `ecu_storage_input` VALUES (1,1,'Kioxia THGBMFG9C1LBAIL'),(2,3,'Micr
 UNLOCK TABLES;
 
 --
+-- Table structure for table `elementfunction`
+--
+
+DROP TABLE IF EXISTS `elementfunction`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `elementfunction` (
+  `ID` int NOT NULL AUTO_INCREMENT,
+  `Name` varchar(225) NOT NULL,
+  `Description` text,
+  `idfunc` int DEFAULT NULL,
+  `FullName` varchar(300) GENERATED ALWAYS AS (concat(_utf8mb4'EF',`idfunc`)) VIRTUAL,
+  PRIMARY KEY (`ID`),
+  UNIQUE KEY `ID_UNIQUE` (`ID`),
+  UNIQUE KEY `Name_UNIQUE` (`Name`)
+) ENGINE=InnoDB AUTO_INCREMENT=149 DEFAULT CHARSET=utf8mb3;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `elementfunction`
+--
+
+LOCK TABLES `elementfunction` WRITE;
+/*!40000 ALTER TABLE `elementfunction` DISABLE KEYS */;
+INSERT INTO `elementfunction` (`ID`, `Name`, `Description`, `idfunc`) VALUES (1,'Content addition on GLOBAL MAP',NULL,128),(2,'Generate topology information within GLOBAL MAP',NULL,129),(3,'Detect loop closure for global map',NULL,130),(4,'Improvement of the Memorized Route',NULL,131),(5,'Transfert local map in global map coordinate',NULL,132),(6,'Generate local map with navigation content',NULL,133),(7,'Generate the Map Patch',NULL,134),(8,'Content Redundancy verification',NULL,135),(9,'MEM MAP INIT',NULL,136),(10,'Define driver demande',NULL,137),(11,'Define MAPPING Mode','This logic component takes the result of map coverage and what the driver\'s command to define the mode of mapping',138),(12,'Determine the coordiante transfer matrix',NULL,139),(13,'Generate Ego Vehicle\'s Trajectory',NULL,140),(14,'Tranfer map data to ego vehicle coordinate',NULL,1),(15,'Determine ego scenario location',NULL,2),(16,'Arbitrate and Determine the fused routing info',NULL,3),(17,'Determine and extract the ODD information from Map',NULL,4),(18,'Select neccessary map element for driving policy',NULL,5),(19,'Generate line polynomial for linear object',NULL,6),(20,'Generate line polynomial for control reference lines',NULL,7),(21,'Generate map repository path',NULL,141),(22,'Generate & Update MAP_BRIEF_FILE CONTENT',NULL,142),(23,'WRITE THE MAP SLICE FILE INTO THE DISK',NULL,143),(24,'Determine Map Coverage of ego vehicle','This Logic Component determines if the ego vehicle is currently within the Route already recorded in the system and if so, provide the ID.',144),(25,'Determine the correct route/Global MAP to use','',145),(26,'Determine Rough EGO POSITION in GLOBAL MAP coordinate',NULL,8),(27,'Select the map slice ID',NULL,9),(28,'Determine the ego localization status',NULL,10),(29,'Determine which lane ego is located',NULL,11),(30,'Determine the ego coordiante within GLOBAL Map',NULL,12),(31,'Enhance ego POS',NULL,13),(32,'Determine ego localization status',NULL,14),(33,'Yaw Rate Correction',NULL,15),(34,'GET TRACK POSITION',NULL,16),(35,'CLEAR SENSOR INPUT BUFFER',NULL,17),(36,'OBJ MOTION TRAJECTORY PREDICTION',NULL,18),(37,'CHECK OCCULUSION',NULL,19),(38,'FILTER UPDATE',NULL,20),(39,'CALCULATE DRIVEN DISTANCE',NULL,21),(40,'CLEAR OVERLAPPIN OBJECTS',NULL,22),(41,'Determine position of the front obstacles',NULL,23),(42,'Determine the classification of the front obstables',NULL,24),(43,'Determine the dimension of the front obstacles',NULL,25),(44,'Determine the dynamic motion of front vehicle',NULL,26),(45,'Detect TRL position and angle',NULL,27),(46,'Determine the TRL light color',NULL,28),(47,'Determine the TRL Light Status',NULL,29),(48,'Determine the TRL Direction',NULL,30),(49,'Determine the traffic sign position',NULL,31),(50,'Determine the traffic sign value & Type',NULL,32),(51,'Determine position of the all obstacles',NULL,33),(52,'Determine the classification of the all obstables',NULL,34),(53,'Determine the dimension of the all obstacles',NULL,35),(54,'Determine the dynamic motion of all vehicle',NULL,36),(55,'Determine the RM position',NULL,37),(56,'Determine the RM value & Type',NULL,38),(57,'Determine the LM\'s Geo Points ',NULL,39),(58,'Determine the LM Longi Range',NULL,40),(59,'Determine the LM Type & Color',NULL,41),(60,'Determine lane centering scenarios','This function defineds where the vehicle is in the scenarios where the vehicle need to follow the ego lane path',42),(61,'Determine routing request lane change scenarios','Determine if ego needs to change lane to following the defined routing information (lane level Traffic Rules included)',43),(62,'Calculated lane travel efficiency','Determine travel efficiency lane change',44),(63,'Determine lane change to avoid obstacles Scenarios','This function determine if the ego needs to take lane change action to avoid obstacles(defined in the detail design)',45),(64,'Determine travel efficiency lane change','Determine travel efficiency lane change',46),(65,'Perform arbitration（prioritization) of lane change request','This function determine if the ego needs to take lane change action to avoid obstacles(defined in the detail design)',47),(66,'Determine strong brake scenarios','This function defines if the ego vehicle is in the scenarios where the brake force need to be extended',48),(67,'Determine if ego is in nudge scenario','This module is to XXXXXXXXXX',49),(68,'Determine if ego is in unprotected intersection_turn_scenario','This module is to XXXXXXXXXX',50),(69,'Determine if ego is in pass staright intersection scenario','This module is to XXXXXXXXXX',51),(70,'Determine if ego vehicle needs to handle the wait zone scenario','This module is to XXXXXXXXXX',52),(71,'Determine if ego is in U turn scenario','This module is to XXXXXXXXXX',53),(72,'Determine adjacent lane target predicted collision risk',NULL,54),(73,'Determine ego lane target predicted collision risk',NULL,55),(74,'Determine adjacent lane target collision time',NULL,56),(75,'Determine ego lane target collision time',NULL,57),(76,'Determine target collision probability within the intersection',NULL,58),(77,'Determine Primary target to follow',NULL,59),(78,'Extract Speed Limit Rules',NULL,60),(79,'Extract LC Inhibition Rules',NULL,61),(80,'Extract Lane Access Rules',NULL,62),(81,'Extract Stop Area Rules',NULL,63),(82,'Extract Yielding Rules',NULL,64),(83,'Extract timing rules',NULL,65),(84,'Extract Construction Area Rules',NULL,66),(85,'Extract Wait Zone Rules',NULL,67),(86,'Arbitrate scenario proposal and decide next action to perform',NULL,68),(87,'Determine lane follow scenario proposal',NULL,69),(88,'Determine nudge scenario proposal',NULL,70),(89,'Determine lane change scenario proposal',NULL,71),(90,'Determine the intersection scenarios proposal',NULL,72),(91,'Determine the target control point for intersection',NULL,73),(92,'Generate ego speed boundaries in current scenarios','This function generate an interval of speed that constrain the vehicle to go for the planning',74),(93,'Determine Driver\'s set speed','This function generate an interval of speed that constrain the vehicle to go for the planning',75),(94,'Determine safe space for path generation','This function determine the safe space for the function according to different type of environment input and next action decision',76),(95,'Determine Maneuver execution time bound','This function determine the execution pre-defined of maneuver actions',77),(96,'Generate multiple vehicle path(geometrie information)','This function generate a path that contains the x,y position of the vehicle at each time increment',78),(97,'Perform the optimization of the path','This function generate a path that contains the x,y position of the vehicle at each time increment',79),(98,'Generate ego vehicle trajectories','This function generate a path that contains the x,y position of the vehicle at each time increment',80),(99,'Determine Trajectory Cost Value & Arbitration','This function generate a path that contains the x,y position of the vehicle at each time increment',81),(100,'Determine planning status','This function generate a path that contains the x,y position of the vehicle at each time increment',82),(101,'Determine safety turn gap for intersection','This function generate a path that contains the x,y position of the vehicle at each time increment',83),(102,'Determine Lane Change Function State',NULL,84),(103,'Determine Longitudinal control state',NULL,85),(104,'Determine lateral control state',NULL,86),(105,'Determine intersection control state',NULL,87),(106,'Determine Urban Commute system state',NULL,88),(107,'Determine Lane Centering Availability',NULL,89),(108,'Determine Longi Follow Availability',NULL,90),(109,'Determine Nudge Availability',NULL,91),(110,'Determine In Lane Control Availability',NULL,92),(111,'Determine Lane Change Manoeuver Availability',NULL,93),(112,'Determine Lane Change Triggering Availability',NULL,94),(113,'Determine Intersection passing availability',NULL,95),(114,'Generate Longitudinal Control Command',NULL,96),(115,'Generate Brake Control Command',NULL,97),(116,'Longi Ctrol Command Arbitration',NULL,98),(117,'Generate Lateral Control Command',NULL,99),(118,'Lat Ctrol Command Arbitration',NULL,100),(119,'Longitudinal Control Handshake',NULL,101),(120,'Lateral Control Handshake',NULL,102),(121,'Determine vehicle odometry from motion  sensor data（DR）',NULL,146),(122,'Determine Ego Vehicle ODOM from Vision and IMU (VIO)',NULL,147),(123,'Generate the prediction of ego trajectory',NULL,148),(124,'Assign Speed Values to lanes',NULL,103),(125,'Assign Traffic Light to lanes',NULL,104),(126,'Assign lane driving property to lanes',NULL,105),(127,'Generate driving freespace polygone based on occupancy grid',NULL,106),(128,'Generate road & lane boudaries models (ego centerd)',NULL,107),(129,'Generate local map road model',NULL,108),(130,'Generate Lane marker Topology info',NULL,109),(131,'Assign Object to lanes',NULL,110),(132,'Determine object\'s dynamic motion status',NULL,111),(133,'Determine object relation to ego path',NULL,112),(134,'Select Traffic Light on Ego Path',NULL,113),(135,'Determine lane boundries for PnC','This element function is to determine the lane marker and roadedge geometrie point for PnC,either arbitrate or fused between RT perception and Global Map Input.',114),(136,'Determine lane boundries attribute for PnC','This element function is to determine the lane marker and roadedge geometrie point for PnC,either arbitrate or fused between RT perception and Global Map Input.',115),(137,'Determine the road marks for PnC',NULL,116),(138,'Determine the traffic sign to use',NULL,117),(139,'Determine the traffic light to use',NULL,118),(140,'MAPPING VEH IN SIGNAL',NULL,119),(141,'MAPPING VEH OUT SIGNAL',NULL,120),(142,'Extract Driver activation command',NULL,121),(143,'Extract Driver Cancel Command',NULL,122),(144,'Extract Driver Speed adjustment Command',NULL,123),(145,'Extract Driver Lane Change command',NULL,124),(146,'Extract Driver Override Command',NULL,125),(147,'Extract Driver handsoff Status',NULL,126),(148,'Extract Driver Eyesoff Status',NULL,127);
+/*!40000 ALTER TABLE `elementfunction` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
 -- Table structure for table `ethernet_switch`
 --
 
@@ -1016,6 +1045,36 @@ LOCK TABLES `euf_regulation_input` WRITE;
 /*!40000 ALTER TABLE `euf_regulation_input` DISABLE KEYS */;
 INSERT INTO `euf_regulation_input` VALUES (1,25,'FMVSS-127'),(2,25,'AIS-185'),(3,25,'UN-R152'),(4,25,'KMVSS-Article-90-3'),(6,25,'ADR-98'),(7,25,'GB/T-39901'),(8,5,'(EU)-2021/1958'),(9,5,'GB/T-44433-2024'),(10,1,'UN-R13H'),(11,1,'NCAP'),(12,1,'GB/T-20608-2006'),(13,1,'GB-21670-2008'),(14,11,'UN-R130'),(15,11,'ISO-17361:2017'),(16,11,'GB/T-26773-2011'),(17,11,'AIS-188'),(18,11,'ADR-99'),(19,2,'UN-R79'),(20,2,'GB/T-39323-2020'),(21,2,'AIS-193'),(22,26,'(EU)-2021/646'),(23,26,'UN-R79'),(24,26,'AIS-191'),(25,26,'ADR-107/00'),(26,27,'UN-R79'),(27,28,'UN-R79'),(28,12,'UN-R79'),(29,31,'UN-R79'),(30,6,'UN-R48'),(31,6,'FMVSS-108'),(32,6,'Resolution-CONTRAN-970/2022'),(33,6,'ADR-45/01'),(34,6,'UN-R48'),(35,6,'FMVSS-108'),(36,6,'Resolution-CONTRAN-970/2022'),(37,6,'ADR-45/01'),(38,8,'UN-R160'),(39,8,'GB-39732-2020'),(40,8,'AIS-192'),(41,14,'UN-R171'),(42,14,'GB/T-Multi-lane-manoeuver'),(43,13,'GB/T-Multi-lane-manoeuver'),(44,13,'UN-R171'),(45,15,'UN-R171'),(46,15,'GB 7258-202X'),(47,17,'UN-R171'),(48,17,'GB 7258-202X'),(49,34,'UN-R171'),(50,34,'GB 7258-202X'),(51,16,'UN-R157'),(52,35,'UN-R157'),(57,8,'UN-R157/VMAD');
 /*!40000 ALTER TABLE `euf_regulation_input` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `feautre_mf_input`
+--
+
+DROP TABLE IF EXISTS `feautre_mf_input`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `feautre_mf_input` (
+  `ID` int NOT NULL AUTO_INCREMENT,
+  `function_features_ID` int NOT NULL,
+  `mainfunctions_Name` varchar(225) NOT NULL,
+  PRIMARY KEY (`ID`),
+  UNIQUE KEY `ID_UNIQUE` (`ID`),
+  KEY `fk_feautre_mf_input_function_features1_idx` (`function_features_ID`),
+  KEY `fk_feautre_mf_input_mainfunctions1_idx` (`mainfunctions_Name`),
+  CONSTRAINT `fk_feautre_mf_input_function_features1` FOREIGN KEY (`function_features_ID`) REFERENCES `function_features` (`ID`),
+  CONSTRAINT `fk_feautre_mf_input_mainfunctions1` FOREIGN KEY (`mainfunctions_Name`) REFERENCES `mainfunctions` (`Name`)
+) ENGINE=InnoDB AUTO_INCREMENT=40 DEFAULT CHARSET=utf8mb3;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `feautre_mf_input`
+--
+
+LOCK TABLES `feautre_mf_input` WRITE;
+/*!40000 ALTER TABLE `feautre_mf_input` DISABLE KEYS */;
+INSERT INTO `feautre_mf_input` VALUES (17,1,'DETERMINER DRIVER INTERACTION'),(18,1,'Generate ADAS HMI'),(19,1,'GENERATE NAVIGATION PROFILE'),(20,1,'GLOBAL_MAPPING_SYSTEM'),(21,1,'Manage the GLOBAL MAP'),(22,1,'DETERMINE ADAS HMI CONTENT'),(23,20,'DETERMINER DRIVER INTERACTION'),(24,20,'Generate ADAS HMI'),(25,20,'DETERMINE IVI SYS STATUS'),(26,20,'GENERATE NAVIGATION PROFILE'),(27,20,'PROVIDE DIGITAL DATA OF ENVIRONMENT'),(28,20,'MAP PROCESSING SYSTEM'),(29,20,'DETERMINE EGO\'S LOCALIZATION DATA'),(30,20,'DETERMINE ADAS HMI CONTENT'),(31,20,'MAPPING EXTERNAL INFORMATION'),(32,20,'Manage the GLOBAL MAP'),(33,11,'DETERMINE IVI SYS STATUS'),(34,11,'MAP PROCESSING SYSTEM'),(35,11,'PROVIDING ENVIRONMENT PERCEPTION RESULT'),(36,11,'Determine the Environmental Model for Driving Function'),(37,11,'MAPPING EXTERNAL INFORMATION'),(38,11,'DETERMINE ADAS HMI CONTENT'),(39,11,'Manage the GLOBAL MAP');
+/*!40000 ALTER TABLE `feautre_mf_input` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
@@ -1262,7 +1321,7 @@ CREATE TABLE `issuesandadvice` (
   `Category` varchar(45) DEFAULT NULL,
   `Last_Modified` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`ID`)
-) ENGINE=InnoDB AUTO_INCREMENT=30 DEFAULT CHARSET=utf8mb3;
+) ENGINE=InnoDB AUTO_INCREMENT=40 DEFAULT CHARSET=utf8mb3;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1271,7 +1330,7 @@ CREATE TABLE `issuesandadvice` (
 
 LOCK TABLES `issuesandadvice` WRITE;
 /*!40000 ALTER TABLE `issuesandadvice` DISABLE KEYS */;
-INSERT INTO `issuesandadvice` VALUES (17,'我就试试，嘿嘿','2025-11-21 09:45:47','woshishuanghe@qq.com','suggestion','已采纳','YANG YUQI','general','2025-12-07 04:35:29'),(20,'Hello,大佬。我想看市面上关于域控的主流的系统芯片方案有哪些？要去哪里找','2025-11-21 13:04:21','xiaolan@outlook.com','suggestion','待处理','xiaolan','general',NULL),(21,'1. 初始化页面无法选中和移动传感器 2. 保存的2D图，车模位置不正确','2025-11-21 13:05:12','1273880613@qq.com','issue','处理中','Jiawei_SONG','fov_builder','2025-12-08 07:17:25'),(22,'我试一下第六个你会怎么处理呢？','2025-11-21 14:01:23','xiaolan@outlook.com','suggestion','已拒绝','xiaolan','general','2025-12-01 02:23:24'),(27,'lllll','2025-12-07 15:53:25','1273880613@qq.com','issue','处理中','Jiawei_SONG','产品配置器','2025-12-08 06:14:44'),(28,'3D预览功能无法使用','2025-12-08 06:21:47','1273880613@qq.com','issue','已解决','Jiawei_SONG','环境生成器','2025-12-08 06:47:39'),(29,'服务器无法连接-返回fail-to-fetch','2025-12-10 02:20:20','1273880613@qq.com','issue','已解决','Jiawei_SONG','通用信息','2025-12-10 02:29:12');
+INSERT INTO `issuesandadvice` VALUES (17,'我就试试，嘿嘿','2025-11-21 09:45:47','woshishuanghe@qq.com','suggestion','已采纳','YANG YUQI','general','2025-12-07 04:35:29'),(20,'Hello,大佬。我想看市面上关于域控的主流的系统芯片方案有哪些？要去哪里找','2025-11-21 13:04:21','xiaolan@outlook.com','suggestion','待处理','xiaolan','general',NULL),(21,'1. 初始化页面无法选中和移动传感器 2. 保存的2D图，车模位置不正确','2025-11-21 13:05:12','1273880613@qq.com','issue','处理中','Jiawei_SONG','fov_builder','2025-12-08 07:17:25'),(22,'我试一下第六个你会怎么处理呢？','2025-11-21 14:01:23','xiaolan@outlook.com','suggestion','已拒绝','xiaolan','general','2025-12-01 02:23:24'),(27,'lllll','2025-12-07 15:53:25','1273880613@qq.com','issue','处理中','Jiawei_SONG','产品配置器','2025-12-08 06:14:44'),(28,'3D预览功能无法使用','2025-12-08 06:21:47','1273880613@qq.com','issue','已解决','Jiawei_SONG','环境生成器','2025-12-08 06:47:39'),(29,'服务器无法连接-返回fail-to-fetch','2025-12-10 02:20:20','1273880613@qq.com','issue','已解决','Jiawei_SONG','通用信息','2025-12-10 02:29:12'),(36,'aaaa','2025-12-17 14:35:31','1273880613@qq.com','issue','待处理','AAA','生态网络',NULL),(37,'a','2025-12-17 14:57:25','1273880613@qq.com','suggestion','待处理','a','general',NULL),(38,'kkkk','2025-12-17 15:07:05','song-jiawei@outlook.com','suggestion','待处理','Jiawei_SONG','general',NULL),(39,'用户订阅后，并未成功订阅','2025-12-18 17:58:33','song-jiawei@outlook.com','issue','待处理','Jiawei SONG','通用信息',NULL);
 /*!40000 ALTER TABLE `issuesandadvice` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -1481,6 +1540,35 @@ LOCK TABLES `lidar_input` WRITE;
 UNLOCK TABLES;
 
 --
+-- Table structure for table `mainfunctions`
+--
+
+DROP TABLE IF EXISTS `mainfunctions`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `mainfunctions` (
+  `ID` int NOT NULL AUTO_INCREMENT,
+  `Name` varchar(225) NOT NULL,
+  `Description` text,
+  `idmainfunc` int DEFAULT NULL,
+  `FullName` varchar(225) GENERATED ALWAYS AS (concat(_utf8mb4'MF',`idmainfunc`)) STORED,
+  PRIMARY KEY (`ID`),
+  UNIQUE KEY `ID_UNIQUE` (`ID`),
+  UNIQUE KEY `Name_UNIQUE` (`Name`)
+) ENGINE=InnoDB AUTO_INCREMENT=15 DEFAULT CHARSET=utf8mb3;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `mainfunctions`
+--
+
+LOCK TABLES `mainfunctions` WRITE;
+/*!40000 ALTER TABLE `mainfunctions` DISABLE KEYS */;
+INSERT INTO `mainfunctions` (`ID`, `Name`, `Description`, `idmainfunc`) VALUES (1,'DETERMINER DRIVER INTERACTION','This main function determines the all the driver\'s interaction with the IVI system and assembles the actions that has interaction with ADAS functions',1),(2,'Generate ADAS HMI','This main function is in the purpose of generate the anition and informatic HMI to the driver',2),(3,'DETERMINE IVI SYS STATUS','This main function is to determine the working status of the IVI System containing the system working status and also the working state of its functions',3),(4,'GENERATE NAVIGATION PROFILE','This main function performes the navigation activities, calculating routings and select defined informations to the ADAS system',4),(5,'PROVIDE DIGITAL DATA OF ENVIRONMENT','This main function acts as an interface between the physical world and vehicle system, this main function allows different sensors to sense and output dedicated type of data that reflects the physical world to digitial world',5),(6,'GLOBAL_MAPPING_SYSTEM','This logical component (main function) represent  the process of GLOBAL_MAP creation and enhanced,it doesn\'t invovle the part where the GLOBAL_MAP is used for driving function',12),(7,'MAP PROCESSING SYSTEM','This function represent the process using the Global Map during the ADAS control phase, the sub component and tasks are as also dedicated',6),(8,'Manage the GLOBAL MAP','This logical component (main function) is for managing the saving,store and distruction of the Global maps database',7),(9,'PROVIDING ENVIRONMENT PERCEPTION RESULT','This logical component (main function) is to detect, extract,organize the necessary information for driving function from the data representing the environment',8),(10,'PROVING VEHICLE PLANNING AND CONTROL COMMAND','This logical component (main function) is to determine how to control the vehicle to finish the planned route while safe based on the pre-treated environment information and dynamic traffic information as well as the system status (equals to ADAS PnC + function Logic)',9),(11,'DETERMINE EGO\'S LOCALIZATION DATA','This main function performes the navigation activities, calculating routings and select defined informations to the ADAS system',10),(12,'Determine the Environmental Model for Driving Function','This logical component (main function) represent  the process of GLOBAL_MAP creation and enhanced,it doesn\'t invovle the part where the GLOBAL_MAP is used for driving function',13),(13,'DETERMINE ADAS HMI CONTENT','This function represent the process using the Global Map during the ADAS control phase, the sub component and tasks are as also dedicated',11),(14,'MAPPING EXTERNAL INFORMATION','This logical component (main function) represent  the process of GLOBAL_MAP creation and enhanced,it doesn\'t invovle the part where the GLOBAL_MAP is used for driving function',14);
+/*!40000 ALTER TABLE `mainfunctions` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
 -- Table structure for table `manager_account`
 --
 
@@ -1670,6 +1758,36 @@ INSERT INTO `metiers` VALUES (1,'产品工程师',NULL),(2,'功能开发工程�
 UNLOCK TABLES;
 
 --
+-- Table structure for table `mf_tf_input`
+--
+
+DROP TABLE IF EXISTS `mf_tf_input`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `mf_tf_input` (
+  `ID` int NOT NULL AUTO_INCREMENT,
+  `mainfunctions_ID` int NOT NULL,
+  `technicalfunction_Name` varchar(225) NOT NULL,
+  PRIMARY KEY (`ID`),
+  UNIQUE KEY `ID_UNIQUE` (`ID`),
+  KEY `fk_mf_tf_input_mainfunctions1_idx` (`mainfunctions_ID`),
+  KEY `fk_mf_tf_input_technicalfunction1_idx` (`technicalfunction_Name`),
+  CONSTRAINT `fk_mf_tf_input_mainfunctions1` FOREIGN KEY (`mainfunctions_ID`) REFERENCES `mainfunctions` (`ID`),
+  CONSTRAINT `fk_mf_tf_input_technicalfunction1` FOREIGN KEY (`technicalfunction_Name`) REFERENCES `technicalfunction` (`Name`)
+) ENGINE=InnoDB AUTO_INCREMENT=241 DEFAULT CHARSET=utf8mb3;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `mf_tf_input`
+--
+
+LOCK TABLES `mf_tf_input` WRITE;
+/*!40000 ALTER TABLE `mf_tf_input` DISABLE KEYS */;
+INSERT INTO `mf_tf_input` VALUES (167,1,'DETERMINE DRIVER INTERACTION ON SCREEN'),(168,2,'GENERATE ADAS ANIMATION&POPUP'),(169,3,'DETERMINE IVI SYS STATUS'),(170,4,'GENERATE NAVIGATION PROFILE'),(171,5,'PROVIDE FC_W IMAGE DATA'),(172,5,'PROVIDE FC_N IMAGE DATA'),(173,5,'PROVIDE FSC_L IMAGE DATA'),(174,5,'PROVIDE FSC_R IMAGE DATA'),(175,5,'PROVIDE RSC_L IMAGE DATA'),(176,5,'PROVIDE RSC_R IMAGE DATA'),(177,5,'PROVIDE RC IMAGE DATA'),(178,5,'LIDAR_SYSTEM'),(179,5,'FRONT_RADAR_SENSING'),(180,5,'FC_W IMAGE PROCESSING'),(181,5,'FC_N IMAGE PROCESSING'),(182,5,'FSC_L_IMAGE PROCESSING'),(183,5,'FSC_R_IMAGE PROCESSING'),(184,5,'RSC_L_IMAGE PROCESSING'),(185,5,'RSC_R_IMAGE PROCESSING'),(186,5,'RC_IMAGE PROCESSING'),(187,5,'TRANSFERT ENVIRONMENT TO IMAGE DATA FC_W'),(188,5,'TRANSFERT ENVIRONMENT TO IMAGE DATA FC_N'),(189,5,'TRANSFERT ENVIRONMENT TO IMAGE DATA FSC_L'),(190,5,'TRANSFERT ENVIRONMENT TO IMAGE DATA FSC_R'),(191,5,'TRANSFERT ENVIRONMENT TO IMAGE DATA RSC_L'),(192,5,'TRANSFERT ENVIRONMENT TO IMAGE DATA RSC_R'),(193,5,'TRANSFERT ENVIRONMENT TO IMAGE DATA RC'),(194,5,'Process Radar Point Clouds'),(195,5,'PROVIDE FC_W IMAGE DATA_QC'),(196,5,'TRANSFERT ENVIRONMENT TO IMAGE DATA FC_W_QC'),(197,5,'FC_W IMAGE PROCESSING_QC'),(198,6,'UPDATE & IMPROVE GLOBAL MAP'),(199,6,'DETERMINE MAP PATCH FOR CURRENT FRAME'),(200,6,'DETERMINE THE GLOBAL MAPPING MODE'),(201,6,'DETERMINE EGO LOCALIZATION FOR MAPPING'),(202,7,'PROVIDE MAP DATA IN VEH COORDINATE'),(203,7,'DETERMINE MAP PROCESS SYSTEM STATUS'),(204,7,'DETERMINE EGO FUNCTION LOCATION'),(205,7,'DETERMINE GLOBAL ROUTING INFORMATION'),(206,7,'EXTRACT EGO RELATED MAP ELEMENTS'),(207,8,'MANAGE THE MAP FILE SAVING'),(208,8,'STORAGE_MANAGEMENT'),(209,8,'DETERMINE EGO ROUGH LOCALIZATION'),(210,8,'READ THE MAP BRIEF FILE'),(211,8,'DETERMINE EGO PRECISE LOCALIZATION'),(212,8,'READ THE MAP SLICE FILE'),(213,9,'MULTI_SENSOR_OBJECT_FUSION'),(214,9,'DETECT EMERGENCY OBJECT FROM CAM '),(215,9,'DETECT TRAFFIC LIGHT AND IT\'S ATTRIBUTE FROM CAM'),(216,9,'DETECT TRAFFIC SIGN and ATTRIBUTE FROM CAMERA'),(217,9,'DETECT ALL 3D OBJECT&INFO FROM CAM'),(218,9,'DETECT ROADMARKS & ATTRIB FROM CAM'),(219,9,'DETECT LANEMARKER&ATTRIB  FROM CAM'),(220,9,'DETERMINE OCCUPANCY GRID FROM CAM'),(221,9,'IMAGE_DATE_PRE_PROCESSING(BEV)'),(222,9,'POST PROCESS PERCEPTED ELEMENT'),(223,10,'DETERMINE FUNCTION SCENARIO NEEDS'),(224,10,'DETERMINE COLLISION RISKS'),(225,10,'DETERMINE EGO RELATED TRAFFIC RULES'),(226,10,'DETERMINE FUNCTIONAL DECISION'),(227,10,'DETERMINE EGO TRAJECTORY PLANNING'),(228,10,'MANAGE AND SYSTEM FUNCTION STATE'),(229,10,'DETERMINE SCENARIOS AVAILABILITY CONDITION'),(230,10,'DETERMINE VEHICLE CONTROL COMMAND'),(231,11,'DETERMINE EGO\'S ODOMETRY'),(232,12,'GENERATE_LOCAL_MAP'),(233,12,'DETERMINE DYNAMIC ENVIRONMENT'),(234,12,'DETERMINE STATIC ELEMENT FOR PNC'),(235,12,'OBJECT BEHAVIOR PREDICTION'),(236,13,'Arbitration Function HMI'),(237,13,'ADJUST SR ELEMENT ACCORDING TO FUNC'),(238,13,'GENERATE ADAS WARNING&REQUEST'),(239,14,'DETERMINE VEH SIGNAL MAPPING'),(240,14,'DETERMINE DRIVER ADAS ACTION');
+/*!40000 ALTER TABLE `mf_tf_input` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
 -- Table structure for table `middlewaretype_enum`
 --
 
@@ -1718,30 +1836,6 @@ LOCK TABLES `objects` WRITE;
 /*!40000 ALTER TABLE `objects` DISABLE KEYS */;
 INSERT INTO `objects` VALUES ('calculator','Name','ID','计算芯片'),('camera','Name','ID','摄像头'),('ecu','Name','ID','电控单元'),('euf','Name','ID','用户功能'),('lidar','Name','ID','激光雷达'),('radar','Name','ID','毫米波雷达'),('regulation','Name','ID','法律法规'),('system_solution','Name','ID','系统方案'),('uss','Name','ID','超声波雷达'),('vehiclemodel','Name','ID','车型'),('work','Name','ID','任务列表');
 /*!40000 ALTER TABLE `objects` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
--- Table structure for table `online_status_enum`
---
-
-DROP TABLE IF EXISTS `online_status_enum`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `online_status_enum` (
-  `Status` varchar(45) NOT NULL,
-  PRIMARY KEY (`Status`),
-  UNIQUE KEY `Status_UNIQUE` (`Status`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `online_status_enum`
---
-
-LOCK TABLES `online_status_enum` WRITE;
-/*!40000 ALTER TABLE `online_status_enum` DISABLE KEYS */;
-INSERT INTO `online_status_enum` VALUES ('新产品上线'),('未上线'),('正式版本上线'),('测试版本上线'),('规划中');
-/*!40000 ALTER TABLE `online_status_enum` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
@@ -1922,38 +2016,6 @@ CREATE TABLE `processor_enum_sub` (
 LOCK TABLES `processor_enum_sub` WRITE;
 /*!40000 ALTER TABLE `processor_enum_sub` DISABLE KEYS */;
 /*!40000 ALTER TABLE `processor_enum_sub` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
--- Table structure for table `productfeatures`
---
-
-DROP TABLE IF EXISTS `productfeatures`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `productfeatures` (
-  `ID` int unsigned NOT NULL,
-  `Function` varchar(45) DEFAULT NULL,
-  `Category` varchar(45) DEFAULT NULL,
-  `Description` varchar(45) DEFAULT NULL,
-  `CN_Name` varchar(45) DEFAULT NULL,
-  `Status` varchar(45) NOT NULL,
-  PRIMARY KEY (`ID`),
-  UNIQUE KEY `ID_UNIQUE` (`ID`),
-  UNIQUE KEY `Function_UNIQUE` (`Function`),
-  KEY `fk_productfeatures_online_status_enum1_idx` (`Status`),
-  CONSTRAINT `fk_productfeatures_online_status_enum1` FOREIGN KEY (`Status`) REFERENCES `online_status_enum` (`Status`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `productfeatures`
---
-
-LOCK TABLES `productfeatures` WRITE;
-/*!40000 ALTER TABLE `productfeatures` DISABLE KEYS */;
-INSERT INTO `productfeatures` VALUES (1,'FunctionHall','知识宇宙','提供应用层功能知识','功能星球','测试版本上线'),(2,'SensorHall','知识宇宙','提供传感器知识和数据库','传感器星球','测试版本上线'),(3,'HardWareHall','知识宇宙','提供硬件知识和数据库','硬件星球','测试版本上线'),(4,'Knowledgenet','知识网络','提供硬件知识和数据库','知识网络','测试版本上线'),(5,'RegulationMap','知识宇宙','提供法规相关知识','法规/标准星球','测试版本上线'),(6,'ArchitectureBuild','知识宇宙','提供架构开发的相关知识','架构星球','未上线'),(7,'AdasBenchmark','行业纵横','提供ADAS对标库','车型矩阵','测试版本上线'),(8,'Configurator','智驾军火库','ADAS方案配置工具','产品配置器','测试版本上线'),(9,'RoadBuilder','智驾军火库','环境绘制生成工具','环境生成器','测试版本上线'),(10,'FoV_build','智驾军火库','定制传感器乌龟图','传感器配置器','测试版本上线'),(11,'SensorInspector','智驾军火库','在3D环境下检查传感器视角功能','传感器仿真','新产品上线'),(12,'SimulationPlatform','智驾军火库','完整的仿真平台','仿真平台','未上线'),(13,'PhyArchiTool','智驾军火库','提供生成标准物理架构的工具','物理架构工具','未上线'),(14,'solutionbenchmark','行业纵横','提供ADAS系统方案级别的陈列以及对比','方案矩阵','未上线'),(15,'comparison','行业纵横','提供整车级别,方案级别等的对比工具以及报告输出','方案角斗场','未上线'),(16,'markettrend','行业纵横','提供行业分析','市场通','未上线'),(17,'eco-system net','行业纵横','提供行业内不同公司的合作关系','生态网络','未上线'),(18,'Forum','智驾论坛','提供智能驾驶行业信息交流的空间','智驾论坛','未上线'),(19,'General','通用信息','辅助网站工作','通用信息','未上线');
-/*!40000 ALTER TABLE `productfeatures` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
@@ -2185,7 +2247,7 @@ CREATE TABLE `release_content` (
   PRIMARY KEY (`ID`),
   UNIQUE KEY `ID_UNIQUE` (`ID`),
   UNIQUE KEY `Bug_ID_UNIQUE` (`Bug_ID`)
-) ENGINE=InnoDB AUTO_INCREMENT=30 DEFAULT CHARSET=utf8mb3;
+) ENGINE=InnoDB AUTO_INCREMENT=33 DEFAULT CHARSET=utf8mb3;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -2194,7 +2256,7 @@ CREATE TABLE `release_content` (
 
 LOCK TABLES `release_content` WRITE;
 /*!40000 ALTER TABLE `release_content` DISABLE KEYS */;
-INSERT INTO `release_content` VALUES (1,'发布\"功能星球”板块业务，提供ADAS用户功能知识信息','2025-12-11','Beta-25-12-7','已上线','功能星球','2025-12-07 05:20:30','creation','NO-1'),(2,'发布\"硬件星球”板块业务，提供ADAS用户功能知识信息','2025-12-07','Beta-25-12-7','已上线','硬件星球','2025-12-07 05:21:49','creation','NO-2'),(3,'发布“知识网络”功能，通过交互式网络图提供ADAS学习的脉络和方法','2025-12-07','Beta-25-12-7','已上线','知识网络','2025-12-07 15:09:42','creation','NO-3'),(4,'发布“传感器星球”功能','2025-12-08','Beta-25-12-7','已上线','传感器星球','2025-12-07 15:10:48','creation','NO-4'),(5,'发布“环境生成器”功能','2025-11-29','Beta-25-12-7','已上线','环境生成器','2025-12-07 15:11:24','creation','NO-5'),(6,'发布“传感器配置器”功能，自行定义，快速绘制你的传感器配置图','2025-12-06','Beta-25-12-7','已上线','传感器配置器','2025-12-07 15:34:06','creation','NO-6'),(9,'lllll','2025-12-12','Beta-25-12-8','已上线','产品配置器','2025-12-08 06:14:44','bug_fix','27'),(10,'3D预览功能无法使用','2025-12-13','Beta-25-12-7','已上线','环境生成器','2025-12-08 06:21:57','bug_fix','28'),(26,'111','2025-12-20',NULL,'开发中','知识网络','2025-12-08 07:50:31','creation','NO-26'),(27,'替换后台服务器数据库','2025-12-06','Beta-25-12-7','已上线','通用修改','2025-12-10 01:58:42','creation','NO-27'),(28,'服务器无法连接-返回fail-to-fetch','2025-12-17','Beta-25-12-7','已上线','通用信息','2025-12-10 02:27:27','bug_fix','29');
+INSERT INTO `release_content` VALUES (1,'发布\"功能星球”板块业务，提供ADAS用户功能知识信息','2025-12-11','Beta-25-12-7','已上线','功能星球','2025-12-07 05:20:30','creation','NO-1'),(2,'发布\"硬件星球”板块业务，提供ADAS用户功能知识信息','2025-12-07','Beta-25-12-7','已上线','硬件星球','2025-12-07 05:21:49','creation','NO-2'),(3,'发布“知识网络”功能，通过交互式网络图提供ADAS学习的脉络和方法','2025-12-07','Beta-25-12-7','已上线','知识网络','2025-12-07 15:09:42','creation','NO-3'),(4,'发布“传感器星球”功能','2025-12-08','Beta-25-12-7','已上线','传感器星球','2025-12-07 15:10:48','creation','NO-4'),(5,'发布“环境生成器”功能','2025-11-29','Beta-25-12-7','已上线','环境生成器','2025-12-07 15:11:24','creation','NO-5'),(6,'发布“传感器配置器”功能，自行定义，快速绘制你的传感器配置图','2025-12-06','Beta-25-12-7','已上线','传感器配置器','2025-12-07 15:34:06','creation','NO-6'),(9,'lllll','2025-12-12','Beta-25-12-8','已上线','产品配置器','2025-12-08 06:14:44','bug_fix','27'),(10,'3D预览功能无法使用','2025-12-13','Beta-25-12-7','已上线','环境生成器','2025-12-08 06:21:57','bug_fix','28'),(26,'111','2025-12-20',NULL,'开发中','知识网络','2025-12-08 07:50:31','creation','NO-26'),(27,'替换后台服务器数据库','2025-12-06','Beta-25-12-7','已上线','通用修改','2025-12-10 01:58:42','creation','NO-27'),(28,'服务器无法连接-返回fail-to-fetch','2025-12-17','Beta-25-12-7','已上线','通用信息','2025-12-10 02:27:27','bug_fix','29'),(30,'用户订阅网站后，无用户信息','2025/12/26',NULL,'完成_待上线','通用信息','2025-12-18 18:03:26','bug_fix','0'),(31,'新增初始页面达克鸭介绍页面','2025-12-25',NULL,'完成_待上线','通用信息','2025-12-19 15:19:50','creation','NO-31'),(32,'达客鸭助手允许拖拽到页面任何为止','2025-12-25',NULL,'完成_待上线','通用信息','2025-12-19 15:21:17','creation','NO-32');
 /*!40000 ALTER TABLE `release_content` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -2596,7 +2658,7 @@ CREATE TABLE `subobjects` (
 
 LOCK TABLES `subobjects` WRITE;
 /*!40000 ALTER TABLE `subobjects` DISABLE KEYS */;
-INSERT INTO `subobjects` VALUES ('app','Name','ID','应用层软件'),('country','Name','ID','国家列表'),('digitalmap','Name','ID','电子地图'),('ethernet_switch','Name','ID','交换机'),('function_features','Name','ID','子功能'),('image_sensors','Name','ID','图像传感器'),('lens','Name','ID','光学镜头'),('serializers','Name','ID','加串器'),('storage_unit','Name','ID','存储单元'),('usecases','Name','ID','使用场景'),('vehicle_mark','Name','ID','汽车品牌');
+INSERT INTO `subobjects` VALUES ('app','Name','ID','应用层软件'),('country','Name','ID','国家列表'),('digitalmap','Name','ID','电子地图'),('ethernet_switch','Name','ID','交换机'),('function_features','Name','ID','子功能'),('image_sensors','Name','ID','图像传感器'),('lens','Name','ID','光学镜头'),('mainfunctions','Name','ID','主功能'),('serializers','Name','ID','加串器'),('storage_unit','Name','ID','存储单元'),('technicalfunction','Name','ID','技术功能'),('usecases','Name','ID','使用场景'),('vehicle_mark','Name','ID','汽车品牌');
 /*!40000 ALTER TABLE `subobjects` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -2683,6 +2745,35 @@ INSERT INTO `system_solution` VALUES (3,'VSS360','Valeo','IN SOP'),(4,'Valeo 2 B
 UNLOCK TABLES;
 
 --
+-- Table structure for table `technicalfunction`
+--
+
+DROP TABLE IF EXISTS `technicalfunction`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `technicalfunction` (
+  `ID` int NOT NULL AUTO_INCREMENT,
+  `Name` varchar(225) NOT NULL,
+  `Description` text,
+  `idfunc` int DEFAULT NULL,
+  `FullName` varchar(300) GENERATED ALWAYS AS (concat(_utf8mb4'TF',`idfunc`)) STORED,
+  PRIMARY KEY (`ID`),
+  UNIQUE KEY `ID_UNIQUE` (`ID`),
+  UNIQUE KEY `Name_UNIQUE` (`Name`)
+) ENGINE=InnoDB AUTO_INCREMENT=79 DEFAULT CHARSET=utf8mb3;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `technicalfunction`
+--
+
+LOCK TABLES `technicalfunction` WRITE;
+/*!40000 ALTER TABLE `technicalfunction` DISABLE KEYS */;
+INSERT INTO `technicalfunction` (`ID`, `Name`, `Description`, `idfunc`) VALUES (1,'DETERMINE DRIVER INTERACTION ON SCREEN','This technical function is to determine the driver\'s interaction type and conclude them for ADAS system',1),(2,'GENERATE ADAS ANIMATION&POPUP','This logical component (technical function) is to provide Navigation information',2),(3,'DETERMINE IVI SYS STATUS','This main function is to determine the working status of the IVI System containing the system working status and also the working state of its functions',3),(4,'GENERATE NAVIGATION PROFILE','This technical function is to calculate the navigation information and provide them for ADAS app',4),(5,'PROVIDING EGO GNSS INFO','This logical component TF function is to recieve the GNSS coordiante and system status from the satellite ',5),(6,'PROVIDE EGO MOTION MEASUREMENT','This logical component TF function is to recieve the GNSS coordiante and system status from the satellite ',6),(7,'DETERMINE EGO INERTIA NAVIGATION DATA','This logical component use the gnss information and imu data to calculated the ego\'s odometry and dynamic motion data',7),(8,'DETERMINE POSITION SYSMTE STATUS','This logical component is to monitor and determine the functional status of the position system',8),(9,'PROVIDE FC_W IMAGE DATA','This logical component TF function is to tranfert the information percieved by Front Wild Camera into digital video image data',9),(10,'PROVIDE FC_N IMAGE DATA','This logical component TF function is to tranfert the information percieved by Front Narrow Camera into digital video image data',10),(11,'PROVIDE FSC_L IMAGE DATA','This logical component TF function is to tranfert the information percieved by Front Left Side Cameras into digital video image data',11),(12,'PROVIDE FSC_R IMAGE DATA','This logical component TF function is to tranfert the information percieved by Front Right Side Camera into digital video image data',12),(13,'PROVIDE RSC_L IMAGE DATA','This logical component TF function is to tranfert the information percieved by Rear Left Side Camera into digital video image data',13),(14,'PROVIDE RSC_R IMAGE DATA','This logical component TF function is to tranfert the information percieved by Rear Right Side Camera into digital video image data',14),(15,'PROVIDE RC IMAGE DATA','This logical component TF function is to tranfert the information percieved by Rear Camera into digital video image data',15),(16,'LIDAR_SYSTEM','This logical component TF function is to tranfert the information percieved by LIDAR Sensor into point cloud information',16),(17,'FRONT_RADAR_SENSING','This logical component TF function is to tranfert the information percieved by Front Center Radar into point cloud data information',17),(18,'FC_W IMAGE PROCESSING','This logical component TF function is to tranfert the information percieved by Front Wild Camera into digital video image data',18),(19,'FC_N IMAGE PROCESSING','This logical component TF function is to tranfert the information percieved by Front Wild Camera into digital video image data',19),(20,'FSC_L_IMAGE PROCESSING','This logical component TF function is to tranfert the information percieved by Front Wild Camera into digital video image data',20),(21,'FSC_R_IMAGE PROCESSING','This logical component TF function is to tranfert the information percieved by Front Wild Camera into digital video image data',21),(22,'RSC_L_IMAGE PROCESSING','This logical component TF function is to tranfert the information percieved by Front Wild Camera into digital video image data',22),(23,'RSC_R_IMAGE PROCESSING','This logical component TF function is to tranfert the information percieved by Front Wild Camera into digital video image data',23),(24,'RC_IMAGE PROCESSING','This logical component TF function is to tranfert the information percieved by Front Wild Camera into digital video image data',24),(25,'TRANSFERT ENVIRONMENT TO IMAGE DATA FC_W','This logical component TF function is to tranfert the information percieved by Front Wild Camera into digital video image data',25),(26,'TRANSFERT ENVIRONMENT TO IMAGE DATA FC_N','This logical component TF function is to tranfert the information percieved by Front Wild Camera into digital video image data',26),(27,'TRANSFERT ENVIRONMENT TO IMAGE DATA FSC_L','This logical component TF function is to tranfert the information percieved by Front Wild Camera into digital video image data',27),(28,'TRANSFERT ENVIRONMENT TO IMAGE DATA FSC_R','This logical component TF function is to tranfert the information percieved by Front Wild Camera into digital video image data',28),(29,'TRANSFERT ENVIRONMENT TO IMAGE DATA RSC_L','This logical component TF function is to tranfert the information percieved by Front Wild Camera into digital video image data',29),(30,'TRANSFERT ENVIRONMENT TO IMAGE DATA RSC_R','This logical component TF function is to tranfert the information percieved by Front Wild Camera into digital video image data',30),(31,'TRANSFERT ENVIRONMENT TO IMAGE DATA RC','This logical component TF function is to tranfert the information percieved by Front Wild Camera into digital video image data',31),(32,'Process Radar Point Clouds','This logical component TF function is to process the radar point cloud raw data to a format usable by applications',32),(33,'PROVIDE FC_W IMAGE DATA_QC','This logical component TF function is to tranfert the information percieved by Front Wild Camera into digital video image data',33),(34,'TRANSFERT ENVIRONMENT TO IMAGE DATA FC_W_QC','This logical component TF function is to tranfert the information percieved by Front Wild Camera into digital video image data',34),(35,'FC_W IMAGE PROCESSING_QC','This logical component TF function is to tranfert the information percieved by Front Wild Camera into digital video image data',35),(36,'UPDATE & IMPROVE GLOBAL MAP','This logical component (technical function) is to take the map patch and perform the merge or the update the global map, it is also responsible to check the loop closure situation,and monitor the map udpate status',75),(37,'DETERMINE MAP PATCH FOR CURRENT FRAME','This logical component (technical function) is to use the local static map information of the current frame and the ego loc results to generate the content to be updated （map patch)',76),(38,'DETERMINE THE GLOBAL MAPPING MODE','This logical component (Technical Function) is to use the global map savings, vehicle position and driver\'s command to define what mode will the mapping system be in. The output helps the to choose the right database and also give driving function management input information',77),(39,'DETERMINE EGO LOCALIZATION FOR MAPPING','This logical component (technical function) is determine and provide ego localziation using the Position system info and vehicle info and provide also the ego trajectory info',78),(40,'PROVIDE MAP DATA IN VEH COORDINATE','This logical component (techical function) is to select a certain range of global map around the vehicle instead of the overall map content',36),(41,'DETERMINE MAP PROCESS SYSTEM STATUS','This logical component (technical function) is monitor the runing status of the map processing system and give the status of it',37),(42,'DETERMINE EGO FUNCTION LOCATION','This logical component(technical function) is to define the functional location of the  vehicle to help define which kind of element need to be used by driving function',38),(43,'DETERMINE GLOBAL ROUTING INFORMATION','This logical component (technical function) is to determin the routing that the vehicle needs to follow it takes account of the memorized map info, real time navigation info and also the driver\'s habite',39),(44,'EXTRACT EGO RELATED MAP ELEMENTS','This logical component (technical function) is to select,extract,organize the map element to be used by driving function',40),(45,'MANAGE THE MAP FILE SAVING','This logical component (main function) is for managing the saving,store and distruction of the Global maps database',41),(46,'STORAGE_MANAGEMENT','This logical component (main function) is for managing the saving,store and distruction of the Global maps database',42),(47,'DETERMINE EGO ROUGH LOCALIZATION','This system represent the logic component of CV perception using only front camera images, only part of the detection work is done within the system (emergency braking object detection)',43),(48,'READ THE MAP BRIEF FILE','This logical component (main function) is for managing the saving,store and distruction of the Global maps database',44),(49,'DETERMINE EGO PRECISE LOCALIZATION','This logical component (technical function) is to use the pre-saved map information, realtime loc information and perception information to perform vehicle localization and obtain vehicle\'s precised loc information within the map',45),(50,'READ THE MAP SLICE FILE','This logical component (main function) is for managing the saving,store and distruction of the Global maps database',46),(51,'MULTI_SENSOR_OBJECT_FUSION','This logical component (Technical Function) is to use differnet 3D object information percepted from different sensor input and perform the fusion process to give the final object information with also some enhanced information than CV object results',47),(52,'DETECT EMERGENCY OBJECT FROM CAM ','This technical function is to detect long range target and target with emergency collision risks from long range front camera',48),(53,'DETECT TRAFFIC LIGHT AND IT\'S ATTRIBUTE FROM CAM','This technical function is to use the front long range camera to detect the traffic light and provide it\'s attribute',49),(54,'DETECT TRAFFIC SIGN and ATTRIBUTE FROM CAMERA','This technical function is to use the vehicle information and the video image to detect and provide information of the traffic sign',50),(55,'DETECT ALL 3D OBJECT&INFO FROM CAM','This technical fucntion is to use the all the image data to determine the all the 3D Object around the ego vehicle',51),(56,'DETECT ROADMARKS & ATTRIB FROM CAM','This technical function is to use the vehicle information and the video image to detect and provide information of the traffic sign',52),(57,'DETECT LANEMARKER&ATTRIB  FROM CAM','This technical function is to use the vehicle information and the video image to detect and provide information of the traffic sign',53),(58,'DETERMINE OCCUPANCY GRID FROM CAM','This technical function is to use the vehicle information and the video image to detect and provide information of the traffic sign',54),(59,'IMAGE_DATE_PRE_PROCESSING(BEV)','This technical function is to process the images from all cameras for BEV model',55),(60,'POST PROCESS PERCEPTED ELEMENT','This logic component predict the object behavior - AI based',56),(61,'DETERMINE FUNCTION SCENARIO NEEDS','This technical function is to use the static and dynamic environment and ego situation to deteminer what kind of function scenario is the ego vehicle in (to  determine if the vehicle needs to perform different action)',57),(62,'DETERMINE COLLISION RISKS','This technical function is to calculate the collision risk and collision data of ego to all the traffic participant',58),(63,'DETERMINE EGO RELATED TRAFFIC RULES','This technical function is to use Map info,ENV_model_info and Navigation Info to determine the traffic rules that applies to ego vehicle',59),(64,'DETERMINE FUNCTIONAL DECISION','This technical function takes the input of needs and condition of different function scenarios and decide ego\'s next manoeuver',60),(65,'DETERMINE EGO TRAJECTORY PLANNING','This technical function is to determine the ego\'s trajectory to be able to finish the function scenarios',61),(66,'MANAGE AND SYSTEM FUNCTION STATE',NULL,62),(67,'DETERMINE SCENARIOS AVAILABILITY CONDITION','This logical condition uses dynamic and static env info and ego status to determine if ego has the condition to perform the actions link to different function scenarios',63),(68,'DETERMINE VEHICLE CONTROL COMMAND',NULL,64),(69,'DETERMINE EGO\'S ODOMETRY','This system represent the logic component of CV perception using only front camera images, only part of the detection work is done within the system (emergency braking object detection)',65),(70,'GENERATE_LOCAL_MAP','This logical component (Technical Function) is to use the static element from the vision perception system to create and ogranize the local static map that indicated the road model and usable element for driving function',66),(71,'DETERMINE DYNAMIC ENVIRONMENT','This logical function (technical function) is to combine the dynamic element and road model to enrich the attribute of dynamic target',67),(72,'DETERMINE STATIC ELEMENT FOR PNC','This logical function is to take the perception static element and global map element to determine the final static element (arbitrate or fuse)',68),(73,'OBJECT BEHAVIOR PREDICTION','This logic component predict the object behavior - AI based',69),(74,'Arbitration Function HMI','This logical component (technical function) is to select,extract,organize the map element to be used by driving function',70),(75,'ADJUST SR ELEMENT ACCORDING TO FUNC','This logical component (technical function) is to select,extract,organize the map element to be used by driving function',71),(76,'GENERATE ADAS WARNING&REQUEST','This technical function is to take the function states and generate adas warning messages and alert and request messages',72),(77,'DETERMINE VEH SIGNAL MAPPING','This technical function is to use the driver/vehicle system interaction info and interpret them to actions link to ADAS functions',73),(78,'DETERMINE DRIVER ADAS ACTION','This technical function is to use the driver/vehicle system interaction info and interpret them to actions link to ADAS functions',74);
+/*!40000 ALTER TABLE `technicalfunction` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
 -- Table structure for table `techpoint`
 --
 
@@ -2728,6 +2819,36 @@ LOCK TABLES `test_enum` WRITE;
 /*!40000 ALTER TABLE `test_enum` DISABLE KEYS */;
 INSERT INTO `test_enum` VALUES ('ANCAP'),('ASEAN NCAP'),('Bharat NCAP'),('C-IAC'),('C-NCAP'),('C_ICAP'),('Euro NCAP'),('i-VISTA'),('IHS'),('JNCAP'),('K-NCAP'),('Latin NCAP');
 /*!40000 ALTER TABLE `test_enum` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `tf_ef_input`
+--
+
+DROP TABLE IF EXISTS `tf_ef_input`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `tf_ef_input` (
+  `ID` int NOT NULL AUTO_INCREMENT,
+  `technicalfunction_ID` int NOT NULL,
+  `elementfunction_Name` varchar(225) NOT NULL,
+  PRIMARY KEY (`ID`),
+  UNIQUE KEY `ID_UNIQUE` (`ID`),
+  KEY `fk_tf_ef_input_technicalfunction1_idx` (`technicalfunction_ID`),
+  KEY `fk_tf_ef_input_elementfunction1_idx` (`elementfunction_Name`),
+  CONSTRAINT `fk_tf_ef_input_elementfunction1` FOREIGN KEY (`elementfunction_Name`) REFERENCES `elementfunction` (`Name`),
+  CONSTRAINT `fk_tf_ef_input_technicalfunction1` FOREIGN KEY (`technicalfunction_ID`) REFERENCES `technicalfunction` (`ID`)
+) ENGINE=InnoDB AUTO_INCREMENT=149 DEFAULT CHARSET=utf8mb3;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `tf_ef_input`
+--
+
+LOCK TABLES `tf_ef_input` WRITE;
+/*!40000 ALTER TABLE `tf_ef_input` DISABLE KEYS */;
+INSERT INTO `tf_ef_input` VALUES (1,36,'Content addition on GLOBAL MAP'),(2,36,'Generate topology information within GLOBAL MAP'),(3,36,'Detect loop closure for global map'),(4,36,'Improvement of the Memorized Route'),(5,37,'Transfert local map in global map coordinate'),(6,37,'Generate local map with navigation content'),(7,37,'Generate the Map Patch'),(8,37,'Content Redundancy verification'),(9,38,'MEM MAP INIT'),(10,38,'Define driver demande'),(11,38,'Define MAPPING Mode'),(12,39,'Determine the coordiante transfer matrix'),(13,39,'Generate Ego Vehicle\'s Trajectory'),(14,40,'Tranfer map data to ego vehicle coordinate'),(15,42,'Determine ego scenario location'),(16,43,'Arbitrate and Determine the fused routing info'),(17,43,'Determine and extract the ODD information from Map'),(18,44,'Select neccessary map element for driving policy'),(19,44,'Generate line polynomial for linear object'),(20,44,'Generate line polynomial for control reference lines'),(21,45,'Generate map repository path'),(22,45,'Generate & Update MAP_BRIEF_FILE CONTENT'),(23,45,'WRITE THE MAP SLICE FILE INTO THE DISK'),(24,47,'Determine Map Coverage of ego vehicle'),(25,47,'Determine the correct route/Global MAP to use'),(26,47,'Determine Rough EGO POSITION in GLOBAL MAP coordinate'),(27,47,'Select the map slice ID'),(28,47,'Determine the ego localization status'),(29,49,'Determine which lane ego is located'),(30,49,'Determine the ego coordiante within GLOBAL Map'),(31,49,'Enhance ego POS'),(32,49,'Determine ego localization status'),(33,51,'Yaw Rate Correction'),(34,51,'GET TRACK POSITION'),(35,51,'CLEAR SENSOR INPUT BUFFER'),(36,51,'OBJ MOTION TRAJECTORY PREDICTION'),(37,51,'CHECK OCCULUSION'),(38,51,'FILTER UPDATE'),(39,51,'CALCULATE DRIVEN DISTANCE'),(40,51,'CLEAR OVERLAPPIN OBJECTS'),(41,52,'Determine position of the front obstacles'),(42,52,'Determine the classification of the front obstables'),(43,52,'Determine the dimension of the front obstacles'),(44,52,'Determine the dynamic motion of front vehicle'),(45,53,'Detect TRL position and angle'),(46,53,'Determine the TRL light color'),(47,53,'Determine the TRL Light Status'),(48,53,'Determine the TRL Direction'),(49,54,'Determine the traffic sign position'),(50,54,'Determine the traffic sign value & Type'),(51,55,'Determine position of the all obstacles'),(52,55,'Determine the classification of the all obstables'),(53,55,'Determine the dimension of the all obstacles'),(54,55,'Determine the dynamic motion of all vehicle'),(55,56,'Determine the RM position'),(56,56,'Determine the RM value & Type'),(57,57,'Determine the LM\'s Geo Points '),(58,57,'Determine the LM Longi Range'),(59,57,'Determine the LM Type & Color'),(60,61,'Determine lane centering scenarios'),(61,61,'Determine routing request lane change scenarios'),(62,61,'Calculated lane travel efficiency'),(63,61,'Determine lane change to avoid obstacles Scenarios'),(64,61,'Determine travel efficiency lane change'),(65,61,'Perform arbitration（prioritization) of lane change request'),(66,61,'Determine strong brake scenarios'),(67,61,'Determine if ego is in nudge scenario'),(68,61,'Determine if ego is in unprotected intersection_turn_scenario'),(69,61,'Determine if ego is in pass staright intersection scenario'),(70,61,'Determine if ego vehicle needs to handle the wait zone scenario'),(71,61,'Determine if ego is in U turn scenario'),(72,62,'Determine adjacent lane target predicted collision risk'),(73,62,'Determine ego lane target predicted collision risk'),(74,62,'Determine adjacent lane target collision time'),(75,62,'Determine ego lane target collision time'),(76,62,'Determine target collision probability within the intersection'),(77,62,'Determine Primary target to follow'),(78,63,'Extract Speed Limit Rules'),(79,63,'Extract LC Inhibition Rules'),(80,63,'Extract Lane Access Rules'),(81,63,'Extract Stop Area Rules'),(82,63,'Extract Yielding Rules'),(83,63,'Extract timing rules'),(84,63,'Extract Construction Area Rules'),(85,63,'Extract Wait Zone Rules'),(86,64,'Arbitrate scenario proposal and decide next action to perform'),(87,64,'Determine lane follow scenario proposal'),(88,64,'Determine nudge scenario proposal'),(89,64,'Determine lane change scenario proposal'),(90,64,'Determine the intersection scenarios proposal'),(91,64,'Determine the target control point for intersection'),(92,65,'Generate ego speed boundaries in current scenarios'),(93,65,'Determine Driver\'s set speed'),(94,65,'Determine safe space for path generation'),(95,65,'Determine Maneuver execution time bound'),(96,65,'Generate multiple vehicle path(geometrie information)'),(97,65,'Perform the optimization of the path'),(98,65,'Generate ego vehicle trajectories'),(99,65,'Determine Trajectory Cost Value & Arbitration'),(100,65,'Determine planning status'),(101,65,'Determine safety turn gap for intersection'),(102,66,'Determine Lane Change Function State'),(103,66,'Determine Longitudinal control state'),(104,66,'Determine lateral control state'),(105,66,'Determine intersection control state'),(106,66,'Determine Urban Commute system state'),(107,67,'Determine Lane Centering Availability'),(108,67,'Determine Longi Follow Availability'),(109,67,'Determine Nudge Availability'),(110,67,'Determine In Lane Control Availability'),(111,67,'Determine Lane Change Manoeuver Availability'),(112,67,'Determine Lane Change Triggering Availability'),(113,67,'Determine Intersection passing availability'),(114,68,'Generate Longitudinal Control Command'),(115,68,'Generate Brake Control Command'),(116,68,'Longi Ctrol Command Arbitration'),(117,68,'Generate Lateral Control Command'),(118,68,'Lat Ctrol Command Arbitration'),(119,68,'Longitudinal Control Handshake'),(120,68,'Lateral Control Handshake'),(121,69,'Determine vehicle odometry from motion  sensor data（DR）'),(122,69,'Determine Ego Vehicle ODOM from Vision and IMU (VIO)'),(123,69,'Generate the prediction of ego trajectory'),(124,70,'Assign Speed Values to lanes'),(125,70,'Assign Traffic Light to lanes'),(126,70,'Assign lane driving property to lanes'),(127,70,'Generate driving freespace polygone based on occupancy grid'),(128,70,'Generate road & lane boudaries models (ego centerd)'),(129,70,'Generate local map road model'),(130,70,'Generate Lane marker Topology info'),(131,71,'Assign Object to lanes'),(132,71,'Determine object\'s dynamic motion status'),(133,71,'Determine object relation to ego path'),(134,71,'Select Traffic Light on Ego Path'),(135,72,'Determine lane boundries for PnC'),(136,72,'Determine lane boundries attribute for PnC'),(137,72,'Determine the road marks for PnC'),(138,72,'Determine the traffic sign to use'),(139,72,'Determine the traffic light to use'),(140,77,'MAPPING VEH IN SIGNAL'),(141,77,'MAPPING VEH OUT SIGNAL'),(142,78,'Extract Driver activation command'),(143,78,'Extract Driver Cancel Command'),(144,78,'Extract Driver Speed adjustment Command'),(145,78,'Extract Driver Lane Change command'),(146,78,'Extract Driver Override Command'),(147,78,'Extract Driver handsoff Status'),(148,78,'Extract Driver Eyesoff Status');
+/*!40000 ALTER TABLE `tf_ef_input` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
@@ -2994,7 +3115,7 @@ CREATE TABLE `version_management` (
   PRIMARY KEY (`ID`),
   UNIQUE KEY `ID_UNIQUE` (`ID`),
   UNIQUE KEY `Version_UNIQUE` (`Version`)
-) ENGINE=InnoDB AUTO_INCREMENT=103 DEFAULT CHARSET=utf8mb3;
+) ENGINE=InnoDB AUTO_INCREMENT=105 DEFAULT CHARSET=utf8mb3;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -3003,7 +3124,7 @@ CREATE TABLE `version_management` (
 
 LOCK TABLES `version_management` WRITE;
 /*!40000 ALTER TABLE `version_management` DISABLE KEYS */;
-INSERT INTO `version_management` (`ID`, `Major_Version`, `Minor_Version_Year`, `Temp_Version`, `Version_Time`, `Minor_Version_Month`, `Release_Status`, `BackEndToGit`, `GitToServer`, `DarkerToGit`, `Quick_Release`) VALUES (1,'ALPHA',25,1,'2025-12-06 15:52:29',11,'Done','Done','Done','Done',NULL),(2,'Alpha',25,1,'2025-12-11 06:33:27',12,'Done','Done','Done','Done',NULL),(90,'Alpha',25,2,'2025-12-11 06:48:08',12,'Done','Done','Done','Done',NULL),(91,'Alpha',25,3,'2025-12-11 07:31:39',12,'Done','Done','Done','Done',NULL),(92,'Alpha',25,4,'2025-12-11 08:03:48',12,'Done','Done','Done','Done',NULL),(94,'Alpha',25,5,'2025-12-11 08:23:06',12,'Done','Done','Done','Done',NULL),(95,'Beta',25,6,'2025-12-11 09:22:07',12,'Done','Done','Done','Done',NULL),(96,'Beta',25,7,'2025-12-11 09:48:39',12,'Done','Done','Done','Done',NULL),(98,'Beta',25,8,'2025-12-12 08:21:39',12,'Done','Done','Done','Done',NULL),(99,'Beta',25,9,'2025-12-12 13:38:41',12,'Done','Done','Done','Done',NULL),(100,'Beta',25,10,'2025-12-12 14:05:58',12,'Done','Done','Done','Done',NULL),(101,'Beta',25,11,'2025-12-12 14:23:16',12,'Done','Done','Done','Done',NULL),(102,'Beta',25,12,'2025-12-12 14:28:46',12,'Done','Done','Done','Done',NULL);
+INSERT INTO `version_management` (`ID`, `Major_Version`, `Minor_Version_Year`, `Temp_Version`, `Version_Time`, `Minor_Version_Month`, `Release_Status`, `BackEndToGit`, `GitToServer`, `DarkerToGit`, `Quick_Release`) VALUES (1,'ALPHA',25,1,'2025-12-06 15:52:29',11,'Done','Done','Done','Done',NULL),(2,'Alpha',25,1,'2025-12-11 06:33:27',12,'Done','Done','Done','Done',NULL),(90,'Alpha',25,2,'2025-12-11 06:48:08',12,'Done','Done','Done','Done',NULL),(91,'Alpha',25,3,'2025-12-11 07:31:39',12,'Done','Done','Done','Done',NULL),(92,'Alpha',25,4,'2025-12-11 08:03:48',12,'Done','Done','Done','Done',NULL),(94,'Alpha',25,5,'2025-12-11 08:23:06',12,'Done','Done','Done','Done',NULL),(95,'Beta',25,6,'2025-12-11 09:22:07',12,'Done','Done','Done','Done',NULL),(96,'Beta',25,7,'2025-12-11 09:48:39',12,'Done','Done','Done','Done',NULL),(98,'Beta',25,8,'2025-12-12 08:21:39',12,'Done','Done','Done','Done',NULL),(99,'Beta',25,9,'2025-12-12 13:38:41',12,'Done','Done','Done','Done',NULL),(100,'Beta',25,10,'2025-12-12 14:05:58',12,'Done','Done','Done','Done',NULL),(101,'Beta',25,11,'2025-12-12 14:23:16',12,'Done','Done','Done','Done',NULL),(102,'Beta',25,12,'2025-12-12 14:28:46',12,'Done','Done','Done','Done',NULL),(103,'Beta',25,13,'2025-12-12 15:18:08',12,'Done','Done','Done','Done',NULL),(104,'Beta',25,14,'2025-12-12 15:46:00',12,NULL,NULL,NULL,NULL,NULL);
 /*!40000 ALTER TABLE `version_management` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -3087,4 +3208,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2025-12-12 23:05:39
+-- Dump completed on 2025-12-23 17:39:55

@@ -13,16 +13,20 @@
 # import pymysql
 # import csv
 import json
+import os
+import shutil
 from datetime import datetime
 from typing import List, Dict, Any, Optional
 from Python_S.emailing import send_single_email
 from Python_S.sql_operations import SQLOperations
+# 用于SSH远程操作
+import paramiko
 # from pymysql.cursors import DictCursorMixin
 
 from collections import Counter
 
 
-def export_table_columns_with_foreign_key() -> List[Dict[str, str]]:
+def export_table_columns_with_foreign_key(db) -> List[Dict[str, str]]:
     """
     导出数据库中所有表的：表名+列名+数据类型+键类型+完整外键信息
     修复：CONSTRAINT_TYPE 字段所在表错误的问题
@@ -60,7 +64,7 @@ def export_table_columns_with_foreign_key() -> List[Dict[str, str]]:
     conn = None
     cursor = None
     try:
-        db = SQLOperations()
+        # db = SQLOperations()
         # 连接数据库
         cursor = db.conn.cursor()
 
@@ -528,6 +532,7 @@ def generate_new_object_data_structure(processed_results,lib_tables_data,target_
     生成类似object_data.json格式的数据结构
     
     Args:
+        db: 数据库连接对象
         processed_results: 处理后的数据库表结构信息
         target_table: 主表名称
         lib_tables_data: 包含_lib/_enum表数据的字典
@@ -676,21 +681,20 @@ def _load_id_columns_info(self):
     except Exception as e:
         print(f"加载ID列名信息失败: {str(e)}")
 
-def fetch_db_summary():
+def fetch_db_summary(db):
     """
     从数据库中获取所有表的列信息
     
     Returns:
         包含所有表列信息的列表
     """
-    db = SQLOperations()
     result = {}
     result['顶层对象'] = db.read_data('objects')
     result['独立非顶层对象']= db.read_data('subobjects')
     result['辅助数据']= db.read_data('supportobjects')
     return result
 
-def fetch_table_sumary(input_data):
+def fetch_table_sumary(db,input_data):
     """
     获取指定表的摘要信息
     
@@ -710,7 +714,7 @@ def fetch_table_sumary(input_data):
         raise ValueError("表名参数缺失，请提供'tablename'")
     
     # 创建数据库连接
-    db = SQLOperations()
+    # db = SQLOperations()
     
     # 从columns中提取查询条件
     conditions = {}
@@ -732,7 +736,7 @@ def fetch_table_sumary(input_data):
     result = db.read_data(tablename, conditions)
     return result
 
-def generate_targetted_object_data_fordisplay(processed_results,lib_tables_data,target_table: str, target_item: str, column_name: str):
+def generate_targetted_object_data_fordisplay(db,processed_results,lib_tables_data,target_table: str, target_item: str, column_name: str):
     """
     生成类似object_data.json格式的数据结构，支持递归提取多层级表格数据
     
@@ -744,7 +748,7 @@ def generate_targetted_object_data_fordisplay(processed_results,lib_tables_data,
     Returns:
         包含主表和递归子表数据的元组
     """
-    db = SQLOperations()
+    # db = SQLOperations()
 
     # 递归提取表格数据的内部函数
     def fetch_table_data_recursive(table_name,colunm_name,parent_id,child_tables_data):
@@ -784,7 +788,9 @@ def generate_targetted_object_data_fordisplay(processed_results,lib_tables_data,
 
     main_table_rows = [row for row in processed_results if row['表名'] == target_table]
     import_tables_data = {}
+    # print(target_table,db.read_data(target_table,{column_name:target_item}))
     main_row = db.read_data(target_table,{column_name:target_item})[0]
+
     if main_row is None:
         print(f"未找到 {column_name} 为 {target_item} 的行")
         return None
@@ -827,7 +833,7 @@ def generate_targetted_object_data_fordisplay(processed_results,lib_tables_data,
     return main_row,child_tables_data,lib_tables_data
 
 
-def generate_targetted_object_data(processed_results,lib_tables_data,target_table: str,target_item: str,column_name: str):
+def generate_targetted_object_data(db,processed_results,lib_tables_data,target_table: str,target_item: str,column_name: str):
     """
     生成类似object_data.json格式的数据结构
     
@@ -838,7 +844,7 @@ def generate_targetted_object_data(processed_results,lib_tables_data,target_tabl
 
     """
 
-    db = SQLOperations()
+    # db = SQLOperations()
     read_data = db.read_data(target_table)
     main_row = None
     main_row_index = None
@@ -883,7 +889,7 @@ def generate_targetted_object_data(processed_results,lib_tables_data,target_tabl
     return main_row_key,main_row_index,main_row,child_tables_data,main_table_rows,lib_tables_data,processed_results,child_tables_foreign_key_column
 
 
-def perform_group_delete_operation(processed_results,lib_tables_data,target_table: str,target_item: str,column_name: str):
+def perform_group_delete_operation(db,processed_results,lib_tables_data,target_table: str,target_item: str,column_name: str):
     """
     执行删除操作
     
@@ -892,7 +898,7 @@ def perform_group_delete_operation(processed_results,lib_tables_data,target_tabl
         target_item: 目标项名
         column_name: 用于匹配项的列名
     """
-    main_row_key,main_row_index,main_row,child_tables_data,main_table_rows,lib_tables_data,processed_results,child_tables_foreign_key_column = generate_targetted_object_data(processed_results,lib_tables_data,target_table,target_item,column_name)
+    main_row_key,main_row_index,main_row,child_tables_data,main_table_rows,lib_tables_data,processed_results,child_tables_foreign_key_column = generate_targetted_object_data(db,processed_results,lib_tables_data,target_table,target_item,column_name)
     db = SQLOperations()
     
     # 3. 处理关联到子表的行
@@ -908,7 +914,7 @@ def perform_group_delete_operation(processed_results,lib_tables_data,target_tabl
     db.delete_data(target_table, {main_row_key: main_row_index})
     print(f"已删除 {target_table} 中 {column_name} 为 {target_item} 的行")
 
-def generate_target_object_data_structure(processed_results,lib_tables_data,target_table: str,target_item: str,column_name: str):
+def generate_target_object_data_structure(db,processed_results,lib_tables_data,target_table: str,target_item: str,column_name: str):
     """
 
     生成类似object_data.json格式的数据结构
@@ -919,7 +925,7 @@ def generate_target_object_data_structure(processed_results,lib_tables_data,targ
         lib_tables_data: 包含_lib/_enum表数据的字典
     """
 
-    main_row_key,main_row_index,main_row,child_tables_data,main_table_rows,lib_tables_data,processed_results,child_tables_foreign_key_column = generate_targetted_object_data(processed_results,lib_tables_data,target_table,target_item,column_name)
+    main_row_key,main_row_index,main_row,child_tables_data,main_table_rows,lib_tables_data,processed_results,child_tables_foreign_key_column = generate_targetted_object_data(db,processed_results,lib_tables_data,target_table,target_item,column_name)
     
     name_tag = next((item['NAME'] for item in TargetDict if item['OBJECT'] == target_table), None)
     # 创建基础数据结构
@@ -986,13 +992,13 @@ def generate_target_object_data_structure(processed_results,lib_tables_data,targ
 
     return json.dumps(object_data, ensure_ascii=False, indent=2)
 
-def fetch_regulation_list(processed_results,lib_tables_data,target_table: str,target_item: list,column_name: str):
-    db = SQLOperations()
+def fetch_regulation_list(db,processed_results,lib_tables_data,target_table: str,target_item: list,column_name: str):
+        # db = SQLOperations()
     regulation_dict = {}
     regulation_list = []
     region_list = []
     for country in target_item:
-        table_data = extract_single_item(processed_results,lib_tables_data,target_table,country,column_name)
+        table_data = extract_single_item(db,processed_results,lib_tables_data,target_table,country,column_name)
         new_regions = json.loads(table_data)[country]["region_group"]
         for region in new_regions:
             if region not in regulation_dict:
@@ -1003,12 +1009,16 @@ def fetch_regulation_list(processed_results,lib_tables_data,target_table: str,ta
             regulation_dict[region]["country"].append(country)
             regulation_dict[region]["regulation"]=(db.read_data("regulation",{"Region_Name":region}))
 
+    with open("generated_object_data.json", 'w', encoding='utf-8') as json_file:
+        json.dump(regulation_dict, json_file, ensure_ascii=False, indent=2)
+    print(f"\n已生成类似object_data.json格式的数据结构，保存到 generated_object_data.json")
+
     return json.dumps(regulation_dict, ensure_ascii=False, indent=2)
 
-def extract_single_item(processed_result,lib_tables_data,target_table: str,target_item: str,column_name: str):
+def extract_single_item(db,processed_result,lib_tables_data,target_table: str,target_item: str,column_name: str):
     result = {}
     searchkeyname = ""
-    main_row,child_tables_data,lib_tables_data = generate_targetted_object_data_fordisplay(processed_result,lib_tables_data,target_table,target_item,column_name)
+    main_row,child_tables_data,lib_tables_data = generate_targetted_object_data_fordisplay(db,processed_result,lib_tables_data,target_table,target_item,column_name)
 
     searchkeyname = main_row['Name']
     if child_tables_data == {}:
@@ -1279,20 +1289,20 @@ def merge_dicts_by_keys(arr, key_fields=('POSITION', 'Type', 'SubType'), priorit
     # 3. 提取合并后的字典，返回列表（顺序与原始列表中首次出现的分组顺序一致）
     return list(merged_dict.values())
 
-def initiate_configurator(processed_results,lib_tables_data):
+def initiate_configurator(db,processed_results,lib_tables_data):
     Result = {}
     # Item_group = 
-    Result["calculator"]=json.loads(extract_item_group(processed_results,lib_tables_data,"calculator","hardware"))
-    Result["euf"]=json.loads(extract_item_group(processed_results,lib_tables_data,"euf","function"))
+    Result["calculator"]=json.loads(extract_item_group(db,processed_results,lib_tables_data,"calculator","hardware"))
+    Result["euf"]=json.loads(extract_item_group(db,processed_results,lib_tables_data,"euf","function"))
     Result["sensors"] = {}
-    Result["sensors"]["camera"]=json.loads(extract_item_group(processed_results,lib_tables_data,"camera","hardware"))
-    Result["sensors"]["radar"]=json.loads(extract_item_group(processed_results,lib_tables_data,"radar","hardware"))
-    Result["sensors"]["lidar"]=json.loads(extract_item_group(processed_results,lib_tables_data,"lidar","hardware"))
-    Result["sensors"]["uss"]=json.loads(extract_item_group(processed_results,lib_tables_data,"uss","hardware"))
+    Result["sensors"]["camera"]=json.loads(extract_item_group(db,processed_results,lib_tables_data,"camera","hardware"))
+    Result["sensors"]["radar"]=json.loads(extract_item_group(db,processed_results,lib_tables_data,"radar","hardware"))
+    Result["sensors"]["lidar"]=json.loads(extract_item_group(db,processed_results,lib_tables_data,"lidar","hardware"))
+    Result["sensors"]["uss"]=json.loads(extract_item_group(db,processed_results,lib_tables_data,"uss","hardware"))
 
     return json.dumps(Result, ensure_ascii=False, indent=2)
 
-def config_searching(processed_results,lib_tables_data,search_condition):
+def config_searching(db,processed_results,lib_tables_data,search_condition):
     function_check = False
     calculator_check = False
     calculator_supplier_check = False
@@ -1345,7 +1355,7 @@ def config_searching(processed_results,lib_tables_data,search_condition):
     print("sensor_type_check:",sensor_type_check)
     print("sensor_subtype_check:",sensor_subtype_check)
 
-    solution_list = extract_item_group(processed_results,lib_tables_data,"system_solution","solution")
+    solution_list = extract_item_group(db,processed_results,lib_tables_data,"system_solution","solution")
     solution_list = json.loads(solution_list)["Catalogue"]
     sensordict = {"camera_input":["Camera_Name","camera"],"radar_input":["Radar_Name","radar"],"lidar_input":["Lidar_Name","lidar"],"Uss_input":["Uss_Name","uss"]}
     # with open("generated_object_data.json", 'w', encoding='utf-8') as json_file:
@@ -1426,8 +1436,177 @@ def config_searching(processed_results,lib_tables_data,search_condition):
         
     return json.dumps(comply_solution,ensure_ascii=False, indent=2)
 
-def extract_item_group(processed_results,lib_tables_data,target_table: str,category):
-    db = SQLOperations()
+def extract_single_feature(db,input_feature_name):
+    """提取单个FEATURE的信息，为每个TF添加顺序编号"""
+    try:
+        # db = SQLOperations()
+
+        
+        # 读取SUBFEATURES工作表，筛选目标FEATURE
+        df_subfeatures = db.read_data('function_features',{"Name":input_feature_name})
+        if len(df_subfeatures) == 0:
+            raise ValueError(f"未找到FEATURE: {input_feature_name}")
+                
+        # 初始化FEATURE数据结构
+        feature_data = {
+            'FUNCTION_NAME': input_feature_name,
+            'FUNCTION_INDEX':"Feature 1.1",
+            'mf_functions': []  # 数组存储MF
+        }
+        
+        feature_id = df_subfeatures[0]["ID"]
+
+        # 提取该FEATURE关联的MF（有序数组）
+
+        mf_list = db.read_data('feautre_mf_input',{"function_features_ID":feature_id})
+
+        # mf_names = []
+
+        # 初始化MF数组
+        for mf_name in mf_list:
+            tf_functions = []
+            main_data = db.read_data('mainfunctions',{"Name":mf_name['mainfunctions_Name']})[0]
+            feature_data['mf_functions'].append({
+                'FUNCTION_NAME': main_data['Name'],
+                'FUNCTION_INDEX': main_data['FullName'],
+                'Detail':db.read_data('mainfunctions',{"Name":mf_name['mainfunctions_Name']})[0],
+                'tf_functions': tf_functions  # 数组存储TF
+            })
+        # 读取MAIN FUNCTION，提取MF的TF映射
+        # df_mainfunc = db.read_data('mainfunctions')
+        # 为每个MF填充信息
+            tf_list = db.read_data('mf_tf_input',{"mainfunctions_ID":main_data['ID']})
+            for tf in tf_list:
+                tf_data = db.read_data('technicalfunction',{"Name":tf['technicalfunction_Name']})[0]
+                tf_functions.append({
+                    'FUNCTION_NAME': tf_data['Name'],
+                    'FUNCTION_INDEX': tf_data['FullName'],
+                    'Detail':tf_data
+                })
+
+        
+        # # 读取TECHNICAL FUNCTION，提取TF详情
+        # df_techfunc = pd.read_excel(excel_path, sheet_name='TECHNICAL FUNCTION')
+        # if not df_techfunc.empty:
+        #     techfunc_index_col = next(
+        #         (col for col in df_techfunc.columns if col.strip().upper() == 'FUNCTION_INDEX'),
+        #         None
+        #     )
+            
+        #     if techfunc_index_col:
+        #         # 构建TF索引到详情的映射
+        #         tf_detail_map = {
+        #             str(row[techfunc_index_col]).strip(): row.to_dict()
+        #             for _, row in df_techfunc.iterrows()
+        #         }
+        #         # 为每个MF填充TF详情（有序数组）
+        #         for mf_data in feature_data['mf_functions']:
+        #             if '_temp_tf_mappings' in mf_data:
+        #                 for tf_index in mf_data['_temp_tf_mappings']:
+        #                     if tf_index in tf_detail_map:
+        #                         tf_details = {
+        #                             k: str(v).strip()
+        #                             for k, v in tf_detail_map[tf_index].items()
+        #                             # if k != techfunc_index_col
+        #                         }
+        #                         mf_data['tf_functions'].append(tf_details)
+        #                         print(tf_details)
+        #                 # 移除临时字段
+        #                 mf_data.pop('_temp_tf_mappings')
+        
+        # 后处理：统计数量、编号、计算位置
+        feature_data['mf_count'] = len(feature_data['mf_functions'])
+        feature_data['tf_total_count'] = sum(len(mf['tf_functions']) for mf in feature_data['mf_functions'])
+        
+        # 为MF编号、计算位置，并为TF顺序编号（全局顺序）
+        previous_end = 0
+        global_tf_number = 1  # TF全局编号（从1开始）
+        
+        for idx, mf in enumerate(feature_data['mf_functions'], 1):
+            mf['mf_number'] = idx
+            mf['tf_count'] = len(mf['tf_functions'])
+            
+            # 位置计算
+            start = 1 if previous_end == 0 else previous_end
+            length = mf['tf_count']
+            end = start + length
+            mf['position'] = {
+                'start': start,
+                'length': length,
+                'end': end
+            }
+            previous_end = end
+            
+            # 为当前MF的每个TF添加全局编号
+            for tf in mf['tf_functions']:
+                tf['tf_number'] = global_tf_number  # 全局顺序编号
+                global_tf_number += 1
+        
+        return json.dumps(feature_data, ensure_ascii=False, indent=2)
+        
+    except Exception as e:
+        print(f"处理过程中出错：{str(e)}")
+        return None
+
+def extrac_function_breakdown_group(db,processed_results,lib_tables_data,target_table: str,category):
+    Result = {}
+    EUF_LIST = []
+    EUF2FFS = {}
+    euf_list = json.loads(extract_item_group(db,processed_results,lib_tables_data,"euf","functs"))['Catalogue']
+    for euf in euf_list:
+        euf_dict ={'name':f'EUF{euf_list[euf]["ID"]}','desc':euf_list[euf]["Name"],'feature':euf_list[euf]["function_features"]}
+        EUF_LIST.append(euf_dict)
+        if len(euf_list[euf]['function_features']) > 0:
+            ffs_list = []
+            for ff in euf_list[euf]['function_features']:
+                ffs_list.append(f'FFS{ff["ID"]}')
+            EUF2FFS[f'EUF{euf_list[euf]["ID"]}']=ffs_list
+
+    
+    FFS_LIST = []
+    FFS2MF = {}
+    ffs_list = json.loads(extract_item_group(db,processed_results,lib_tables_data,"function_features","functs"))['Catalogue']
+    for ff in ffs_list:
+        ffs_dict ={'name':f'FFS{ffs_list[ff]["ID"]}','desc':ffs_list[ff]["Name"]}
+        FFS_LIST.append(ffs_dict)
+        if len(ffs_list[ff]['feautre_mf_input']) > 0:
+            mf_input_list = []
+            for mf_input in ffs_list[ff]['feautre_mf_input']:
+                mf_input_list.append(f'MF{mf_input["mainfunctions_Name"]["idmainfunc"]}')
+            FFS2MF[f'FFS{ffs_list[ff]["ID"]}']=mf_input_list
+        
+    MF_LIST = []
+    MF2TF = {}
+    mf_list= json.loads(extract_item_group(db,processed_results,lib_tables_data,"mainfunctions","functs"))['Catalogue']
+    for mf in mf_list:
+        mf_dict ={'name':f'MF{mf_list[mf]["idmainfunc"]}','desc':mf_list[mf]["Name"]}
+        MF_LIST.append(mf_dict)
+        if len(mf_list[mf]['mf_tf_input']) > 0:
+            tf_input_list = []
+            for tf_input in mf_list[mf]['mf_tf_input']:
+                tf_input_list.append(f'TF{tf_input["technicalfunction_Name"]["idfunc"]}')   
+            MF2TF[f'MF{mf_list[mf]["ID"]}']=tf_input_list
+
+    TF_LIST = []
+    tf_list = json.loads(extract_item_group(db,processed_results,lib_tables_data,"technicalfunction","functs"))['Catalogue']
+    for tf in tf_list:
+        tf_dict ={'name':f'TF{tf_list[tf]["idfunc"]}','desc':tf_list[tf]["Name"]}
+        TF_LIST.append(tf_dict)
+
+    # for euf in json.loads(euf_list)["Catalogue"]:
+    Result["EUF_LIST"]=EUF_LIST
+    Result["EUF2FFS"]=EUF2FFS
+    Result["FFS_LIST"]=FFS_LIST
+    Result["FFS2MF"]=FFS2MF
+    Result["MF_LIST"]=MF_LIST
+    Result["MF2TF"]=MF2TF
+    Result["TF_LIST"]=TF_LIST
+
+    return json.dumps(Result,ensure_ascii=False, indent=2)
+    
+
+def extract_item_group(db,processed_results,lib_tables_data,target_table: str,category):
+    # db = SQLOperations()
     Item_group = {}
     Item_group["type"]=target_table
     Item_group["Catalogue"]={}
@@ -1443,7 +1622,7 @@ def extract_item_group(processed_results,lib_tables_data,target_table: str,categ
         Item_group["PowerType"]=[]
     TargetLines = db.read_data(target_table)
     for line in TargetLines:
-        result = extract_single_item(processed_results,lib_tables_data,target_table,line['Name'],'Name')
+        result = extract_single_item(db,processed_results,lib_tables_data,target_table,line['Name'],'Name')
         result_dict = json.loads(result)
         Item_group["Catalogue"][line['Name']]=result_dict[line['Name']]
         if category == "hardware":
@@ -1496,14 +1675,14 @@ def extract_item_group(processed_results,lib_tables_data,target_table: str,categ
 
     return json.dumps(Item_group,ensure_ascii=False, indent=2)
 
-def extract_entire_network(processed_results,lib_tables_data,target_table: str):
-    db = SQLOperations()
+def extract_entire_network(db,processed_results,lib_tables_data,target_table: str):
+    # db = SQLOperations()
     Item_group = {}
     Item_group["type"]="Ele"
     Item_group["Element"]=[]
     TargetLines = db.read_data(target_table)
     for line in TargetLines:
-        result = extract_single_item(processed_results,lib_tables_data,target_table,line['Name'],'Name')
+        result = extract_single_item(db,processed_results,lib_tables_data,target_table,line['Name'],'Name')
         result_dict = json.loads(result)
         Item_group["Element"].append(result_dict[line['Name']])
 
@@ -1518,11 +1697,9 @@ def extract_entire_network(processed_results,lib_tables_data,target_table: str):
         })
     return json.dumps(Item_group,ensure_ascii=False, indent=2)
 
-def add_users(data):
-    db = SQLOperations()
-            
+def add_subscribers(db,data):
+    # db = SQLOperations()
     userdata = {"Name": data['name'], "email": data["submitter_email"], "isSubscribe": True}
-
     # 尝试插入数据
     result = db.insert_data("user", userdata)
     if isinstance(result, int) and result > 0:
@@ -1533,23 +1710,8 @@ def add_users(data):
         admin_email = "darkerassistance@thedarker-tech.com"
         
         # 发送管理员提醒邮件，使用新的admin_notification邮件类型
-        send_single_email(
-            recipient_email=admin_email,
-            email_type="admin_notification",
-            user_data=userdata
-        )
-        
-        # # 构建管理员提醒邮件内容
-        # current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        # admin_subject = "【新用户提醒】有人订阅了达客科技服务"
-        
-        # # 发送管理员提醒邮件
-        # send_single_email(
-        #     recipient_email=admin_email,
-        #     custom_content=admin_content,
-        #     custom_subject=admin_subject
-        # )
-        
+        send_single_email(recipient_email=admin_email,email_type="admin_notification",user_data=userdata)
+                
         return {"status": True, "insert_id": result}
     else:
         if "email" in result:
@@ -1565,8 +1727,8 @@ def add_users(data):
             else:
                 return {"status": False, "error": 3,"name":data['name']}    
 
-def submit_issue(data):
-    db = SQLOperations()
+def submit_issue(db,data):
+    # db = SQLOperations('dynamic')
         
     issuedata = {
         "Type":data["type"],
@@ -1593,17 +1755,204 @@ def submit_issue(data):
     else:
         return {"status": False, "insert_id": "shit nigger"}
 
-def manage_login(data):
-    db = SQLOperations()
-    result = db.read_data("manager_account",{"Name":data["name"]})
+
+def create_folder_local(base_path, template_name, target_name):
+    """
+    在本地创建文件夹，复制模板文件夹到目标位置
+    
+    Args:
+        base_path: 基础路径
+        template_name: 模板文件夹名称
+        target_name: 目标文件夹名称
+        user_data: 用户数据字典，包含email, UserLevel, RegisterTime，用于修改JSON文件
+    
+    Returns:
+        bool: 创建是否成功
+    """
+    try:
+        # 构建模板文件夹路径和目标文件夹路径
+        template_path = os.path.join(base_path, template_name)
+        target_path = os.path.join(base_path, str(target_name))
+        
+        # 检查模板文件夹是否存在
+        if not os.path.exists(template_path):
+            print(f"模板文件夹 {template_path} 不存在")
+            return False
+        
+        # 检查目标文件夹是否已存在，如果存在则先删除
+        if os.path.exists(target_path):
+            shutil.rmtree(target_path)
+            print(f"已删除已存在的目标文件夹: {target_path}")
+        
+        # 复制模板文件夹到目标位置
+        shutil.copytree(template_path, target_path)
+        print(f"成功创建文件夹: {target_path}")
+        
+        return True
+    except Exception as e:
+        print(f"本地创建文件夹失败: {str(e)}")
+        return False
+
+
+def create_folder_remote(ssh_host, ssh_port, ssh_username, ssh_password, base_path, template_name, target_name):
+    """
+    通过SSH远程创建文件夹，复制模板文件夹到目标位置
+    
+    Args:
+        ssh_host: SSH主机地址
+        ssh_port: SSH端口
+        ssh_username: SSH用户名
+        ssh_password: SSH密码
+        base_path: 基础路径
+        template_name: 模板文件夹名称
+        target_name: 目标文件夹名称
+        user_data: 用户数据字典，包含email, UserLevel, RegisterTime，用于修改JSON文件
+    
+    Returns:
+        bool: 创建是否成功
+    """
+    try:
+        # 构建模板文件夹路径和目标文件夹路径
+        template_path = os.path.join(base_path, template_name)
+        target_path = os.path.join(base_path, str(target_name))
+        
+        # 创建SSH客户端
+        ssh = paramiko.SSHClient()
+        ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+        
+        # 连接SSH服务器
+        ssh.connect(ssh_host, ssh_port, ssh_username, ssh_password)
+        
+        # 执行命令：检查模板文件夹是否存在
+        stdin, stdout, stderr = ssh.exec_command(f"if exist \"{template_path}\" (echo 1) else (echo 0)")
+        template_exists = stdout.read().decode().strip() == "1"
+        
+        if not template_exists:
+            print(f"远程模板文件夹 {template_path} 不存在")
+            ssh.close()
+            return False
+        
+        # 执行命令：删除已存在的目标文件夹（如果存在）
+        ssh.exec_command(f"if exist \"{target_path}\" rmdir /s /q \"{target_path}\"")
+        
+        # 执行命令：复制模板文件夹到目标位置
+        # 使用xcopy命令复制文件夹，/E 复制所有子目录和文件，/I 假设目标是目录
+        stdin, stdout, stderr = ssh.exec_command(f"xcopy \"{template_path}\" \"{target_path}\" /E /I /Y")
+        
+        # 检查命令执行结果
+        exit_status = stdout.channel.recv_exit_status()
+        
+        if exit_status == 0:
+            print(f"成功远程创建文件夹: {target_path}")
+            
+        ssh.close()
+        
+        if exit_status == 0:
+            return True
+        else:
+            error_msg = stderr.read().decode().strip()
+            print(f"远程创建文件夹失败: {error_msg}")
+            return False
+    except Exception as e:
+        print(f"SSH操作失败: {str(e)}")
+        return False
+
+
+def manage_register(db,data,deploy_mode):
+    # print(data,deploy_mode) 
+    current_id = None
+    user_info = {}
+
+    if data["regi_mode"] == "renew":
+        userdata = {"email": data["email"], "Password": data["password"],"is_user":1,"UserLevel":"Normal"}
+        current_id = db.read_data("user",{"email":data["email"]})[0]["ID"]
+        if not current_id:
+            return {"status": False, "error": 1}
+        else:
+            db.update_data("user",userdata,{"ID":current_id})
+            result = db.read_data("user",{"ID":current_id})
+    elif data["regi_mode"] == "new":
+        userdata = {"email": data["email"], "Password": data["password"],"is_user":1,"UserLevel":"Normal","Name":data["name"],"isSubscribe":1}
+        current_id = db.insert_data("user", userdata)
+        if isinstance(current_id, int) and current_id > 0:
+            # 获取新创建用户的current_id
+            result = db.read_data("user",{"ID":current_id})
+        else:
+            return {"status": False, "error": "服务器故障，请稍后重试"}
+                # 准备用户数据，用于修改userbasicinfo.json文件
+    if isinstance(current_id, int) and current_id > 0:
+        user_info = {
+            "Email": result[0]["email"],
+            "UserLevel": result[0]["UserLevel"],
+            "Name": result[0]["Name"],
+            "ID": result[0]["ID"],
+            "RegisterTime":result[0]["create_time"],
+            "Password":result[0]["Password"]
+        }
+        planetdata= {
+            "AdasBenchmark":0,
+            "ArchitectureBuild":0,
+            "comparison":0,
+            "Configurator":0,
+            "EcoSystem_net":0,
+            "Forum":0,
+            "FoV_build":0,
+            "FunctionHall":0,
+            "HardWareHall":0,
+            "Knowledgenet":0,
+            "markettrend":0,
+            "PhyArchiTool":0,
+            "RegulationMap":0,
+            "RoadBuilder":0,
+            "SensorHall":0,
+            "SensorInspector":0,
+            "SimulationPlatform":0,
+            "solutionbenchmark":0,
+            "user_ID":current_id
+        }
+        db.insert_data("lightplanet",planetdata)
+    # 创建文件夹
+    if current_id:
+        base_path = "C:\\DarkerUserData"
+        template_name = "Template"
+        
+        if deploy_mode == "test":
+            ssh_host = "47.99.204.97"
+            ssh_port = 22
+            ssh_username = "Administrator"
+            ssh_password = "Sjw9@0613"
+            create_folder_remote(ssh_host, ssh_port, ssh_username, ssh_password, base_path, template_name, current_id)
+        else:
+            # 本地模式：直接在本地创建文件夹
+            create_folder_local(base_path, template_name, current_id)
+
+        send_single_email(recipient_email=user_info["Email"],email_type="registration_confirmation",user_data=user_info)
+        return {"status": True, "error": 0}
+
+
+def manage_login(db,data):
+    # db = SQLOperations()
+    if data["mode"] == "email":
+        result = db.read_data("user",{"Name":data["name"]})
+    elif data["mode"] == "username":
+        result = db.read_data("user",{"Name":data["name"]})
 
     if not result:
-
         return {"status": False, "error": 1}
     else:
-        if result[0]["Password"] == data["password"]:
-
-            return {"status": True, "error": 0,"access":{"allright":result[0]["isAllRight"],"modification":result[0]["isModification"],"adding":result[0]["isAdding"]}}
+        if (result[0]["Password"] == data["password"]) and (result[0]["is_user"] == 1):
+            userinfo = result[0]
+            if userinfo["UserLevel"].startswith("Manager"):
+                userinfo = convert_datetime_to_str(userinfo)
+                Final = {"status": True, "error": 0,"UserInfo":userinfo}
+            else:
+                userinfo["userdata"]={}
+                userinfo["userdata"]['lightplanet'] = db.read_data('lightplanet',{"user_ID":userinfo["ID"]})[0]
+                userinfo["userdata"]["planetdictionary"] = db.read_data('productfeatures')
+                userinfo = convert_datetime_to_str(userinfo)
+                Final = {"status": True, "error": 0,"UserInfo":userinfo}
+            return json.dumps(Final, ensure_ascii=False, indent=2)
+            
         else:
             return {"status": False, "error": 2}
 
@@ -1619,8 +1968,7 @@ def convert_datetime_to_str(obj):
     else:
         return obj
 
-def fetch_advice_recording():
-    db = SQLOperations()
+def fetch_advice_recording(db):
     try:
         Result = {}
         result = db.read_data("issuesandadvice")
@@ -1653,15 +2001,14 @@ def fetch_advice_recording():
         # 捕获并返回错误信息
         error_result = {"success": False, "error": str(e)}
         return json.dumps(error_result, ensure_ascii=False, indent=2)
-    finally:
-        # 确保数据库连接关闭
-        try:
-            db.close()
-        except:
-            pass
+    # finally:
+    #     # 确保数据库连接关闭
+    #     try:
+            
+    #     except:
+    #         pass
 
-def fetch_siteproduct_info():
-    db = SQLOperations()
+def fetch_siteproduct_info(db):
     Result = {}
     product_features = db.read_data("productfeatures")
     
@@ -1678,40 +2025,36 @@ def fetch_siteproduct_info():
     Result["categorized_features"] = categorized_features
     
     # 保留原有的status枚举量
-    Status_info = db.read_data("online_status_enum")
+    Status_info = db.read_data("online_enum")
     Result["status"] = []
     for item in Status_info:
-        Result["status"].append(item["Status"])
+        Result["status"].append(item["status"])
 
     Feedback = {"status": True, "error": 0,"Result":Result}
     return json.dumps(Feedback, ensure_ascii=False, indent=2)
 
-def update_recordings(data,id):
-    db = SQLOperations()
+def update_recordings(db,data,id):
     row=db.update_data("issuesandadvice", data,{"ID": id})
-    Result = fetch_advice_recording()
+    Result = fetch_advice_recording(db)
     Feedback = {"status": True, "error": 0,"Result":json.loads(Result)}
 
     return json.dumps(Feedback, ensure_ascii=False, indent=2)
 
-def update_productStatus(data,id):
-    db = SQLOperations()
+def update_productStatus(db,data,id):
     row=db.update_data("productfeatures", data,{"ID": id})
-    Result = fetch_siteproduct_info()
+    Result = fetch_siteproduct_info(db)
     Feedback = {"status": True, "error": 0,"Result":json.loads(Result)}
 
     return json.dumps(Feedback, ensure_ascii=False, indent=2)
 
-def delete_recordings(id):
-    db = SQLOperations()
+def delete_recordings(db,id):
     row=db.delete_data("issuesandadvice", {"ID": id})
-    Result = fetch_advice_recording()
+    Result = fetch_advice_recording(db) 
     Feedback = {"status": True, "error": 0,"Result":json.loads(Result)}
 
     return json.dumps(Feedback, ensure_ascii=False, indent=2)
 
-def get_user_info():
-    db = SQLOperations()
+def get_all_users(db):
     Result = {}
     users = db.read_data("user")
     Result["user"] = users
@@ -1721,8 +2064,8 @@ def get_user_info():
     
     return json.dumps(Feedback, ensure_ascii=False, indent=2)
 
-def create_task(data):
-    db = SQLOperations()
+def create_task(db,data):
+
     Result = db.insert_data("release_content",data)
     if data["Content_Type"]=="creation":
         db.update_data("release_content",{"Bug_ID": "NO-"+str(Result)},{"ID":Result})
@@ -1732,9 +2075,7 @@ def create_task(data):
     Feedback = {"status": True, "error": 0,"Result":Result}
     return json.dumps(Feedback, ensure_ascii=False, indent=2)
 
-def update_task(data):
-    db = SQLOperations()
-    print(data["table"])
+def update_task(db,data):
     if data["table"] == "task":
         id = data["content"]["Task_ID"]
         columns = data["content"]["Column"]
@@ -1750,8 +2091,7 @@ def update_task(data):
     Feedback = {"status": True, "error": 0,"Result":row}
     return json.dumps(Feedback, ensure_ascii=False, indent=2)
 
-def get_task_tobepub():
-    db = SQLOperations()
+def get_task_tobepub(db):
     Result = {}
     content = db.read_data("release_content")
     Result["content"] = content
@@ -1761,16 +2101,21 @@ def get_task_tobepub():
     
     return json.dumps(Feedback, ensure_ascii=False, indent=2)
 
-def visit_management(data):
-    db = SQLOperations()
+def visit_management(db,data,uservisit):
 
     Result = db.insert_data("visit",data)
     Feedback = {"status": True, "error": 0,"Result":Result}
+    if uservisit:
+        funclist = db.read_data("lightplanet",{"user_ID":uservisit["userid"]})[0]
+        for key in funclist:
+            if key not in ("ID", "user_ID"):
+                if key.lower() in uservisit["page"].lower():
+                    db.update_data("lightplanet",{key:funclist[key]+1},{"user_ID":uservisit["userid"]})
+
     return json.dumps(Feedback, ensure_ascii=False, indent=2)
 
 
-def visit_statistic():
-    db = SQLOperations()
+def visit_statistic(db):
     Result = {}
     visit_data = db.read_data("visit")
     Result["visit"] = visit_data
