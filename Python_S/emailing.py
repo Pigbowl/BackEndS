@@ -203,7 +203,7 @@ class EmailSender:
                 
                 <!-- 添加带图片的导向按钮，使用base64数据URL或emoji -->
                 <div style="text-align: center; margin: 20px 0;">
-                    <a href="http://thedarker-tech.com" style="display: inline-flex; align-items: center; background-color: #1a73e8; color: white; text-decoration: none; padding: 12px 25px; border-radius: 4px; font-weight: bold; gap: 10px; font-size: 16px;">
+                    <a href="https://thedarker-tech.com" style="display: inline-flex; align-items: center; background-color: #1a73e8; color: white; text-decoration: none; padding: 12px 25px; border-radius: 4px; font-weight: bold; gap: 10px; font-size: 16px;">
                         访问达客科技官网
                         {f'<img src="{darkerduck_base64}" alt="达客鸭" style="width: 24px; height: 24px; vertical-align: middle;"/>' if darkerduck_base64 else '<span style="font-size: 18px;">✅</span>'}
                     </a>
@@ -515,7 +515,7 @@ class EmailSender:
                 
                 <!-- 添加带图片的导向按钮，使用base64数据URL或emoji -->
                 <div style="text-align: center; margin: 20px 0;">
-                    <a href="http://thedarker-tech.com/login" style="display: inline-flex; align-items: center; background-color: #1a73e8; color: white; text-decoration: none; padding: 12px 25px; border-radius: 4px; font-weight: bold; gap: 10px; font-size: 16px;">
+                    <a href="https://thedarker-tech.com/pages/login.html" style="display: inline-flex; align-items: center; background-color: #1a73e8; color: white; text-decoration: none; padding: 12px 25px; border-radius: 4px; font-weight: bold; gap: 10px; font-size: 16px;">
                         登录达客科技
                         {f'<img src="{darkerduck_base64}" alt="达客鸭" style="width: 24px; height: 24px; vertical-align: middle;"/>' if darkerduck_base64 else '<span style="font-size: 18px;">🔑</span>'}
                     </a>
