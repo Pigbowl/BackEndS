@@ -1758,10 +1758,16 @@ def submit_issue(db,data):
             db.insert_data("user", {"Name": newname, "email": issuedata["Email"], "isSubscribe": True})
 
     if isinstance(result, int) and result > 0:
+        # 向用户发送订阅确认邮件
+        send_single_email(issuedata["Email"], "issue_recieve_confirm",issuedata)
+        # 向管理员发送问题检查通知邮件
+        send_single_email(recipient_email=admin_email,email_type="admin_check_notif",user_data=issuedata)
+        
         return {"status": True, "insert_id": result}
     else:
         return {"status": False, "insert_id": "shit nigger"}
 
+    
 
 def create_folder_local(base_path, template_name, target_name):
     """

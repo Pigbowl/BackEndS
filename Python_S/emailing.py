@@ -333,6 +333,108 @@ class EmailSender:
         </html>
         """
         return email_content
+    
+    def get_issue_recieve_confirm_content(self, issuedata):
+        """
+        生成问题收到确认邮件内容
+        
+        Args:
+            issuedata: 问题数据，包含用户名、问题标题、问题类型和问题描述
+        """
+        current_time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        
+        # 函数：将图片转换为base64数据URL
+        def image_to_base64(image_path):
+            try:
+                full_path = os.path.join('c:\\Users\\宋嘉玮\\OneDrive\\Desktop\\BackEndS', image_path)
+                if os.path.exists(full_path):
+                    with open(full_path, "rb") as img_file:
+                        # 读取图片文件并转换为base64
+                        img_base64 = base64.b64encode(img_file.read()).decode('utf-8')
+                        # 根据文件扩展名确定MIME类型
+                        ext = os.path.splitext(image_path)[1].lower()
+                        mime_type = f"image/{ext[1:]}" if ext else "image/png"
+                        return f"data:{mime_type};base64,{img_base64}"
+            except Exception as e:
+                print(f"转换图片 {image_path} 为base64时出错: {e}")
+            # 如果转换失败，返回空字符串
+            return ""
+        
+        # 转换图片为base64
+        logo_base64 = image_to_base64("logo.png")
+        darkerduck_base64 = image_to_base64("darkerduck.png")
+        
+        email_content = f"""
+        <html>
+        <head>
+            <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+            <style>
+                body {{ font-family: 'Microsoft YaHei', Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #f8f9fa; }}
+                .container {{ background-color: white; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); padding: 30px; }}
+                .header {{ text-align: center; padding-bottom: 20px; border-bottom: 2px solid #e7f0fd; margin-bottom: 20px; }}
+                .logo {{ width: 80px; height: 80px; margin-bottom: 15px; }}
+                h2 {{ color: #1a73e8; margin-top: 0; }}
+                .issue-info {{ background-color: #f0f4f8; padding: 20px; border-radius: 4px; margin: 20px 0; }}
+                .info-item {{ margin-bottom: 15px; }}
+                .info-label {{ font-weight: bold; color: #555; display: inline-block; width: 100px; }}
+                .footer {{ margin-top: 30px; font-size: 12px; color: #666; text-align: center; }}
+                .time-info {{ font-size: 12px; color: #666; text-align: right; margin-top: 20px; }}
+            </style>
+        </head>
+        <body>
+            <div class="container">
+                <div class="header">
+                    <!-- 使用base64数据URL嵌入图片 -->
+                    {f'<img src="{logo_base64}" alt="达客科技" class="logo" width="80" height="80"/>' if logo_base64 else '<h1 style="color: #1a73e8; margin: 0; font-size: 36px;">达客科技</h1>'}
+                    <h2>【问题收到确认】您的问题已收到</h2>
+                </div>
+                
+                <p>尊敬的{issuedata['UserName']}先生/女士：</p>
+                
+                <p>感谢您提交问题反馈！我们已经收到您的问题，并会在2日之内进行处理，决定是否修改或采纳。</p>
+                
+                <p>以下是您提交的问题信息：</p>
+                
+                <div class="issue-info">
+                    <div class="info-item">
+                        <span class="info-label">问题类型：</span>
+                        <span>{issuedata['Type']}</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">问题标题：</span>
+                        <span>{issuedata['Category']}</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">问题描述：</span>
+                        <span>{issuedata['Description']}</span>
+                    </div>
+                </div>
+                
+                <p>再次感谢您对我们的支持！</p>
+                
+                <!-- 添加带图片的导向按钮，使用base64数据URL或emoji -->
+                <div style="text-align: center; margin: 20px 0;">
+                    <a href="http://thedarker-tech.com" style="display: inline-flex; align-items: center; background-color: #1a73e8; color: white; text-decoration: none; padding: 12px 25px; border-radius: 4px; font-weight: bold; gap: 10px; font-size: 16px;">
+                        访问达客科技官网
+                        {f'<img src="{darkerduck_base64}" alt="达客鸭" style="width: 24px; height: 24px; vertical-align: middle;"/>' if darkerduck_base64 else '<span style="font-size: 18px;">✅</span>'}
+                    </a>
+                </div>
+                
+                <div class="time-info">
+                    <p>发送时间：{current_time}</p>
+                    <p>发件人：{self.sender_name}</p>
+                </div>
+                
+                <hr>
+                <div class="footer">
+                    <p>此邮件由达客科技系统自动发送，请勿回复。如有问题，请联系客服。</p>
+                    <p>© 2025 达客科技. 保留所有权利。</p>
+                </div>
+            </div>
+        </body>
+        </html>
+        """
+        return email_content
         
     def get_registration_confirmation_content(self, user_data):
         """
@@ -437,6 +539,118 @@ class EmailSender:
         """
         return email_content
     
+    def get_admin_check_notif_content(self, issuedata):
+        """
+        生成管理员检查通知邮件内容
+        
+        Args:
+            issuedata: 问题数据，包含用户名、问题标题、问题类型和问题描述
+        """
+        current_time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        
+        # 函数：将图片转换为base64数据URL
+        def image_to_base64(image_path):
+            try:
+                full_path = os.path.join(r'c:\Users\宋嘉玮\OneDrive\Desktop\BackEndS', image_path)
+                if os.path.exists(full_path):
+                    with open(full_path, "rb") as img_file:
+                        # 读取图片文件并转换为base64
+                        img_base64 = base64.b64encode(img_file.read()).decode('utf-8')
+                        # 根据文件扩展名确定MIME类型
+                        ext = os.path.splitext(image_path)[1].lower()
+                        mime_type = f"image/{ext[1:]}" if ext else "image/png"
+                        return f"data:{mime_type};base64,{img_base64}"
+            except Exception as e:
+                print(f"转换图片 {image_path} 为base64时出错: {e}")
+            # 如果转换失败，返回空字符串
+            return ""
+        
+        # 转换图片为base64
+        logo_base64 = image_to_base64("logo.png")
+        darkerduck_base64 = image_to_base64("darkerduck.png")
+        
+        email_content = f"""
+        <html>
+        <head>
+            <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+            <style>
+                body {{ font-family: 'Microsoft YaHei', Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #f8f9fa; }}
+                .container {{ background-color: white; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); padding: 30px; }}
+                .header {{ text-align: center; padding-bottom: 20px; border-bottom: 2px solid #e7f0fd; margin-bottom: 20px; }}
+                .logo {{ width: 80px; height: 80px; margin-bottom: 15px; }}
+                h2 {{ color: #d93025; margin-top: 0; font-weight: bold; }}
+                .issue-info {{ background-color: #fff3f3; border: 1px solid #ffcccc; padding: 20px; border-radius: 4px; margin: 20px 0; }}
+                .info-item {{ margin-bottom: 15px; }}
+                .info-label {{ font-weight: bold; color: #555; display: inline-block; width: 100px; }}
+                .urgent-note {{ background-color: #fff3f3; border-left: 4px solid #d93025; padding: 15px; margin: 20px 0; }}
+                .footer {{ margin-top: 30px; font-size: 12px; color: #666; text-align: center; }}
+                .time-info {{ font-size: 12px; color: #666; text-align: right; margin-top: 20px; }}
+            </style>
+        </head>
+        <body>
+            <div class="container">
+                <div class="header">
+                    <!-- 使用base64数据URL嵌入图片 -->
+                    {f'<img src="{logo_base64}" alt="达客科技" class="logo" width="80" height="80"/>' if logo_base64 else '<h1 style="color: #1a73e8; margin: 0; font-size: 36px;">达客科技</h1>'}
+                    <h2>【紧急通知】收到新的问题反馈，需尽快处理</h2>
+                </div>
+                
+                <p>尊敬的管理员：</p>
+                
+                <p>有新用户提交了问题反馈，请尽快查看并处理！</p>
+                
+                <div class="issue-info">
+                    <div class="info-item">
+                        <span class="info-label">提交用户：</span>
+                        <span>{issuedata.get('UserName', '未知用户')}</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">问题类型：</span>
+                        <span>{issuedata.get('Type', '未知类型')}</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">问题标题：</span>
+                        <span>{issuedata.get('Category', '无标题')}</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">问题描述：</span>
+                        <span>{issuedata.get('Description', '无描述')}</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">提交时间：</span>
+                        <span>{current_time}</span>
+                    </div>
+                </div>
+                
+                <div class="urgent-note">
+                    <p style="color: #d93025; font-weight: bold; margin: 0;">⚠️ 紧急提醒：</p>
+                    <p style="margin: 5px 0 0 0;">请务必在收到此邮件后的24小时内查看并处理该问题，确保用户体验和服务质量。</p>
+                </div>
+                
+                <!-- 添加带图片的导向按钮，使用base64数据URL或emoji -->
+                <div style="text-align: center; margin: 20px 0;">
+                    <a href="http://thedarker-tech.com" style="display: inline-flex; align-items: center; background-color: #d93025; color: white; text-decoration: none; padding: 12px 25px; border-radius: 4px; font-weight: bold; gap: 10px; font-size: 16px;">
+                        立即查看问题
+                        {f'<img src="{darkerduck_base64}" alt="达客鸭" style="width: 24px; height: 24px; vertical-align: middle;"/>' if darkerduck_base64 else '<span style="font-size: 18px;">🚨</span>'}
+                    </a>
+                </div>
+                
+                <div class="time-info">
+                    <p>发送时间：{current_time}</p>
+                    <p>发件人：{self.sender_name}</p>
+                </div>
+                
+                <hr>
+                <div class="footer">
+                    <p>此邮件由达客科技系统自动发送，请勿回复。</p>
+                    <p>© 2025 达客科技. 保留所有权利。</p>
+                </div>
+            </div>
+        </body>
+        </html>
+        """
+        return email_content
+    
     def send_email(self, mode="single", recipient_email=None, email_type="product_update", user_data=None, notiftype="subscribe"):
         """
         发送邮件
@@ -444,10 +658,10 @@ class EmailSender:
         Args:
             mode: 发送模式，"single"表示单发，"batch"表示群发
             recipient_email: 单发模式下的收件人邮箱
-            email_type: 邮件类型，"product_update"表示产品上线提醒，"subscription_confirm"表示订阅通知，"admin_notification"表示管理员通知，"registration_confirmation"表示注册成功确认
+            email_type: 邮件类型，"product_update"表示产品上线提醒，"subscription_confirm"表示订阅通知，"admin_notification"表示管理员通知，"registration_confirmation"表示注册成功确认，"issue_recieve_confirm"表示问题收到确认
             custom_content: 自定义邮件内容（HTML格式），如果提供则忽略email_type
             custom_subject: 自定义邮件主题，如果提供则忽略email_type
-            user_data: 用户数据，用于管理员通知邮件和注册成功确认邮件
+            user_data: 用户数据，用于管理员通知邮件、注册成功确认邮件和问题收到确认邮件
             notiftype: 通知类型，"subscribe"表示有人订阅，"registration"表示有人注册，仅用于admin_notification类型
             
         Returns:
@@ -523,8 +737,24 @@ class EmailSender:
                     return False
                 email_content = self.get_registration_confirmation_content(user_data)
                 subject = Header("【注册成功】欢迎加入达客科技", 'utf-8')
+            elif email_type == "issue_recieve_confirm":
+                if not user_data:
+                    error_msg = "issue_recieve_confirm类型邮件必须提供user_data参数"
+                    logging.error(error_msg)
+                    print(f"错误: {error_msg}")
+                    return False
+                email_content = self.get_issue_recieve_confirm_content(user_data)
+                subject = Header("【问题收到确认】您的问题已收到", 'utf-8')
+            elif email_type == "admin_check_notif":
+                if not user_data:
+                    error_msg = "admin_check_notif类型邮件必须提供user_data参数"
+                    logging.error(error_msg)
+                    print(f"错误: {error_msg}")
+                    return False
+                email_content = self.get_admin_check_notif_content(user_data)
+                subject = Header("【紧急通知】收到新的问题反馈，需尽快处理", 'utf-8')
             else:
-                error_msg = f"无效的邮件类型: {email_type}，支持的类型为'product_update'、'subscription_confirm'、'admin_notification'和'registration_confirmation'"
+                error_msg = f"无效的邮件类型: {email_type}，支持的类型为'product_update'、'subscription_confirm'、'admin_notification'、'registration_confirmation'、'issue_recieve_confirm'和'admin_check_notif'"
                 logging.error(error_msg)
                 print(f"错误: {error_msg}")
                 return False
@@ -631,10 +861,10 @@ def send_single_email(recipient_email, email_type="product_update",user_data=Non
     
     Args:
         recipient_email: 收件人邮箱
-        email_type: 邮件类型，"product_update"表示产品上线提醒，"subscription_confirm"表示订阅通知，"admin_notification"表示管理员通知，"registration_confirmation"表示注册成功确认
+        email_type: 邮件类型，"product_update"表示产品上线提醒，"subscription_confirm"表示订阅通知，"admin_notification"表示管理员通知，"registration_confirmation"表示注册成功确认，"issue_recieve_confirm"表示问题收到确认，"admin_check_notif"表示管理员问题检查通知
         custom_content: 自定义邮件内容（HTML格式），如果提供则忽略email_type
         custom_subject: 自定义邮件主题，如果提供则忽略email_type
-        user_data: 用户数据，用于管理员通知邮件和注册成功确认邮件
+        user_data: 用户数据，用于管理员通知邮件、注册成功确认邮件和问题收到确认邮件
         notiftype: 通知类型，"subscribe"表示有人订阅，"registration"表示有人注册，仅用于admin_notification类型
         
     Returns:

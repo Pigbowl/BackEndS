@@ -621,6 +621,34 @@ INSERT INTO `db_structure` VALUES ('objects','直接展现给用户的产品','�
 UNLOCK TABLES;
 
 --
+-- Table structure for table `deliverable_content`
+--
+
+DROP TABLE IF EXISTS `deliverable_content`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `deliverable_content` (
+  `ID` int NOT NULL AUTO_INCREMENT,
+  `Doc` varchar(45) DEFAULT NULL,
+  `Name` varchar(45) DEFAULT NULL,
+  PRIMARY KEY (`ID`),
+  UNIQUE KEY `ID_UNIQUE` (`ID`),
+  UNIQUE KEY `Name_UNIQUE` (`Name`),
+  KEY `NameIndex` (`Name`)
+) ENGINE=InnoDB AUTO_INCREMENT=24 DEFAULT CHARSET=utf8mb3;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `deliverable_content`
+--
+
+LOCK TABLES `deliverable_content` WRITE;
+/*!40000 ALTER TABLE `deliverable_content` DISABLE KEYS */;
+INSERT INTO `deliverable_content` VALUES (1,NULL,'产品PRD'),(2,NULL,'对标报告'),(3,NULL,'使用场景列表'),(4,NULL,'Deliver_1'),(5,NULL,'Deliver_2'),(6,NULL,'Deliver_5'),(7,NULL,'Deliver_15'),(8,NULL,'Deliver_16'),(9,NULL,'Deliver_17'),(10,NULL,'Deliver_18'),(11,NULL,'Deliver_19'),(12,NULL,'Deliver_20'),(13,NULL,'Deliver_21'),(14,NULL,'Deliver_22'),(15,NULL,'Deliver_23'),(16,NULL,'Deliver_24'),(17,NULL,'Deliver_25'),(18,NULL,'Deliver_26'),(19,NULL,'Deliver_27'),(20,NULL,'Deliver_28'),(21,NULL,'Deliver_29'),(22,NULL,'Deliver_30'),(23,NULL,'Deliver_31');
+/*!40000 ALTER TABLE `deliverable_content` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
 -- Table structure for table `deliverables`
 --
 
@@ -632,11 +660,12 @@ CREATE TABLE `deliverables` (
   `Work_ID` int NOT NULL,
   `Deliverable` varchar(45) NOT NULL,
   PRIMARY KEY (`ID`),
+  UNIQUE KEY `ID_UNIQUE` (`ID`),
   KEY `fk_Deliverables_Work1_idx` (`Work_ID`),
   KEY `fk_Deliverables_Deliveralbe_content1_idx` (`Deliverable`),
-  CONSTRAINT `fk_Deliverables_Deliveralbe_content1` FOREIGN KEY (`Deliverable`) REFERENCES `deliveralbe_content` (`Name`),
+  CONSTRAINT `fk_Deliverables_Deliveralbe_content1` FOREIGN KEY (`Deliverable`) REFERENCES `deliverable_content` (`Name`),
   CONSTRAINT `fk_Deliverables_Work1` FOREIGN KEY (`Work_ID`) REFERENCES `work` (`ID`)
-) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb3;
+) ENGINE=InnoDB AUTO_INCREMENT=72 DEFAULT CHARSET=utf8mb3;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -645,35 +674,8 @@ CREATE TABLE `deliverables` (
 
 LOCK TABLES `deliverables` WRITE;
 /*!40000 ALTER TABLE `deliverables` DISABLE KEYS */;
-INSERT INTO `deliverables` VALUES (2,1,'产品PRD'),(3,2,'对标报告'),(4,2,'子系统规范');
+INSERT INTO `deliverables` VALUES (1,1,'产品PRD'),(2,2,'对标报告'),(3,3,'使用场景列表'),(4,4,'Deliver_1'),(5,4,'Deliver_2'),(6,4,'Deliver_5'),(7,4,'Deliver_15'),(8,5,'Deliver_1'),(9,5,'Deliver_2'),(10,5,'Deliver_5'),(11,5,'Deliver_16'),(12,6,'Deliver_1'),(13,6,'Deliver_2'),(14,6,'Deliver_5'),(15,6,'Deliver_17'),(16,7,'Deliver_1'),(17,7,'Deliver_2'),(18,7,'Deliver_5'),(19,7,'Deliver_18'),(20,8,'Deliver_1'),(21,8,'Deliver_2'),(22,8,'Deliver_5'),(23,8,'Deliver_19'),(24,9,'Deliver_1'),(25,9,'Deliver_2'),(26,9,'Deliver_5'),(27,9,'Deliver_20'),(28,10,'Deliver_1'),(29,10,'Deliver_2'),(30,10,'Deliver_5'),(31,10,'Deliver_21'),(32,11,'Deliver_1'),(33,11,'Deliver_2'),(34,11,'Deliver_5'),(35,11,'Deliver_22'),(36,12,'Deliver_1'),(37,12,'Deliver_2'),(38,12,'Deliver_5'),(39,12,'Deliver_23'),(40,13,'Deliver_1'),(41,13,'Deliver_2'),(42,13,'Deliver_5'),(43,13,'Deliver_24'),(44,14,'Deliver_1'),(45,14,'Deliver_2'),(46,14,'Deliver_5'),(47,14,'Deliver_25'),(48,15,'Deliver_1'),(49,15,'Deliver_2'),(50,15,'Deliver_5'),(51,15,'Deliver_26'),(52,16,'Deliver_1'),(53,16,'Deliver_2'),(54,16,'Deliver_5'),(55,16,'Deliver_27'),(56,17,'Deliver_1'),(57,17,'Deliver_2'),(58,17,'Deliver_5'),(59,17,'Deliver_28'),(60,18,'Deliver_1'),(61,18,'Deliver_2'),(62,18,'Deliver_5'),(63,18,'Deliver_29'),(64,19,'Deliver_1'),(65,19,'Deliver_2'),(66,19,'Deliver_5'),(67,19,'Deliver_30'),(68,20,'Deliver_1'),(69,20,'Deliver_2'),(70,20,'Deliver_5'),(71,20,'Deliver_31');
 /*!40000 ALTER TABLE `deliverables` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
--- Table structure for table `deliveralbe_content`
---
-
-DROP TABLE IF EXISTS `deliveralbe_content`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `deliveralbe_content` (
-  `ID` int NOT NULL AUTO_INCREMENT,
-  `Doc` varchar(45) DEFAULT NULL,
-  `Name` varchar(45) DEFAULT NULL,
-  PRIMARY KEY (`ID`),
-  UNIQUE KEY `Name_UNIQUE` (`Name`),
-  KEY `NameIndex` (`Name`)
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb3;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `deliveralbe_content`
---
-
-LOCK TABLES `deliveralbe_content` WRITE;
-/*!40000 ALTER TABLE `deliveralbe_content` DISABLE KEYS */;
-INSERT INTO `deliveralbe_content` VALUES (1,'SSS','产品PRD'),(2,'KKK','对标报告'),(3,'PPP','子系统规范');
-/*!40000 ALTER TABLE `deliveralbe_content` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
@@ -1346,11 +1348,12 @@ CREATE TABLE `knowledge` (
   `Work_ID` int NOT NULL,
   `Knowledge` varchar(45) NOT NULL,
   PRIMARY KEY (`ID`),
+  UNIQUE KEY `ID_UNIQUE` (`ID`),
   KEY `fk_Knowledge_Work1_idx` (`Work_ID`),
   KEY `fk_Knowledge_Knowledge_content1_idx` (`Knowledge`),
   CONSTRAINT `fk_Knowledge_Knowledge_content1` FOREIGN KEY (`Knowledge`) REFERENCES `knowledge_content` (`Name`),
   CONSTRAINT `fk_Knowledge_Work1` FOREIGN KEY (`Work_ID`) REFERENCES `work` (`ID`)
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb3;
+) ENGINE=InnoDB AUTO_INCREMENT=53 DEFAULT CHARSET=utf8mb3;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1359,7 +1362,7 @@ CREATE TABLE `knowledge` (
 
 LOCK TABLES `knowledge` WRITE;
 /*!40000 ALTER TABLE `knowledge` DISABLE KEYS */;
-INSERT INTO `knowledge` VALUES (1,1,'ADAS功能介绍'),(2,2,'功能体验通用知识');
+INSERT INTO `knowledge` VALUES (1,1,'ADAS通用知识'),(2,1,'KnowLedge_1'),(3,2,'ADAS通用知识'),(4,2,'KnowLedge_1'),(5,3,'ADAS通用知识'),(6,3,'KnowLedge_1'),(7,4,'功能体验通用知识'),(8,4,'KnowLedge_1'),(9,5,'ADAS通用知识'),(10,5,'KnowLedge_1'),(11,6,'R79'),(12,6,'ISO'),(13,6,'GBT'),(14,7,'ENCAP'),(15,7,'CNCAP'),(16,7,'iVISTA'),(17,8,'系统开发方法论'),(18,9,'系统开发方法论'),(19,9,'ADAS通用知识'),(20,9,'KnowLedge_1'),(21,10,'系统开发方法论'),(22,10,'ADAS通用知识'),(23,10,'KnowLedge_1'),(24,11,'系统开发方法论'),(25,11,'ADAS通用知识'),(26,11,'KnowLedge_1'),(27,12,'ISO26262'),(28,12,'SOTIF'),(29,13,'系统开发方法论'),(30,13,'ADAS通用知识'),(31,13,'KnowLedge_1'),(32,14,'系统开发方法论'),(33,14,'ADAS通用知识'),(34,14,'KnowLedge_2'),(35,15,'系统开发方法论'),(36,15,'ADAS通用知识'),(37,15,'KnowLedge_3'),(38,16,'系统开发方法论'),(39,16,'ADAS通用知识'),(40,16,'KnowLedge_4'),(41,17,'系统开发方法论'),(42,17,'ADAS通用知识'),(43,17,'KnowLedge_5'),(44,18,'系统开发方法论'),(45,18,'ADAS通用知识'),(46,18,'KnowLedge_6'),(47,19,'系统开发方法论'),(48,19,'ADAS通用知识'),(49,19,'KnowLedge_7'),(50,20,'系统开发方法论'),(51,20,'ADAS通用知识'),(52,20,'KnowLedge_8');
 /*!40000 ALTER TABLE `knowledge` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -1371,13 +1374,14 @@ DROP TABLE IF EXISTS `knowledge_content`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `knowledge_content` (
-  `ID` int NOT NULL,
+  `ID` int NOT NULL AUTO_INCREMENT,
   `Name` varchar(45) DEFAULT NULL,
   `link` varchar(45) DEFAULT NULL,
   PRIMARY KEY (`ID`),
+  UNIQUE KEY `ID_UNIQUE` (`ID`),
   UNIQUE KEY `Name_UNIQUE` (`Name`),
   KEY `nameindex` (`Name`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
+) ENGINE=InnoDB AUTO_INCREMENT=20 DEFAULT CHARSET=utf8mb3;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1386,7 +1390,7 @@ CREATE TABLE `knowledge_content` (
 
 LOCK TABLES `knowledge_content` WRITE;
 /*!40000 ALTER TABLE `knowledge_content` DISABLE KEYS */;
-INSERT INTO `knowledge_content` VALUES (1,'ADAS功能介绍','aaaa'),(2,'功能体验通用知识','bbbb');
+INSERT INTO `knowledge_content` VALUES (1,'ADAS通用知识','FunctionHall.html'),(2,'KnowLedge_1',NULL),(3,'功能体验通用知识',NULL),(4,'R79',NULL),(5,'ISO',NULL),(6,'GBT',NULL),(7,'ENCAP',NULL),(8,'CNCAP',NULL),(9,'iVISTA',NULL),(10,'系统开发方法论',NULL),(11,'ISO26262',NULL),(12,'SOTIF',NULL),(13,'KnowLedge_2',NULL),(14,'KnowLedge_3',NULL),(15,'KnowLedge_4',NULL),(16,'KnowLedge_5',NULL),(17,'KnowLedge_6',NULL),(18,'KnowLedge_7',NULL),(19,'KnowLedge_8',NULL);
 /*!40000 ALTER TABLE `knowledge_content` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -1743,8 +1747,9 @@ CREATE TABLE `metiers` (
   `Name` varchar(45) DEFAULT NULL,
   `JD` varchar(45) DEFAULT NULL,
   PRIMARY KEY (`ID`),
+  UNIQUE KEY `ID_UNIQUE` (`ID`),
   UNIQUE KEY `Name_UNIQUE` (`Name`)
-) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8mb3;
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb3;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1753,7 +1758,7 @@ CREATE TABLE `metiers` (
 
 LOCK TABLES `metiers` WRITE;
 /*!40000 ALTER TABLE `metiers` DISABLE KEYS */;
-INSERT INTO `metiers` VALUES (1,'产品工程师',NULL),(2,'功能开发工程师',NULL),(3,'系统工程师',NULL),(4,'软件开发工程师',NULL),(5,'软件验证工程师',NULL),(6,'系统验证工程师',NULL),(7,'功能架构师',NULL),(8,'系统架构师',NULL),(9,'软件架构师',NULL),(10,'算法开发工程师',NULL);
+INSERT INTO `metiers` VALUES (1,'产品工程',NULL),(2,'功能开发',NULL),(3,'系统开发',NULL),(4,'安全开发',NULL),(5,'软件开发',NULL);
 /*!40000 ALTER TABLE `metiers` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -2622,6 +2627,7 @@ CREATE TABLE `subject` (
   `ID` int NOT NULL AUTO_INCREMENT,
   `Name` varchar(45) DEFAULT NULL,
   PRIMARY KEY (`ID`),
+  UNIQUE KEY `ID_UNIQUE` (`ID`),
   UNIQUE KEY `Name_UNIQUE` (`Name`)
 ) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb3;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -2632,7 +2638,7 @@ CREATE TABLE `subject` (
 
 LOCK TABLES `subject` WRITE;
 /*!40000 ALTER TABLE `subject` DISABLE KEYS */;
-INSERT INTO `subject` VALUES (4,'中间层软件'),(1,'产品定义'),(2,'功能设计'),(5,'应用层软件'),(3,'底层软件'),(6,'整车架构');
+INSERT INTO `subject` VALUES (1,'产品定义'),(4,'功能安全'),(5,'感知开发'),(6,'硬件开发'),(2,'系统工程'),(3,'软件工程');
 /*!40000 ALTER TABLE `subject` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -3139,17 +3145,18 @@ CREATE TABLE `work` (
   `ID` int NOT NULL AUTO_INCREMENT,
   `Name` varchar(45) DEFAULT NULL,
   `Description` text,
-  `isPrimary` varchar(45) DEFAULT NULL,
+  `isPrimary` varchar(45) DEFAULT 'NO',
   `Metiers` varchar(45) NOT NULL,
   `Subject` varchar(45) NOT NULL,
   PRIMARY KEY (`ID`),
+  UNIQUE KEY `ID_UNIQUE` (`ID`),
   UNIQUE KEY `Name_UNIQUE` (`Name`),
   KEY `nameindex` (`Name`),
   KEY `fk_work_Metiers1_idx` (`Metiers`),
   KEY `fk_work_subject1_idx` (`Subject`),
   CONSTRAINT `fk_work_Metiers1` FOREIGN KEY (`Metiers`) REFERENCES `metiers` (`Name`),
   CONSTRAINT `fk_work_subject1` FOREIGN KEY (`Subject`) REFERENCES `subject` (`Name`)
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb3;
+) ENGINE=InnoDB AUTO_INCREMENT=21 DEFAULT CHARSET=utf8mb3;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -3158,7 +3165,7 @@ CREATE TABLE `work` (
 
 LOCK TABLES `work` WRITE;
 /*!40000 ALTER TABLE `work` DISABLE KEYS */;
-INSERT INTO `work` VALUES (1,'用户功能定义','明确用户功能是什么？这个功能是要做什么的？给出一个边界和框架为后续的开发做工起头。例如定义ACC功能,为辅助车辆进行车辆的纵向运动控制,只能进行缓加速缓减速的情况下保持车辆匀速行驶且能避免和前方车辆的碰撞','YES','产品工程师','产品定义'),(2,'行业对标','对市场上的ADAS产品针对不同的功能进行对标','NO','产品工程师','产品定义');
+INSERT INTO `work` VALUES (1,'用户功能定义','明确用户功能是什么？这个功能是要做什么的？给出一个边界和框架为后续的开发做工起头。例如定义ACC功能,为辅助车辆进行车辆的纵向运动控制,只能进行缓加速缓减速的情况下保持车辆匀速行驶且能避免和前方车辆的碰撞','YES','产品工程','产品定义'),(2,'行业对标','对市场上的ADAS产品针对不同的功能进行对标','NO','产品工程','产品定义'),(3,'功能场景定义','明确的定义该功能可以覆盖哪些场景,在哪些场景下有什么表现,在哪些场景下有什么限制。定义了所有的场景后才能清晰的定义出这个功能的边界','NO','产品工程','产品定义'),(4,'功能体验定义','定义该功能的体验,用什么方法体验,体验到生成程度,如何实现这些体验','NO','产品工程','产品定义'),(5,'产品限制识别','设计一个功能的时候,根据定义的功能边界,会使得这个功能受到很多的外部限制,如性能约束,场景约束等。需要提取这些约束并添加到场景设计中','NO','功能开发','系统工程'),(6,'法规限制识别','XXXXXXX','NO','功能开发','系统工程'),(7,'评测指标限制识别','XXXXXXX','NO','功能开发','系统工程'),(8,'产品限制提取','设计一个功能的时候,根据定义的功能边界,会使得这个功能受到很多的外部限制,如性能约束,场景约束等。需要提取这些约束并添加到场景设计中','NO','功能开发','系统工程'),(9,'场景性能定义','明确定义所有的的场景都要达到什么样的性能指标','NO','系统开发','系统工程'),(10,'场景逻辑拆解','针对一个场景,事无巨细的定义出所有的逻辑步骤,并涵盖完整的功能场景,从车辆运动到环境提取等。该步骤可以通过最基础的逻辑流保证不会有漏掉的不走,并且明确的展示和定义功能是如何一步一步实现的。','NO','安全开发','软件工程'),(11,'功能安全分析','针对一个场景,定义这场景的安全风险等内容','NO','系统开发','功能安全'),(12,'功能安全级别定义','XXXXXX','NO','系统开发','功能安全'),(13,'功能架构定义','将所有场景的逻辑拆解进行合并,形成一整个针对功能的逻辑架构。然后根据实际情况,逻辑架构中的元素进行整合后形成具备独立业务模块串联而成的功能架构。','NO','软件开发','软件工程'),(14,'性能拆解','XXXXXX','NO','软件开发','软件工程'),(15,'感知性能指标定义','根据性能拆解的情况,推断出对于感知系统方案的选型','NO','软件开发','感知开发'),(16,'硬件性能指标定义','根据性能拆解的情况,推断出对于感知系统方案的选型','NO','软件开发','硬件开发'),(17,'规控性能指标定义','根据性能拆解的情况,推断出对于感知系统方案的选型','NO','软件开发','功能安全'),(18,'感知系统方案选型','XXXXXX','NO','软件开发','软件工程'),(19,'硬件系统方案选型','XXXXXX','NO','软件开发','软件工程'),(20,'规控系统方案选型','XXXXXX','NO','软件开发','软件工程');
 /*!40000 ALTER TABLE `work` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -3178,7 +3185,7 @@ CREATE TABLE `work_from` (
   KEY `fk_work_from_work2_idx` (`isFROM`),
   CONSTRAINT `fk_work_from_work1` FOREIGN KEY (`work_ID`) REFERENCES `work` (`ID`),
   CONSTRAINT `fk_work_from_work2` FOREIGN KEY (`isFROM`) REFERENCES `work` (`Name`)
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb3;
+) ENGINE=InnoDB AUTO_INCREMENT=25 DEFAULT CHARSET=utf8mb3;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -3187,7 +3194,7 @@ CREATE TABLE `work_from` (
 
 LOCK TABLES `work_from` WRITE;
 /*!40000 ALTER TABLE `work_from` DISABLE KEYS */;
-INSERT INTO `work_from` VALUES (2,2,'用户功能定义');
+INSERT INTO `work_from` VALUES (1,2,'用户功能定义'),(2,3,'用户功能定义'),(3,3,'产品限制提取'),(4,4,'用户功能定义'),(5,5,'用户功能定义'),(6,6,'产品限制识别'),(7,7,'产品限制识别'),(8,8,'法规限制识别'),(9,8,'评测指标限制识别'),(10,9,'用户功能定义'),(11,9,'行业对标'),(12,9,'功能场景定义'),(13,9,'功能体验定义'),(14,10,'功能场景定义'),(15,11,'功能场景定义'),(16,12,'功能安全分析'),(17,13,'场景逻辑拆解'),(18,14,'功能架构定义'),(19,15,'性能拆解'),(20,16,'性能拆解'),(21,17,'性能拆解'),(22,18,'感知性能指标定义'),(23,19,'硬件性能指标定义'),(24,20,'规控性能指标定义');
 /*!40000 ALTER TABLE `work_from` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -3208,4 +3215,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2025-12-23 21:28:45
+-- Dump completed on 2025-12-25 14:51:10

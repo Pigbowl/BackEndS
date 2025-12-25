@@ -1,0 +1,50 @@
+2025-12-24 09:41:00,557 - INFO - 使用缓存目录: C:\Users\宋嘉玮\AppData\Local\Configurator\cache
+2025-12-24 22:49:58,191 - INFO - 使用缓存目录: C:\Users\宋嘉玮\AppData\Local\Configurator\cache
+2025-12-24 23:06:05,935 - INFO - 准备发送邮件，模式: single, 类型: subscription_notification, 主要收件人: asdfadf@qqqq.com, BCC收件人数量: 0
+2025-12-24 23:06:06,046 - INFO - 准备发送邮件到以下收件人：主要收件人 - asdfadf@qqqq.com, BCC收件人 - 无
+2025-12-24 23:06:15,790 - INFO - 邮件发送成功！已发送到 1 个收件人
+2025-12-24 23:06:15,839 - INFO - 准备发送邮件，模式: single, 类型: admin_notification, 主要收件人: songjiawei@thedarker-tech.com, BCC收件人数量: 0
+2025-12-24 23:06:15,908 - INFO - 准备发送邮件到以下收件人：主要收件人 - songjiawei@thedarker-tech.com, BCC收件人 - 无
+2025-12-24 23:06:22,407 - INFO - 邮件发送成功！已发送到 1 个收件人
+2025-12-25 02:14:29,706 - INFO - 使用缓存目录: C:\Users\宋嘉玮\AppData\Local\Configurator\cache
+2025-12-25 02:15:22,071 - INFO - 准备发送邮件，模式: single, 类型: issue_recieve_confirm, 主要收件人: 1273880613@qq.com, BCC收件人数量: 0
+2025-12-25 02:15:22,203 - INFO - 准备发送邮件到以下收件人：主要收件人 - 1273880613@qq.com, BCC收件人 - 无
+2025-12-25 02:15:31,779 - INFO - 邮件发送成功！已发送到 1 个收件人
+2025-12-25 02:34:32,242 - INFO - 使用缓存目录: C:\Users\宋嘉玮\AppData\Local\Configurator\cache
+2025-12-25 02:34:46,094 - INFO - 准备发送邮件，模式: single, 类型: issue_recieve_confirm, 主要收件人: 1273880613@qq.com, BCC收件人数量: 0
+2025-12-25 02:34:46,197 - INFO - 准备发送邮件到以下收件人：主要收件人 - 1273880613@qq.com, BCC收件人 - 无
+2025-12-25 02:34:52,084 - INFO - 邮件发送成功！已发送到 1 个收件人
+2025-12-25 02:34:52,133 - INFO - 准备发送邮件，模式: single, 类型: admin_check_notif, 主要收件人: songjiawei@thedarker-tech.com, BCC收件人数量: 0
+2025-12-25 02:34:52,229 - INFO - 准备发送邮件到以下收件人：主要收件人 - songjiawei@thedarker-tech.com, BCC收件人 - 无
+2025-12-25 02:35:00,773 - INFO - 邮件发送成功！已发送到 1 个收件人
+2025-12-25 02:39:10,641 - INFO - 准备发送邮件，模式: single, 类型: issue_recieve_confirm, 主要收件人: 1273880613@qq.com, BCC收件人数量: 0
+2025-12-25 02:39:10,739 - INFO - 准备发送邮件到以下收件人：主要收件人 - 1273880613@qq.com, BCC收件人 - 无
+2025-12-25 02:39:19,931 - INFO - 邮件发送成功！已发送到 1 个收件人
+2025-12-25 02:39:19,980 - INFO - 准备发送邮件，模式: single, 类型: admin_check_notif, 主要收件人: songjiawei@thedarker-tech.com, BCC收件人数量: 0
+2025-12-25 02:39:20,073 - INFO - 准备发送邮件到以下收件人：主要收件人 - songjiawei@thedarker-tech.com, BCC收件人 - 无
+2025-12-25 02:39:28,754 - INFO - 邮件发送成功！已发送到 1 个收件人
+2025-12-25 12:16:53,353 - INFO - Connected (version 2.0, client OpenSSH_for_Windows_9.5)
+2025-12-25 12:16:53,780 - INFO - Authentication (password) failed.
+2025-12-25 12:16:53,800 - INFO - 准备发送邮件，模式: single, 类型: registration_confirmation, 主要收件人: 127388pp3@qq.com, BCC收件人数量: 0
+2025-12-25 12:16:53,913 - INFO - 准备发送邮件到以下收件人：主要收件人 - 127388pp3@qq.com, BCC收件人 - 无
+2025-12-25 12:18:11,433 - INFO - 邮件发送成功！已发送到 1 个收件人
+2025-12-25 12:18:11,570 - INFO - 准备发送邮件，模式: single, 类型: admin_notification, 主要收件人: songjiawei@thedarker-tech.com, BCC收件人数量: 0
+2025-12-25 12:18:11,639 - INFO - 准备发送邮件到以下收件人：主要收件人 - songjiawei@thedarker-tech.com, BCC收件人 - 无
+2025-12-25 12:18:20,076 - INFO - 邮件发送成功！已发送到 1 个收件人
+2025-12-25 12:18:22,997 - INFO - Connected (version 2.0, client OpenSSH_for_Windows_9.5)
+2025-12-25 12:18:23,383 - INFO - Authentication (password) failed.
+2025-12-25 12:18:23,400 - INFO - 准备发送邮件，模式: single, 类型: registration_confirmation, 主要收件人: asdasd@aa.com, BCC收件人数量: 0
+2025-12-25 12:18:23,502 - INFO - 准备发送邮件到以下收件人：主要收件人 - asdasd@aa.com, BCC收件人 - 无
+2025-12-25 12:19:35,620 - INFO - 使用缓存目录: C:\Users\宋嘉玮\AppData\Local\Configurator\cache
+2025-12-25 12:20:39,515 - INFO - Connected (version 2.0, client OpenSSH_for_Windows_9.5)
+2025-12-25 12:20:40,742 - INFO - Authentication (password) failed.
+2025-12-25 12:20:40,758 - INFO - 准备发送邮件，模式: single, 类型: registration_confirmation, 主要收件人: 123123@11111.com, BCC收件人数量: 0
+2025-12-25 12:20:40,861 - INFO - 准备发送邮件到以下收件人：主要收件人 - 123123@11111.com, BCC收件人 - 无
+2025-12-25 12:20:52,769 - INFO - 邮件发送成功！已发送到 1 个收件人
+2025-12-25 12:20:52,850 - INFO - 准备发送邮件，模式: single, 类型: admin_notification, 主要收件人: songjiawei@thedarker-tech.com, BCC收件人数量: 0
+2025-12-25 12:20:52,917 - INFO - 准备发送邮件到以下收件人：主要收件人 - songjiawei@thedarker-tech.com, BCC收件人 - 无
+2025-12-25 12:21:14,590 - INFO - 邮件发送成功！已发送到 1 个收件人
+2025-12-25 12:24:22,590 - INFO - Connected (version 2.0, client OpenSSH_for_Windows_9.5)
+2025-12-25 12:24:22,970 - INFO - Authentication (password) failed.
+2025-12-25 12:24:22,989 - INFO - 准备发送邮件，模式: single, 类型: registration_confirmation, 主要收件人: kkk@qq1.com, BCC收件人数量: 0
+2025-12-25 12:24:23,088 - INFO - 准备发送邮件到以下收件人：主要收件人 - kkk@qq1.com, BCC收件人 - 无

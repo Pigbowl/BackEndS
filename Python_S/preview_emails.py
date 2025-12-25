@@ -79,9 +79,15 @@ with open(preview_file, 'w', encoding='utf-8') as f:
     # 生成并预览每种邮件类型
     email_types = [
         ("product_update", "产品上线提醒", sender.get_product_update_content),
-        ("subscription_confirm", "订阅确认", sender.get_subscription_confirm_content),
+        ("subscription_confirm", "订阅确认", lambda: sender.get_subscription_confirm_content(test_user_data)),
         ("admin_notification", "管理员提醒", lambda: sender.get_admin_notification_content(test_user_data)),
-        ("registration_confirmation", "注册成功确认", lambda: sender.get_registration_confirmation_content(test_user_data))
+        ("registration_confirmation", "注册成功确认", lambda: sender.get_registration_confirmation_content(test_user_data)),
+        ("issue_recieve_confirm", "问题收到确认", lambda: sender.get_issue_recieve_confirm_content({
+            'Name': '测试用户',
+            'Type': '功能建议',
+            'Title': '关于改进用户界面的建议',
+            'Description': '我希望能改进用户界面，使其更加简洁易用，特别是在移动端的体验。'
+        }))
     ]
     
     for email_type, title, content_func in email_types:
