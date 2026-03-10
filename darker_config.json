@@ -30,6 +30,10 @@
         "password": "12345678",
         "database": "operationdatabase"
     },
+    "backend_git_repo": "https://github.com/Pigbowl/BackEndS.git",
+    "backend_server_folder": "C:\\Darker_Backend",
+    "frontend_git_repo": "https://github.com/Pigbowl/Darker-tech.git",
+    "frontend_server_folder": "C:\\Darker_FrontEnd",
     "develop_product_config": {
         "host": "localhost",
         "port": 3306,

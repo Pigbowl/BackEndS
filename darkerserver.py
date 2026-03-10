@@ -424,10 +424,10 @@ class MyHandler(BaseHTTPRequestHandler):
             else:
                 datamode = data.get('datatype')
 
-            if deploy_mode =\"test\"
+            if deploy_mode == "test":
                 db_product = SQLOperations(develop_product_config)
                 db_operation = SQLOperations(develop_operation_config)
-            elif deploy_mode =\"test\"
+            elif deploy_mode == "full":
                 #若当前代码部署在服务器端，则产品数据不允许写入，故意设置错误密码
                 db_product = SQLOperations(server_product_config)
                 #若当前代码部署在服务器端，则运营数据写入服务器数据库（既相对的）
@@ -511,7 +511,7 @@ class MyHandler(BaseHTTPRequestHandler):
                 resulting = extract_single_item(database,processed_results,lib_tables_data,data2['tablename'],first_value,first_key)
                 self._send_response({'success': True, 'output': resulting})    
             elif self.path == '/createnewsql': #Done
-                if deploy_mode =\"test\"
+                if deploy_mode == "test":
                     try:
                         resulting = database_manipulate(database,data.get('data'))
                         self._send_response({'success': True, 'output': resulting})
@@ -712,7 +712,7 @@ def main():
     try:
         with open('darker_config.json', 'r', encoding='utf-8') as f:
             config_data = json.load(f)
-            deploy_mode = \"test\"
+            deploy_mode = config_data.get('deploy_mode', 'test')  # 默认值为'test'
             server_product_config = config_data.get('server_product_config')
             server_operation_config = config_data.get('server_operation_config')
             develop_product_config = config_data.get('develop_product_config')
@@ -724,17 +724,17 @@ def main():
             serverLocation = config_data.get('serverLocation')
     except FileNotFoundError:
         print(f"配置文件 adminconfig.json 不存在，使用默认值 'test'")
-        deploy_mode = \"test\"
+        deploy_mode = "test"
     except json.JSONDecodeError:
         print(f"配置文件 adminconfig.json 格式错误，使用默认值 'test'")
-        deploy_mode = \"test\"
+        deploy_mode = "test"
     except Exception as e:
         print(f"读取配置文件时发生错误: {e}，使用默认值 'test'")
-        deploy_mode = \"test\"
+        deploy_mode = "test"
 
-    if deploy_mode =\"test\"
+    if deploy_mode == "test":
         server_address = ('localhost', test_com_port)
-    elif deploy_mode =\"test\"
+    elif deploy_mode == "full":
         if serverLocation == 'CN':
             server_address = ('0.0.0.0', CN_com_port)
         elif serverLocation == 'US':
