@@ -2160,10 +2160,12 @@ def visit_management(db,data,uservisit):
     return json.dumps(Feedback, ensure_ascii=False, indent=2)
 
 
+from datetime import datetime, timedelta
+
 def visit_statistic(db):
     Result = {}
     visit_data = db.read_data("visit")
-    Result["visit"] = visit_data
+    # Result["visit"] = visit_data
     # 计算独立用户数（注意：这里假设'user_ad'是正确的字段名）
     Result["unique_user_count"] = len(set(visit.get("user_ad", "") for visit in visit_data if visit.get("user_ad")))
     Result["visit_count"] = len(visit_data)
@@ -2215,10 +2217,18 @@ def visit_statistic(db):
                 else:
                     daily_visit_stats[date_key]['Visitor'] += 1
 
+    # 只保留最近30天的数据
+    thirty_days_ago = datetime.now() - timedelta(days=30)
+    recent_daily_stats = {}
+    for date_key, stats in daily_visit_stats.items():
+        date_obj = datetime.strptime(date_key, '%Y-%m-%d')
+        if date_obj >= thirty_days_ago:
+            recent_daily_stats[date_key] = stats
+    daily_visit_stats = recent_daily_stats
+
     # 转换datetime对象
     Result = convert_datetime_to_str(Result)
     Feedback = {"status": True, "error": 0, "Result": Result, "page_count": page_count, "daily_visit_stats": daily_visit_stats}
-
     return json.dumps(Feedback, ensure_ascii=False, indent=2)
 if __name__ == "__main__":
     # 运行导出（默认输出为 database_table_structure.csv）
