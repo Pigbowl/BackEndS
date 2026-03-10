@@ -1,13 +1,11 @@
 
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-
 import smtplib
 import ssl
 import re
 import logging
 import os
 import base64
+import json
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from email.mime.image import MIMEImage
@@ -15,6 +13,25 @@ from email.header import Header
 from email.utils import formataddr
 import datetime
 from Python_S.sql_operations import SQLOperations
+
+# global deploy_mode,server_product_config,server_operation_config,develop_product_config,develop_operation_config
+
+
+with open('darker_config.json', 'r', encoding='utf-8') as f:
+    config_data = json.load(f)
+    deploy_mode = config_data.get('deploy_mode', 'test')  # 默认值为'test'
+    server_product_config = config_data.get('server_product_config')
+    server_operation_config = config_data.get('server_operation_config')
+    develop_product_config = config_data.get('develop_product_config')
+    develop_operation_config = config_data.get('develop_operation_config')
+    admin_email = config_data.get('admin_email')
+    sender_email = config_data.get('sender_email')
+    sender_password = config_data.get('sender_password')
+    smtp_server = config_data.get('smtp_server')
+    port = config_data.get('port')
+    sender_name = config_data.get('sender_name')
+    darker_url = config_data.get('darker_url')
+
 
 # 配置日志记录
 logging.basicConfig(
@@ -26,13 +43,13 @@ logging.basicConfig(
 class EmailSender:
     def __init__(self):
         # 邮件服务器配置
-        self.smtp_server = "smtp.exmail.qq.com"
-        self.port = 465  # SSL端口
+        self.smtp_server = smtp_server
+        self.port = port  # SSL端口
         
         # 发件人信息
-        self.sender_email = "darkerAssistance@thedarker-tech.com"
-        self.sender_password = "wtgYJBBMT4Kddjab"
-        self.sender_name = "达客小助手"
+        self.sender_email = sender_email
+        self.sender_password = sender_password
+        self.sender_name = sender_name
     
     def is_valid_email(self, email):
         """
@@ -46,7 +63,11 @@ class EmailSender:
         从数据库读取所有用户的email
         """
         try:
-            db = SQLOperations()
+            if deploy_mode == 'test':
+                database_config = develop_operation_config
+            else:
+                database_config = server_operation_config
+            db = SQLOperations(database_config)
             users = db.read_data('user', columns=['email'])
             db.close()
             # 提取email列表
@@ -126,7 +147,7 @@ class EmailSender:
                 <p>查看完整更新说明：</p>
                 <!-- 添加带图片的导向按钮，使用base64数据URL或emoji -->
                 <div style="text-align: center; margin: 20px 0;">
-                    <a href="http://thedarker-tech.com" style="display: inline-flex; align-items: center; background-color: #1a73e8; color: white; text-decoration: none; padding: 12px 20px; border-radius: 4px; font-weight: bold; gap: 10px;">
+                    <a href="{darker_url}" style="display: inline-flex; align-items: center; background-color: #1a73e8; color: white; text-decoration: none; padding: 12px 20px; border-radius: 4px; font-weight: bold; gap: 10px;">
                         访问达客科技官网
                         {f'<img src="{darkerduck_base64}" alt="达客鸭" style="width: 24px; height: 24px; vertical-align: middle;"/>' if darkerduck_base64 else '<span style="font-size: 18px;">🚀</span>'}
                     </a>
@@ -203,7 +224,7 @@ class EmailSender:
                 
                 <!-- 添加带图片的导向按钮，使用base64数据URL或emoji -->
                 <div style="text-align: center; margin: 20px 0;">
-                    <a href="https://thedarker-tech.com" style="display: inline-flex; align-items: center; background-color: #1a73e8; color: white; text-decoration: none; padding: 12px 25px; border-radius: 4px; font-weight: bold; gap: 10px; font-size: 16px;">
+                    <a href="{darker_url}" style="display: inline-flex; align-items: center; background-color: #1a73e8; color: white; text-decoration: none; padding: 12px 25px; border-radius: 4px; font-weight: bold; gap: 10px; font-size: 16px;">
                         访问达客科技官网
                         {f'<img src="{darkerduck_base64}" alt="达客鸭" style="width: 24px; height: 24px; vertical-align: middle;"/>' if darkerduck_base64 else '<span style="font-size: 18px;">✅</span>'}
                     </a>
@@ -414,7 +435,7 @@ class EmailSender:
                 
                 <!-- 添加带图片的导向按钮，使用base64数据URL或emoji -->
                 <div style="text-align: center; margin: 20px 0;">
-                    <a href="http://thedarker-tech.com" style="display: inline-flex; align-items: center; background-color: #1a73e8; color: white; text-decoration: none; padding: 12px 25px; border-radius: 4px; font-weight: bold; gap: 10px; font-size: 16px;">
+                    <a href="{darker_url}" style="display: inline-flex; align-items: center; background-color: #1a73e8; color: white; text-decoration: none; padding: 12px 25px; border-radius: 4px; font-weight: bold; gap: 10px; font-size: 16px;">
                         访问达客科技官网
                         {f'<img src="{darkerduck_base64}" alt="达客鸭" style="width: 24px; height: 24px; vertical-align: middle;"/>' if darkerduck_base64 else '<span style="font-size: 18px;">✅</span>'}
                     </a>
@@ -515,7 +536,7 @@ class EmailSender:
                 
                 <!-- 添加带图片的导向按钮，使用base64数据URL或emoji -->
                 <div style="text-align: center; margin: 20px 0;">
-                    <a href="https://thedarker-tech.com/pages/login.html" style="display: inline-flex; align-items: center; background-color: #1a73e8; color: white; text-decoration: none; padding: 12px 25px; border-radius: 4px; font-weight: bold; gap: 10px; font-size: 16px;">
+                    <a href="{darker_url}/pages/login.html" style="display: inline-flex; align-items: center; background-color: #1a73e8; color: white; text-decoration: none; padding: 12px 25px; border-radius: 4px; font-weight: bold; gap: 10px; font-size: 16px;">
                         登录达客科技
                         {f'<img src="{darkerduck_base64}" alt="达客鸭" style="width: 24px; height: 24px; vertical-align: middle;"/>' if darkerduck_base64 else '<span style="font-size: 18px;">🔑</span>'}
                     </a>
@@ -629,7 +650,7 @@ class EmailSender:
                 
                 <!-- 添加带图片的导向按钮，使用base64数据URL或emoji -->
                 <div style="text-align: center; margin: 20px 0;">
-                    <a href="http://thedarker-tech.com" style="display: inline-flex; align-items: center; background-color: #d93025; color: white; text-decoration: none; padding: 12px 25px; border-radius: 4px; font-weight: bold; gap: 10px; font-size: 16px;">
+                    <a href="{darker_url}" style="display: inline-flex; align-items: center; background-color: #d93025; color: white; text-decoration: none; padding: 12px 25px; border-radius: 4px; font-weight: bold; gap: 10px; font-size: 16px;">
                         立即查看问题
                         {f'<img src="{darkerduck_base64}" alt="达客鸭" style="width: 24px; height: 24px; vertical-align: middle;"/>' if darkerduck_base64 else '<span style="font-size: 18px;">🚨</span>'}
                     </a>

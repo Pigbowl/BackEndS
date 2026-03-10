@@ -2,7 +2,6 @@ import pandas as pd
 from difflib import SequenceMatcher
 from typing import List, Dict, Any, Optional, Tuple
 from Python_S.ReadDBAndGenerateProtocol import extract_single_item
-from Python_S.sql_operations import SQLOperations
 import json
 def similar(a: str, b: str) -> float:
     """计算两个字符串的相似度"""
@@ -30,7 +29,6 @@ def fuzzy_search(
     top_n: int = None):
     try:
         
-        # db = SQLOperations()
         Item_group = {}
         Item_group["type"]=table_name
         Item_group["Catalogue"]={}
@@ -38,7 +36,7 @@ def fuzzy_search(
         TargetLines = db.read_data(table_name)
         for line in TargetLines:
             is_match = False
-            result = extract_single_item(processed_results,lib_tables_data,table_name,line['Name'],'Name')
+            result = extract_single_item(db,processed_results,lib_tables_data,table_name,line['Name'],'Name')
             target_str_lower = result.lower()
             # 检查完全匹配
             if target_str_lower == search_keyword_lower:

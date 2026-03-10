@@ -1,17 +1,4 @@
-# from ast import main
-# from enum import Flag
-# from nt import access
-# from operator import is_
-# from pipes import quote
-# from re import T
-# from sqlite3 import Row
-# from xml.etree.ElementTree import tostring
-# from matplotlib import table
-# from numpy import concat
-# from numpy.polynomial.legendre import legline
-# from pandas._libs.groupby import group_any_all
-# import pymysql
-# import csv
+
 import json
 import os
 import shutil
@@ -22,10 +9,9 @@ from Python_S.sql_operations import SQLOperations
 # 用于SSH远程操作
 import paramiko
 # from pymysql.cursors import DictCursorMixin
-
 from collections import Counter
 # 从adminconfig.json加载remotecode
-with open('adminconfig.json', 'r', encoding='utf-8') as f:
+with open('darker_config.json', 'r', encoding='utf-8') as f:
     code_data = json.load(f)
     admin_email = code_data['admin_email']
     server_code = code_data['server_code']
@@ -33,7 +19,7 @@ with open('adminconfig.json', 'r', encoding='utf-8') as f:
     server_ip = code_data['server_ip']
     server_sshport = code_data['server_sshport']
 
-def export_table_columns_with_foreign_key(db) -> List[Dict[str, str]]:
+def export_table_columns_with_foreign_key(db,database_name) -> List[Dict[str, str]]:
     """
     导出数据库中所有表的：表名+列名+数据类型+键类型+完整外键信息
     修复：CONSTRAINT_TYPE 字段所在表错误的问题
@@ -53,29 +39,18 @@ def export_table_columns_with_foreign_key(db) -> List[Dict[str, str]]:
     :return: 包含以_lib结尾的表数据的字典
     """
 
-    config = {
-        "host": "localhost",
-        "port": 3306,
-        "user": "root",
-        "password": "12345678",
-        "db": "darkerdatabase",
-        "charset": "utf8mb4"
-    }   
     # 用于存储以_lib或_enum结尾的表的数据（按需提取）
     lib_tables_data = {}
 
     # 用于存储表格之间的外键关联信息
     foreign_key_relations = []
-    target_db = config["db"]
+    target_db = database_name
     children = []
     conn = None
     cursor = None
     try:
-        # db = SQLOperations()
         # 连接数据库
         cursor = db.conn.cursor()
-
-
         # 核心SQL：三表联合查询（修复CONSTRAINT_TYPE字段来源）
         # 1. REFERENTIAL_CONSTRAINTS：获取外键约束类型、名称、关联表信息
         # 2. KEY_COLUMN_USAGE：获取外键对应的列（子表列+主表列）
@@ -721,7 +696,6 @@ def fetch_table_sumary(db,input_data):
         raise ValueError("表名参数缺失，请提供'tablename'")
     
     # 创建数据库连接
-    # db = SQLOperations()
     
     # 从columns中提取查询条件
     conditions = {}
@@ -755,7 +729,6 @@ def generate_targetted_object_data_fordisplay(db,processed_results,lib_tables_da
     Returns:
         包含主表和递归子表数据的元组
     """
-    # db = SQLOperations()
 
     # 递归提取表格数据的内部函数
     def fetch_table_data_recursive(table_name,colunm_name,parent_id,child_tables_data):
@@ -850,8 +823,6 @@ def generate_targetted_object_data(db,processed_results,lib_tables_data,target_t
         target_item: 目标项名
 
     """
-
-    # db = SQLOperations()
     read_data = db.read_data(target_table)
     main_row = None
     main_row_index = None
@@ -906,7 +877,6 @@ def perform_group_delete_operation(db,processed_results,lib_tables_data,target_t
         column_name: 用于匹配项的列名
     """
     main_row_key,main_row_index,main_row,child_tables_data,main_table_rows,lib_tables_data,processed_results,child_tables_foreign_key_column = generate_targetted_object_data(db,processed_results,lib_tables_data,target_table,target_item,column_name)
-    db = SQLOperations()
     
     # 3. 处理关联到子表的行
     for child_table_name, attached_rows in child_tables_data.items():
@@ -1000,7 +970,6 @@ def generate_target_object_data_structure(db,processed_results,lib_tables_data,t
     return json.dumps(object_data, ensure_ascii=False, indent=2)
 
 def fetch_regulation_list(db,processed_results,lib_tables_data,target_table: str,target_item: list,column_name: str):
-        # db = SQLOperations()
     regulation_dict = {}
     regulation_list = []
     region_list = []
@@ -1016,9 +985,9 @@ def fetch_regulation_list(db,processed_results,lib_tables_data,target_table: str
             regulation_dict[region]["country"].append(country)
             regulation_dict[region]["regulation"]=(db.read_data("regulation",{"Region_Name":region}))
 
-    with open("generated_object_data.json", 'w', encoding='utf-8') as json_file:
-        json.dump(regulation_dict, json_file, ensure_ascii=False, indent=2)
-    print(f"\n已生成类似object_data.json格式的数据结构，保存到 generated_object_data.json")
+    # with open("generated_object_data.json", 'w', encoding='utf-8') as json_file:
+    #     json.dump(regulation_dict, json_file, ensure_ascii=False, indent=2)
+    # print(f"\n已生成类似object_data.json格式的数据结构，保存到 generated_object_data.json")
 
     return json.dumps(regulation_dict, ensure_ascii=False, indent=2)
 
@@ -1068,9 +1037,8 @@ def extract_single_item(db,processed_result,lib_tables_data,target_table: str,ta
         else:
             return None
 
-    def dealwithsolution(main_row):
+    def dealwithsolution(db,main_row):
 
-        db = SQLOperations()
         main_row["briefing"]={}
         sensor_set =""
         browsing_list = ["camera_input","radar_input","lidar_input","ultrasonic_input"]
@@ -1163,7 +1131,6 @@ def extract_single_item(db,processed_result,lib_tables_data,target_table: str,ta
 
 
     if target_table =="work":
-        db = SQLOperations()
         main_row["to"]=[]
         main_row["from"]=[]
         connections = db.read_data("work_from")
@@ -1220,20 +1187,13 @@ def extract_single_item(db,processed_result,lib_tables_data,target_table: str,ta
         main_row["region_group"] = region_list
 
     elif target_table == "vehiclemodel":
-        dealwithsolution(result[searchkeyname]["Adas_Solution"])
-
-        # brand_kit = []
-        # recursivelooking(main_row,"brand",brand_kit)
-        # main_row["briefing"]["brand_group"] = brand_kit
-
-
-
+        dealwithsolution(db,result[searchkeyname]["Adas_Solution"])
 
     elif target_table == "system_solution":
         """
         summerize sensor set
         """
-        dealwithsolution(result[searchkeyname])
+        dealwithsolution(db,result[searchkeyname])
 
     return json.dumps(result, ensure_ascii=False, indent=2)
 
@@ -1445,10 +1405,7 @@ def config_searching(db,processed_results,lib_tables_data,search_condition):
 
 def extract_single_feature(db,input_feature_name):
     """提取单个FEATURE的信息，为每个TF添加顺序编号"""
-    try:
-        # db = SQLOperations()
-
-        
+    try:        
         # 读取SUBFEATURES工作表，筛选目标FEATURE
         df_subfeatures = db.read_data('function_features',{"Name":input_feature_name})
         if len(df_subfeatures) == 0:
@@ -1491,35 +1448,6 @@ def extract_single_feature(db,input_feature_name):
                     'Detail':tf_data
                 })
 
-        
-        # # 读取TECHNICAL FUNCTION，提取TF详情
-        # df_techfunc = pd.read_excel(excel_path, sheet_name='TECHNICAL FUNCTION')
-        # if not df_techfunc.empty:
-        #     techfunc_index_col = next(
-        #         (col for col in df_techfunc.columns if col.strip().upper() == 'FUNCTION_INDEX'),
-        #         None
-        #     )
-            
-        #     if techfunc_index_col:
-        #         # 构建TF索引到详情的映射
-        #         tf_detail_map = {
-        #             str(row[techfunc_index_col]).strip(): row.to_dict()
-        #             for _, row in df_techfunc.iterrows()
-        #         }
-        #         # 为每个MF填充TF详情（有序数组）
-        #         for mf_data in feature_data['mf_functions']:
-        #             if '_temp_tf_mappings' in mf_data:
-        #                 for tf_index in mf_data['_temp_tf_mappings']:
-        #                     if tf_index in tf_detail_map:
-        #                         tf_details = {
-        #                             k: str(v).strip()
-        #                             for k, v in tf_detail_map[tf_index].items()
-        #                             # if k != techfunc_index_col
-        #                         }
-        #                         mf_data['tf_functions'].append(tf_details)
-        #                         print(tf_details)
-        #                 # 移除临时字段
-        #                 mf_data.pop('_temp_tf_mappings')
         
         # 后处理：统计数量、编号、计算位置
         feature_data['mf_count'] = len(feature_data['mf_functions'])
@@ -1613,7 +1541,6 @@ def extrac_function_breakdown_group(db,processed_results,lib_tables_data,target_
     
 
 def extract_item_group(db,processed_results,lib_tables_data,target_table: str,category):
-    # db = SQLOperations()
     Item_group = {}
     Item_group["type"]=target_table
     Item_group["Catalogue"]={}
@@ -1683,7 +1610,6 @@ def extract_item_group(db,processed_results,lib_tables_data,target_table: str,ca
     return json.dumps(Item_group,ensure_ascii=False, indent=2)
 
 def extract_entire_network(db,processed_results,lib_tables_data,target_table: str):
-    # db = SQLOperations()
     Item_group = {}
     Item_group["type"]="Ele"
     Item_group["Element"]=[]
@@ -1705,21 +1631,11 @@ def extract_entire_network(db,processed_results,lib_tables_data,target_table: st
     return json.dumps(Item_group,ensure_ascii=False, indent=2)
 
 def add_subscribers(db,data):
-    # db = SQLOperations()
     userdata = {"Name": data['name'], "email": data["submitter_email"], "isSubscribe": True}
     # 尝试插入数据
     result = db.insert_data("user", userdata)
-    if isinstance(result, int) and result > 0:
-        # 向用户发送订阅确认邮件
-        send_single_email(userdata["email"], "subscription_notification",userdata)
-        
-        # 向管理员发送新用户提醒邮件
-        # admin_email = "darkerassistance@thedarker-tech.com"
-        
-        # 发送管理员提醒邮件，使用新的admin_notification邮件类型
-        send_single_email(recipient_email=admin_email,email_type="admin_notification",user_data=userdata,notiftype="subscribe")
-                
-        return {"status": True, "insert_id": result}
+    if isinstance(result, int) and result > 0:                
+        return {"status": True, "insert_id": result,"userdata":userdata}
     else:
         if "email" in result:
             exist_name = db.read_data("user",{"email":userdata["email"]})[0]["Name"]
@@ -1734,9 +1650,55 @@ def add_subscribers(db,data):
             else:
                 return {"status": False, "error": 3,"name":data['name']}    
 
-def submit_issue(db,data):
-    # db = SQLOperations('dynamic')
+
+def modify_user_level(db,data):
+    userid = data["user_id"]
+    userlevel = data["new_level"]
+    userdata = {"ID": userid, "UserLevel": userlevel}
+    # 尝试插入数据
+    result = db.update_data("user",userdata,{"ID":userid})
+    if isinstance(result, int) and result > 0:                
+        return {"status": True, "insert_id": result,"userdata":userdata}
+    else:
+        return {"status": False, "error": 4,"userid":userid}
+
+def modify_user(db, user_id, modify_item, content):
+    """
+    修改用户数据
+    
+    Args:
+        db: 数据库连接对象
+        user_id: 用户ID
+        modify_item: 要修改的列名
+        content: 新的内容
+    
+    Returns:
+        包含修改结果的字典
+    """
+    try:
+        # 准备更新数据
+        update_data = {modify_item: content}
+        # 执行更新操作
+        result = db.update_data("user", update_data, {"ID": user_id})
         
+        if isinstance(result, int) and result > 0:
+            return {"status": True, "message": "用户数据修改成功", "affected_rows": result}
+        else:
+            return {"status": False, "message": "用户数据修改失败", "error": "更新操作未影响任何行"}
+    except Exception as e:
+        return {"status": False, "message": f"用户数据修改失败: {str(e)}", "error": str(e)}
+
+def submit_action(db,data):
+    issuedata = {
+        "Type":data["type"],
+        "Description":data["description"],
+        "Responsible":data["Responsible"],
+        "Status":data["Status"],
+        "ExpectedTime":data["ExpectedTime"],
+    }
+
+
+def submit_issue(db,data):
     issuedata = {
         "Type":data["type"],
         "Category":data["title"],
@@ -1758,12 +1720,7 @@ def submit_issue(db,data):
             db.insert_data("user", {"Name": newname, "email": issuedata["Email"], "isSubscribe": True})
 
     if isinstance(result, int) and result > 0:
-        # 向用户发送订阅确认邮件
-        send_single_email(issuedata["Email"], "issue_recieve_confirm",issuedata)
-        # 向管理员发送问题检查通知邮件
-        send_single_email(recipient_email=admin_email,email_type="admin_check_notif",user_data=issuedata)
-        
-        return {"status": True, "insert_id": result}
+        return {"status": True, "insert_id": result,"issuedata":issuedata}
     else:
         return {"status": False, "insert_id": "shit nigger"}
 
@@ -1939,13 +1896,11 @@ def manage_register(db,data,deploy_mode):
             # 本地模式：直接在本地创建文件夹
             create_folder_local(base_path, template_name, current_id)
 
-        send_single_email(recipient_email=user_info["Email"],email_type="registration_confirmation",user_data=user_info)
-        send_single_email(recipient_email=admin_email,email_type="admin_notification",user_data=user_info,notiftype="registration")
-        return {"status": True, "error": 0}
+        user_info = convert_datetime_to_str(user_info)
+        return {"status": True, "error": 0,"userinfo":user_info}
 
 
 def manage_login(db,data):
-    # db = SQLOperations()
     if data["mode"] == "email":
         result = db.read_data("user",{"Name":data["name"]})
     elif data["mode"] == "username":
@@ -1981,6 +1936,56 @@ def convert_datetime_to_str(obj):
         return obj.isoformat()
     else:
         return obj
+
+def fetch_actions(db):
+    try:
+        Result = {}
+        result = db.read_data("action_list")
+        Result["actions"] = []
+        # 获取当前日期
+        current_date = datetime.now().date()
+
+        for line in result:
+            # 转换每一行数据中的datetime对象
+            converted_line = convert_datetime_to_str(line)
+            
+            # 计算逾期状态
+            overdue_status = "Normal"
+            status = converted_line.get("Status", "")
+            expected_date_str = converted_line.get("Expected_Date", "")
+
+            # 检查状态是否为Done或Cancel
+            if status not in ["Closed", "Canceled"] and expected_date_str:
+                try:
+                    # 解析预期日期（处理ISO格式的datetime字符串）
+                    if 'T' in expected_date_str:
+                        # 处理ISO格式，如"2026-03-06T00:00:00"
+                        expected_date = datetime.fromisoformat(expected_date_str).date()
+                    else:
+                        # 处理普通日期格式，如"2026-03-06"
+                        expected_date = datetime.strptime(expected_date_str, "%Y-%m-%d").date()
+                    # 计算日期差
+                    days_diff = (expected_date - current_date).days
+                    if days_diff < 0:
+                        # 已经超过预计日期
+                        overdue_status = "overdue"
+                    elif 0 <= days_diff <= 2:
+                        # 还差一点到预计日期（3天内）
+                        overdue_status = "alert"
+                except ValueError as e:
+                    # 日期格式错误，默认为Normal
+                    print(f"日期解析错误: {e}")
+                    pass
+            
+            # 将逾期状态添加到行数据中
+            converted_line["overdue_status"] = overdue_status
+            Result["actions"].append(converted_line)
+        
+        return json.dumps(Result, ensure_ascii=False, indent=2)
+    except Exception as e:
+        # 捕获并返回错误信息
+        error_result = {"success": False, "error": str(e)}
+        return json.dumps(error_result, ensure_ascii=False, indent=2)
 
 def fetch_advice_recording(db):
     try:
@@ -2078,6 +2083,16 @@ def get_all_users(db):
     
     return json.dumps(Feedback, ensure_ascii=False, indent=2)
 
+def bug2action(db,data):
+    Result = db.insert_data("action_list",data)
+    Feedback = {"status": True, "error": 0,"Result":Result}
+    return json.dumps(Feedback, ensure_ascii=False, indent=2)
+
+def create_action(db,data):
+    Result = db.insert_data("action_list",data)
+    Feedback = {"status": True, "error": 0,"Result":Result}
+    return json.dumps(Feedback, ensure_ascii=False, indent=2)
+
 def create_task(db,data):
 
     Result = db.insert_data("release_content",data)
@@ -2087,6 +2102,22 @@ def create_task(db,data):
 
 
     Feedback = {"status": True, "error": 0,"Result":Result}
+    return json.dumps(Feedback, ensure_ascii=False, indent=2)
+
+def update_action(db,data):
+    content = data["Content"]
+    # print(data)
+    
+    # 准备更新数据，排除Content字段
+    update_data = {}
+    for key, value in data.items():
+        if key != "Content":
+            update_data[key] = value
+    
+    # 执行更新操作，根据Content字段匹配行
+    result = db.update_data("action_list", update_data, {"Content": content})
+    
+    Feedback = {"status": True, "error": 0,"Result": result}
     return json.dumps(Feedback, ensure_ascii=False, indent=2)
 
 def update_task(db,data):
@@ -2138,12 +2169,55 @@ def visit_statistic(db):
     Result["visit_count"] = len(visit_data)
 
     # 统计 page_url 出现次数 - 正确迭代visit_data列表
-    page_counter = Counter(row['page_url'] for row in visit_data if 'page_url' in row and row['page_url'])
-    page_count = [{'key': url, 'value': cnt} for url, cnt in page_counter.items()]
+    page_counter = Counter()
+    for row in visit_data:
+        if 'page_url' in row and row['page_url']:
+            url = row['page_url']
+            # 过滤掉 '/index.html' 和 '/' 
+            if url not in ['/index.html', '/']:
+                # 提取最后一个 '/' 和 '.html' 中间的部分作为key
+                if '.html' in url:
+                    # 找到最后一个 '/' 的位置
+                    last_slash_idx = url.rfind('/')
+                    # 找到 '.html' 的位置
+                    html_idx = url.find('.html')
+                    if last_slash_idx < html_idx:
+                        # 提取中间部分
+                        key = url[last_slash_idx+1:html_idx]
+                        page_counter[key] += 1
+                else:
+                    # 对于没有 .html 的URL，直接使用最后一个 '/' 后的部分
+                    last_slash_idx = url.rfind('/')
+                    if last_slash_idx < len(url) - 1:
+                        key = url[last_slash_idx+1:]
+                        page_counter[key] += 1
+    page_count = [{'name': url, 'value': cnt} for url, cnt in page_counter.items()]
+    
+    # 按日期和用户类型统计访问次数
+    daily_visit_stats = {}
+    
+    for visit in visit_data:
+        if 'visit_time' in visit:
+            visit_time = visit['visit_time']
+            # 确保visit_time是datetime对象
+            if hasattr(visit_time, 'strftime'):
+                # 提取日期部分，格式为YYYY-MM-DD
+                date_key = visit_time.strftime('%Y-%m-%d')
+                
+                # 初始化日期数据结构
+                if date_key not in daily_visit_stats:
+                    daily_visit_stats[date_key] = {'Visitor': 0, 'Member': 0}
+                
+                # 按用户类型统计
+                visit_type = visit.get('visit_kink', 'Visitor')
+                if visit_type == 'Member':
+                    daily_visit_stats[date_key]['Member'] += 1
+                else:
+                    daily_visit_stats[date_key]['Visitor'] += 1
 
     # 转换datetime对象
     Result = convert_datetime_to_str(Result)
-    Feedback = {"status": True, "error": 0, "Result": Result, "page_count": page_count}
+    Feedback = {"status": True, "error": 0, "Result": Result, "page_count": page_count, "daily_visit_stats": daily_visit_stats}
 
     return json.dumps(Feedback, ensure_ascii=False, indent=2)
 if __name__ == "__main__":

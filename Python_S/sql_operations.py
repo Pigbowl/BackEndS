@@ -1,16 +1,14 @@
 import pymysql
 from typing import Dict, List, Any, Optional
+import json
 
-# 全局变量：部署模式
-deploy_mode_sql = "full"  # 用于存储部署模式信息
-print("It's there",deploy_mode_sql)
-type = "static"
+with open('darker_config.json', 'r', encoding='utf-8') as f:
+    config_data = json.load(f)
+    deploy_mode_sql = config_data.get('deploy_mode', 'test')  # 默认值为'test'
+
+# type = "static"
 class SQLOperations:
-    def __init__(self,        
-        host="localhost",    # MySQL主机地址
-        user="root",         # MySQL用户名
-        password="12345678",       # MySQL密码
-        database="darkerdatabase"):   # MySQL数据库名)
+    def __init__(self,data_config:Dict[str, Any]):   # MySQL数据库名)
         """
         初始化MySQL数据库连接
         
@@ -19,36 +17,12 @@ class SQLOperations:
             user: MySQL用户名
             password: MySQL密码
             database: MySQL数据库名
-        """
-        # 保存数据库名作为实例变量
-        # self.database = "darkerdatabase"
-        # print(deploy_mode_sql)
-        # if type == "static":  #writting static info 
-        #     if deploy_mode_sql == "local" or deploy_mode_sql == "full": #if backend is on server, not allowed
-        #         host = '47.99.204.97'
-        #         user = 'root'
-        #         password = 'xxxxx'
-        #     elif deploy_mode_sql == "test": #if backend is on local, write into local MySql
-        #         host = 'localhost'
-        #         user = 'root'
-        #         password = '12345678'
-        # elif type == "dynamic": #writing dynamic
-        #     if deploy_mode_sql == "local" or deploy_mode_sql == "full": #if backend is on server, write into server(relative local)
-        #         host = 'localhost'
-        #         user = 'root'
-        #         password = '12345678'
-        #     elif deploy_mode_sql == "test": #if backend is on local, write into remtoe with IP
-        #         host = '47.99.204.97'
-        #         user = 'root'
-        #         password = '12345678'
-        # else:
-        #     raise ValueError("无效的部署模式")
-        
+        """        
         self.conn = pymysql.connect(
-            host=host,
-            user=user,
-            password=password,
-            database=database,
+            host=data_config["host"],
+            user=data_config["user"],
+            password=data_config["password"],
+            database=data_config["database"],
             charset='utf8mb4',
             cursorclass=pymysql.cursors.DictCursor
         )
@@ -272,59 +246,9 @@ class SQLOperations:
             print(f"删除数据时出错: {str(e)}")
             return 0
 
-# 使用示例
-def example_usage():
-    # MySQL示例
-    print("MySQL示例:")
-    # 请根据实际情况修改数据库连接信息
-    db = SQLOperations(
-        host='47.99.204.97',    # MySQL主机地址
-        user='root',         # MySQL用户名
-        password='12345678',         # MySQL密码
-        database='darkerdatabase'   # MySQL数据库名
-    )
-    
-    # 创建测试表
-    cursor = db.conn.cursor()
-    cursor.execute('''
-    CREATE TABLE IF NOT EXISTS users (
-        id INT AUTO_INCREMENT PRIMARY KEY,
-        name VARCHAR(100) NOT NULL,
-        age INT,
-        email VARCHAR(255)
-    )
-    ''')
-    cursor.close()
-    
-    # 插入数据
-    insert_id = db.insert_data('users', {'name': '张ER', 'age': 30, 'email': 'zhangsan@example.com'})
-    print(f"插入数据，ID: {insert_id}")
-    
-    # 读取数据
-    users = db.read_data('users')
-    print(f"读取所有用户: {users}")
-    
-    # 根据条件读取
-    young_users = db.read_data('users', {'age': 30})
-    print(f"读取30岁的用户: {young_users}")
-    
-    # # 更新数据
-    affected = db.update_data('users', {'age': 31}, {'name': '张三'})
-    print(f"更新数据，影响行数: {affected}")
-    
-    # 覆盖条目
-    db.overwrite_entry('users', {'email': 'newemail@example.com'}, {'id': 1})
-    print("覆盖条目")
-    
-    # 再次读取
-    updated_user = db.read_data('users', {'id': 1})
-    print(f"更新后的用户: {updated_user}")
-    
-    # 关闭连接
-    db.close()
-
 if __name__ == "__main__":
+    print("YEAH")
     # 注意：运行前请确保已安装pymysql库
     # pip install pymysql
     # 并且已经创建了MySQL数据库
-    example_usage()
+    # example_usage()

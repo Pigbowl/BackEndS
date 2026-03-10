@@ -1,50 +1,70 @@
-2025-12-24 09:41:00,557 - INFO - 使用缓存目录: C:\Users\宋嘉玮\AppData\Local\Configurator\cache
-2025-12-24 22:49:58,191 - INFO - 使用缓存目录: C:\Users\宋嘉玮\AppData\Local\Configurator\cache
-2025-12-24 23:06:05,935 - INFO - 准备发送邮件，模式: single, 类型: subscription_notification, 主要收件人: asdfadf@qqqq.com, BCC收件人数量: 0
-2025-12-24 23:06:06,046 - INFO - 准备发送邮件到以下收件人：主要收件人 - asdfadf@qqqq.com, BCC收件人 - 无
-2025-12-24 23:06:15,790 - INFO - 邮件发送成功！已发送到 1 个收件人
-2025-12-24 23:06:15,839 - INFO - 准备发送邮件，模式: single, 类型: admin_notification, 主要收件人: songjiawei@thedarker-tech.com, BCC收件人数量: 0
-2025-12-24 23:06:15,908 - INFO - 准备发送邮件到以下收件人：主要收件人 - songjiawei@thedarker-tech.com, BCC收件人 - 无
-2025-12-24 23:06:22,407 - INFO - 邮件发送成功！已发送到 1 个收件人
-2025-12-25 02:14:29,706 - INFO - 使用缓存目录: C:\Users\宋嘉玮\AppData\Local\Configurator\cache
-2025-12-25 02:15:22,071 - INFO - 准备发送邮件，模式: single, 类型: issue_recieve_confirm, 主要收件人: 1273880613@qq.com, BCC收件人数量: 0
-2025-12-25 02:15:22,203 - INFO - 准备发送邮件到以下收件人：主要收件人 - 1273880613@qq.com, BCC收件人 - 无
-2025-12-25 02:15:31,779 - INFO - 邮件发送成功！已发送到 1 个收件人
-2025-12-25 02:34:32,242 - INFO - 使用缓存目录: C:\Users\宋嘉玮\AppData\Local\Configurator\cache
-2025-12-25 02:34:46,094 - INFO - 准备发送邮件，模式: single, 类型: issue_recieve_confirm, 主要收件人: 1273880613@qq.com, BCC收件人数量: 0
-2025-12-25 02:34:46,197 - INFO - 准备发送邮件到以下收件人：主要收件人 - 1273880613@qq.com, BCC收件人 - 无
-2025-12-25 02:34:52,084 - INFO - 邮件发送成功！已发送到 1 个收件人
-2025-12-25 02:34:52,133 - INFO - 准备发送邮件，模式: single, 类型: admin_check_notif, 主要收件人: songjiawei@thedarker-tech.com, BCC收件人数量: 0
-2025-12-25 02:34:52,229 - INFO - 准备发送邮件到以下收件人：主要收件人 - songjiawei@thedarker-tech.com, BCC收件人 - 无
-2025-12-25 02:35:00,773 - INFO - 邮件发送成功！已发送到 1 个收件人
-2025-12-25 02:39:10,641 - INFO - 准备发送邮件，模式: single, 类型: issue_recieve_confirm, 主要收件人: 1273880613@qq.com, BCC收件人数量: 0
-2025-12-25 02:39:10,739 - INFO - 准备发送邮件到以下收件人：主要收件人 - 1273880613@qq.com, BCC收件人 - 无
-2025-12-25 02:39:19,931 - INFO - 邮件发送成功！已发送到 1 个收件人
-2025-12-25 02:39:19,980 - INFO - 准备发送邮件，模式: single, 类型: admin_check_notif, 主要收件人: songjiawei@thedarker-tech.com, BCC收件人数量: 0
-2025-12-25 02:39:20,073 - INFO - 准备发送邮件到以下收件人：主要收件人 - songjiawei@thedarker-tech.com, BCC收件人 - 无
-2025-12-25 02:39:28,754 - INFO - 邮件发送成功！已发送到 1 个收件人
-2025-12-25 12:16:53,353 - INFO - Connected (version 2.0, client OpenSSH_for_Windows_9.5)
-2025-12-25 12:16:53,780 - INFO - Authentication (password) failed.
-2025-12-25 12:16:53,800 - INFO - 准备发送邮件，模式: single, 类型: registration_confirmation, 主要收件人: 127388pp3@qq.com, BCC收件人数量: 0
-2025-12-25 12:16:53,913 - INFO - 准备发送邮件到以下收件人：主要收件人 - 127388pp3@qq.com, BCC收件人 - 无
-2025-12-25 12:18:11,433 - INFO - 邮件发送成功！已发送到 1 个收件人
-2025-12-25 12:18:11,570 - INFO - 准备发送邮件，模式: single, 类型: admin_notification, 主要收件人: songjiawei@thedarker-tech.com, BCC收件人数量: 0
-2025-12-25 12:18:11,639 - INFO - 准备发送邮件到以下收件人：主要收件人 - songjiawei@thedarker-tech.com, BCC收件人 - 无
-2025-12-25 12:18:20,076 - INFO - 邮件发送成功！已发送到 1 个收件人
-2025-12-25 12:18:22,997 - INFO - Connected (version 2.0, client OpenSSH_for_Windows_9.5)
-2025-12-25 12:18:23,383 - INFO - Authentication (password) failed.
-2025-12-25 12:18:23,400 - INFO - 准备发送邮件，模式: single, 类型: registration_confirmation, 主要收件人: asdasd@aa.com, BCC收件人数量: 0
-2025-12-25 12:18:23,502 - INFO - 准备发送邮件到以下收件人：主要收件人 - asdasd@aa.com, BCC收件人 - 无
-2025-12-25 12:19:35,620 - INFO - 使用缓存目录: C:\Users\宋嘉玮\AppData\Local\Configurator\cache
-2025-12-25 12:20:39,515 - INFO - Connected (version 2.0, client OpenSSH_for_Windows_9.5)
-2025-12-25 12:20:40,742 - INFO - Authentication (password) failed.
-2025-12-25 12:20:40,758 - INFO - 准备发送邮件，模式: single, 类型: registration_confirmation, 主要收件人: 123123@11111.com, BCC收件人数量: 0
-2025-12-25 12:20:40,861 - INFO - 准备发送邮件到以下收件人：主要收件人 - 123123@11111.com, BCC收件人 - 无
-2025-12-25 12:20:52,769 - INFO - 邮件发送成功！已发送到 1 个收件人
-2025-12-25 12:20:52,850 - INFO - 准备发送邮件，模式: single, 类型: admin_notification, 主要收件人: songjiawei@thedarker-tech.com, BCC收件人数量: 0
-2025-12-25 12:20:52,917 - INFO - 准备发送邮件到以下收件人：主要收件人 - songjiawei@thedarker-tech.com, BCC收件人 - 无
-2025-12-25 12:21:14,590 - INFO - 邮件发送成功！已发送到 1 个收件人
-2025-12-25 12:24:22,590 - INFO - Connected (version 2.0, client OpenSSH_for_Windows_9.5)
-2025-12-25 12:24:22,970 - INFO - Authentication (password) failed.
-2025-12-25 12:24:22,989 - INFO - 准备发送邮件，模式: single, 类型: registration_confirmation, 主要收件人: kkk@qq1.com, BCC收件人数量: 0
-2025-12-25 12:24:23,088 - INFO - 准备发送邮件到以下收件人：主要收件人 - kkk@qq1.com, BCC收件人 - 无
+2025-12-26 17:05:25,857 - ERROR - 发送邮件时发生错误：'Name'
+2025-12-26 22:15:59,625 - INFO - 使用缓存目录: C:\Users\宋嘉玮\AppData\Local\Configurator\cache
+2025-12-26 22:23:17,862 - INFO - 使用缓存目录: C:\Users\宋嘉玮\AppData\Local\Configurator\cache
+2025-12-27 00:30:26,457 - INFO - 使用缓存目录: C:\Users\宋嘉玮\AppData\Local\Configurator\cache
+2025-12-27 00:34:12,399 - INFO - 使用缓存目录: C:\Users\宋嘉玮\AppData\Local\Configurator\cache
+2025-12-27 00:35:08,989 - INFO - 使用缓存目录: C:\Users\宋嘉玮\AppData\Local\Configurator\cache
+2025-12-27 00:36:36,816 - INFO - 使用缓存目录: C:\Users\宋嘉玮\AppData\Local\Configurator\cache
+2025-12-27 00:39:54,369 - INFO - 使用缓存目录: C:\Users\宋嘉玮\AppData\Local\Configurator\cache
+2025-12-27 00:45:10,424 - INFO - 使用缓存目录: C:\Users\宋嘉玮\AppData\Local\Configurator\cache
+2025-12-27 22:57:13,988 - INFO - 使用缓存目录: C:\Users\宋嘉玮\AppData\Local\Configurator\cache
+2025-12-27 23:00:33,258 - INFO - 使用缓存目录: C:\Users\宋嘉玮\AppData\Local\Configurator\cache
+2025-12-30 15:41:08,166 - INFO - 使用缓存目录: C:\Users\宋嘉玮\AppData\Local\Configurator\cache
+2026-02-11 22:14:06,664 - INFO - 使用缓存目录: C:\Users\宋嘉玮\AppData\Local\Configurator\cache
+2026-02-12 09:15:12,226 - INFO - 使用缓存目录: C:\Users\宋嘉玮\AppData\Local\Configurator\cache
+2026-02-12 09:15:56,496 - INFO - 使用缓存目录: C:\Users\宋嘉玮\AppData\Local\Configurator\cache
+2026-02-12 09:16:03,981 - INFO - 使用缓存目录: C:\Users\宋嘉玮\AppData\Local\Configurator\cache
+2026-02-12 09:22:57,190 - INFO - 使用缓存目录: C:\Users\宋嘉玮\AppData\Local\Configurator\cache
+2026-02-12 09:25:22,949 - INFO - 使用缓存目录: C:\Users\宋嘉玮\AppData\Local\Configurator\cache
+2026-02-12 09:26:59,358 - INFO - 使用缓存目录: C:\Users\宋嘉玮\AppData\Local\Configurator\cache
+2026-02-12 13:58:21,721 - INFO - 使用缓存目录: C:\Users\宋嘉玮\AppData\Local\Configurator\cache
+2026-02-12 14:03:05,935 - INFO - 使用缓存目录: C:\Users\宋嘉玮\AppData\Local\Configurator\cache
+2026-02-24 09:12:30,292 - INFO - 使用缓存目录: C:\Users\宋嘉玮\AppData\Local\Configurator\cache
+2026-03-05 10:35:40,785 - INFO - 使用缓存目录: C:\Users\宋嘉玮\AppData\Local\Configurator\cache
+2026-03-05 15:52:08,661 - INFO - 使用缓存目录: C:\Users\宋嘉玮\AppData\Local\Configurator\cache
+2026-03-05 16:07:55,004 - INFO - 使用缓存目录: C:\Users\宋嘉玮\AppData\Local\Configurator\cache
+2026-03-05 16:12:22,807 - INFO - 使用缓存目录: C:\Users\宋嘉玮\AppData\Local\Configurator\cache
+2026-03-05 17:15:23,577 - INFO - 使用缓存目录: C:\Users\宋嘉玮\AppData\Local\Configurator\cache
+2026-03-05 17:16:15,692 - INFO - 使用缓存目录: C:\Users\宋嘉玮\AppData\Local\Configurator\cache
+2026-03-05 18:42:11,699 - INFO - 使用缓存目录: C:\Users\宋嘉玮\AppData\Local\Configurator\cache
+2026-03-05 18:42:53,746 - INFO - 使用缓存目录: C:\Users\宋嘉玮\AppData\Local\Configurator\cache
+2026-03-05 18:43:52,418 - INFO - 使用缓存目录: C:\Users\宋嘉玮\AppData\Local\Configurator\cache
+2026-03-05 18:43:58,206 - INFO - 使用缓存目录: C:\Users\宋嘉玮\AppData\Local\Configurator\cache
+2026-03-05 18:48:32,126 - INFO - 使用缓存目录: C:\Users\宋嘉玮\AppData\Local\Configurator\cache
+2026-03-05 22:14:59,796 - INFO - 使用缓存目录: C:\Users\宋嘉玮\AppData\Local\Configurator\cache
+2026-03-05 22:17:03,868 - INFO - 使用缓存目录: C:\Users\宋嘉玮\AppData\Local\Configurator\cache
+2026-03-05 22:18:59,131 - INFO - 使用缓存目录: C:\Users\宋嘉玮\AppData\Local\Configurator\cache
+2026-03-05 22:20:55,195 - INFO - 使用缓存目录: C:\Users\宋嘉玮\AppData\Local\Configurator\cache
+2026-03-05 22:23:07,920 - INFO - 使用缓存目录: C:\Users\宋嘉玮\AppData\Local\Configurator\cache
+2026-03-05 22:23:26,523 - INFO - 使用缓存目录: C:\Users\宋嘉玮\AppData\Local\Configurator\cache
+2026-03-05 22:25:31,006 - INFO - 使用缓存目录: C:\Users\宋嘉玮\AppData\Local\Configurator\cache
+2026-03-05 22:26:24,992 - INFO - 使用缓存目录: C:\Users\宋嘉玮\AppData\Local\Configurator\cache
+2026-03-05 22:26:44,272 - INFO - 使用缓存目录: C:\Users\宋嘉玮\AppData\Local\Configurator\cache
+2026-03-05 22:27:12,029 - INFO - 使用缓存目录: C:\Users\宋嘉玮\AppData\Local\Configurator\cache
+2026-03-05 22:27:26,020 - INFO - 使用缓存目录: C:\Users\宋嘉玮\AppData\Local\Configurator\cache
+2026-03-05 22:28:13,612 - INFO - 使用缓存目录: C:\Users\宋嘉玮\AppData\Local\Configurator\cache
+2026-03-05 22:30:56,769 - INFO - 使用缓存目录: C:\Users\宋嘉玮\AppData\Local\Configurator\cache
+2026-03-05 22:51:01,830 - INFO - 使用缓存目录: C:\Users\宋嘉玮\AppData\Local\Configurator\cache
+2026-03-05 22:53:08,270 - INFO - 使用缓存目录: C:\Users\宋嘉玮\AppData\Local\Configurator\cache
+2026-03-05 22:54:40,271 - INFO - 使用缓存目录: C:\Users\宋嘉玮\AppData\Local\Configurator\cache
+2026-03-05 23:10:34,011 - INFO - 使用缓存目录: C:\Users\宋嘉玮\AppData\Local\Configurator\cache
+2026-03-09 10:17:56,340 - INFO - 使用缓存目录: C:\Users\宋嘉玮\AppData\Local\Configurator\cache
+2026-03-09 10:25:18,121 - INFO - 使用缓存目录: C:\Users\宋嘉玮\AppData\Local\Configurator\cache
+2026-03-09 17:18:04,364 - INFO - 使用缓存目录: C:\Users\宋嘉玮\AppData\Local\Configurator\cache
+2026-03-09 18:31:56,953 - INFO - 使用缓存目录: C:\Users\宋嘉玮\AppData\Local\Configurator\cache
+2026-03-09 23:15:29,509 - INFO - 使用缓存目录: C:\Users\宋嘉玮\AppData\Local\Configurator\cache
+2026-03-09 23:19:05,130 - INFO - 使用缓存目录: C:\Users\宋嘉玮\AppData\Local\Configurator\cache
+2026-03-09 23:54:34,683 - INFO - 使用缓存目录: C:\Users\宋嘉玮\AppData\Local\Configurator\cache
+2026-03-10 00:08:28,092 - INFO - 使用缓存目录: C:\Users\宋嘉玮\AppData\Local\Configurator\cache
+2026-03-10 00:45:08,983 - INFO - 使用缓存目录: C:\Users\宋嘉玮\AppData\Local\Configurator\cache
+2026-03-10 00:46:24,003 - INFO - triangulating faces
+2026-03-10 00:57:52,143 - INFO - 使用缓存目录: C:\Users\宋嘉玮\AppData\Local\Configurator\cache
+2026-03-10 00:58:14,028 - INFO - 使用缓存目录: C:\Users\宋嘉玮\AppData\Local\Configurator\cache
+2026-03-10 00:58:52,341 - INFO - 使用缓存目录: C:\Users\宋嘉玮\AppData\Local\Configurator\cache
+2026-03-10 00:59:35,031 - INFO - 使用缓存目录: C:\Users\宋嘉玮\AppData\Local\Configurator\cache
+2026-03-10 01:01:52,184 - INFO - 使用缓存目录: C:\Users\宋嘉玮\AppData\Local\Configurator\cache
+2026-03-10 01:03:24,920 - INFO - 使用缓存目录: C:\Users\宋嘉玮\AppData\Local\Configurator\cache
+2026-03-10 01:03:39,301 - INFO - 使用缓存目录: C:\Users\宋嘉玮\AppData\Local\Configurator\cache
+2026-03-10 01:16:03,479 - INFO - 使用缓存目录: C:\Users\宋嘉玮\AppData\Local\Configurator\cache
+2026-03-10 01:39:07,820 - INFO - 使用缓存目录: C:\Users\宋嘉玮\AppData\Local\Configurator\cache
+2026-03-10 03:24:26,069 - INFO - 使用缓存目录: C:\Users\宋嘉玮\AppData\Local\Configurator\cache
