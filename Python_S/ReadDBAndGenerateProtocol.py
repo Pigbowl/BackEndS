@@ -2061,6 +2061,10 @@ def update_recordings(db,data,id):
 
 def update_productStatus(db,data,id):
     row=db.update_data("productfeatures", data,{"ID": id})
+    
+    # 调用 CREATE_PRODUCT_LIST 生成配置文件
+    create_result = CREATE_PRODUCT_LIST(db)
+    
     Result = fetch_siteproduct_info(db)
     Feedback = {"status": True, "error": 0,"Result":json.loads(Result)}
 
@@ -2161,6 +2165,107 @@ def visit_management(db,data,uservisit):
 
 
 from datetime import datetime, timedelta
+
+def mark_modification(db,tablename):
+    db.update_data("sync_last_modified",{"last_modified_time":datetime.now()},{"ID":1})
+
+def CREATE_PRODUCT_LIST(db):
+    """
+    创建产品配置文件
+    从数据库读取产品特征数据，生成配置文件
+    
+    :param db: SQLOperations - 数据库操作对象
+    :return: dict - 包含执行结果
+    """
+    try:
+        import datetime
+        import os
+        import json
+        
+        print("📋 开始创建产品配置文件...")
+        
+        # 读取配置文件
+        config_file = "darker_config.json"
+        if not os.path.exists(config_file):
+            print(f"❌ 配置文件 {config_file} 不存在")
+            return {'success': False, 'error': '配置文件不存在'}
+        
+        with open(config_file, 'r', encoding='utf-8') as f:
+            config_data = json.load(f)
+        
+        darkertech_dir = config_data.get('frontend_develop_folder', '')
+        
+        if not darkertech_dir:
+            print("❌ 前端文件夹路径未配置")
+            return {'success': False, 'error': '前端文件夹路径未配置'}
+        
+        # 从数据库读取产品特征数据
+        print("📝 从数据库读取产品特征数据...")
+        all_product_features = db.read_data("productfeatures")
+        
+        if not all_product_features:
+            print("⚠️ 数据库中没有产品特征数据")
+            return {'success': False, 'error': '数据库中没有产品特征数据'}
+        
+        print(f"   读取到 {len(all_product_features)} 条产品特征数据")
+        
+        # 按Category列进行分类
+        categorized_features = {}
+        for feature in all_product_features:
+            category = feature.get("Category", "未分类")
+            if category not in categorized_features:
+                categorized_features[category] = []
+            categorized_features[category].append(feature)
+        
+        # 读取状态枚举
+        try:
+            status_info = db.read_data("online_status_enum")
+            status_list = [item.get("Status") for item in status_info]
+        except:
+            status_list = ['正式版本上线', '测试版本上线', '未上线', '规划中', '新产品上线']
+        
+        # 构建结果
+        result_data = {
+            "productfeatures": all_product_features,
+            "categorized_features": categorized_features,
+            "version": datetime.datetime.now().strftime('%Y%m%d%H%M%S'),
+            "status": status_list
+        }
+        
+        # 生成product_configure.js文件
+        target_dir = os.path.join(darkertech_dir, "js")
+        os.makedirs(target_dir, exist_ok=True)
+        
+        js_filename = "product_configure.js"
+        full_js_path = os.path.join(target_dir, js_filename)
+        
+        js_content = f"""
+// 产品配置信息 - 自动生成
+// 生成时间: {datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')}
+
+// 全局产品配置变量
+let products_config = {json.dumps(result_data, ensure_ascii=False, indent=2)};
+"""
+        
+        with open(full_js_path, 'w', encoding='utf-8') as f:
+            f.write(js_content)
+        
+        print(f"✅ 产品配置文件生成成功！")
+        print(f"   文件路径：{full_js_path}")
+        
+        return {
+            'success': True,
+            'message': '产品配置文件生成成功',
+            'file_path': full_js_path,
+            'version': result_data['version'],
+            'total_count': len(all_product_features)
+        }
+        
+    except Exception as e:
+        print(f"❌ 创建产品配置文件失败: {str(e)}")
+        import traceback
+        traceback.print_exc()
+        return {'success': False, 'error': str(e)}
 
 def visit_statistic(db):
     Result = {}

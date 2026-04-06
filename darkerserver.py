@@ -14,6 +14,8 @@ from Python_S.AutoScene3D_height_onefunc import process_map_data
 from Python_S.json_to_sql_processor import database_manipulate
 from Python_S.sql_operations import SQLOperations
 from Python_S.emailing import send_single_email
+from Python_S.LocalAI.ollama_client import OllamaClient, LocalAIRAG
+from Python_S.LocalAI.vector_store import VectorIndexManager
 from Python_S.ReadDBAndGenerateProtocol import (
     update_action,
     fetch_actions,
@@ -49,7 +51,9 @@ from Python_S.ReadDBAndGenerateProtocol import (
     modify_user_level,
     create_action,
     modify_user,
+    mark_modification,
 )
+from Python_S.PageExplain import chat_with_ai
 
 
 
@@ -114,7 +118,12 @@ class MyHandler(BaseHTTPRequestHandler):
         # 其他
         '/process_map_data',
         '/stopserver',
-        '/upload_avatar'
+        '/upload_avatar',
+        # AI相关
+        '/online_AI',
+        '/local_AI',
+        '/ai_health',
+        '/ai_rebuild',
     }
 
     def _send_response(self, data, status=200):
@@ -153,6 +162,40 @@ class MyHandler(BaseHTTPRequestHandler):
             # 其他错误（如读取失败）返回500
             self._send_response({'error': f'下载失败: {str(e)}'}, 500)
             
+    # 添加处理函数
+
+
+    def _handle_ai_health(self):
+        try:
+            ollama_client = OllamaClient()
+            is_connected = ollama_client.check_connection()
+            models = ollama_client.list_models() if is_connected else []
+            
+            self._send_response({
+                'status': 'healthy' if is_connected else 'degraded',
+                'ollama_connected': is_connected,
+                'index_built': self.ai_index.index_built if hasattr(self, 'ai_index') else False,
+                'available_models': models
+            })
+        except Exception as e:
+            self._send_response({'status': 'error', 'message': str(e)}, 500)
+
+    def _handle_ai_rebuild(self):
+        try:
+            content_length = int(self.headers['Content-Length'])
+            post_data = self.rfile.read(content_length)
+            data = json.loads(post_data)
+            force_rebuild = data.get('force_rebuild', False)
+            
+            success = self.ai_index.build_index(force_rebuild=force_rebuild)
+            self._send_response({
+                'success': success,
+                'message': '索引构建成功' if success else '索引构建失败'
+            })
+        except Exception as e:
+            logging.error(f'重建索引出错: {str(e)}')
+            self._send_response({'success': False, 'message': str(e)}, 500)
+
     def _handle_avatar_upload(self):
         """处理头像上传请求"""
         try:
@@ -220,6 +263,10 @@ class MyHandler(BaseHTTPRequestHandler):
                 project_dir = os.path.join(user_dir, 'MapProjectFile')
                 if not os.path.exists(project_dir):
                     os.makedirs(project_dir, exist_ok=True)
+            elif filetype == 'phyarchifile':
+                project_dir = os.path.join(user_dir, 'PhyArchiProjectFile')
+                if not os.path.exists(project_dir):
+                    os.makedirs(project_dir, exist_ok=True)
             else:  # 默认fovfile
                 project_dir = os.path.join(user_dir, 'FoVProjectFile')
                 if not os.path.exists(project_dir):
@@ -282,7 +329,9 @@ class MyHandler(BaseHTTPRequestHandler):
             user_dir = os.path.join(darker_user_data_dir, str(user_id))
             if filetype == 'mapfile':
                 project_dir = os.path.join(user_dir, 'MapProjectFile')
-            else:  # 默认fovfile
+            elif filetype == 'phyarchifile':
+                project_dir = os.path.join(user_dir, 'PhyArchiProjectFile')
+            else:  # 默认fovfilef
                 project_dir = os.path.join(user_dir, 'FoVProjectFile')
             
             # 读取indexing.json文件
@@ -323,6 +372,8 @@ class MyHandler(BaseHTTPRequestHandler):
             user_dir = os.path.join(darker_user_data_dir, str(user_id))
             if filetype == 'mapfile':
                 project_dir = os.path.join(user_dir, 'MapProjectFile')
+            elif filetype == 'phyarchifile':
+                project_dir = os.path.join(user_dir, 'PhyArchiProjectFile')
             else:  # 默认fovfile
                 project_dir = os.path.join(user_dir, 'FoVProjectFile')
             
@@ -405,6 +456,65 @@ class MyHandler(BaseHTTPRequestHandler):
             if self.path == '/upload_avatar':
                 self._handle_avatar_upload()
                 return
+            elif self.path == '/online_AI':
+                # 处理与AI聊天的请求
+                content_length = int(self.headers['Content-Length'])
+                post_data = self.rfile.read(content_length)
+                try:
+                    data = json.loads(post_data)
+                    question = data.get('question', '')
+                    content_type = data.get('content_type', 'project')  # 默认为基于项目信息
+                    if not question:
+                        self._send_response({'success': False, 'message': '缺少问题参数'}, 400)
+                        return
+                    # 调用AI聊天功能
+                    result = chat_with_ai(question, content_type)
+                    self._send_response({'success': True, 'output': json.loads(result)})
+                except json.JSONDecodeError as e:
+                    self._send_response({'error': f'JSON解析错误: {str(e)}'}, 400)
+                except Exception as e:
+                    logging.error(f'处理AI聊天请求时出错: {str(e)}')
+                    self._send_response({'success': False, 'message': f'处理请求时出错: {str(e)}'}, 500)
+                return
+            elif self.path == '/local_AI':
+                # 处理与AI聊天的请求（使用本地Ollama）
+                content_length = int(self.headers['Content-Length'])
+                post_data = self.rfile.read(content_length)
+                try:
+                    data = json.loads(post_data)
+                    question = data.get('question', '')
+                    use_context = data.get('use_context', True)
+                    if not question:
+                        self._send_response({'success': False, 'message': '缺少问题参数'}, 400)
+                        return
+                    
+                    # 检查AI系统是否初始化
+                    if not hasattr(self, 'ai_rag') or not self.ai_rag:
+                        self._send_response({'success': False, 'message': 'AI系统未初始化'}, 500)
+                        return
+                    
+                    # 检查Ollama连接
+                    ollama_client = self.ai_rag.ollama
+                    if not ollama_client.check_connection():
+                        self._send_response({'success': False, 'message': 'Ollama服务连接失败，请确保服务正在运行'}, 500)
+                        return
+                    
+                    # 调用AI聊天功能
+                    result = self.ai_rag.ask(question, use_context=use_context)
+                    result = json.dumps({"answer": result}, ensure_ascii=False)
+                    self._send_response({'success': True, 'output': json.loads(result)})
+                except json.JSONDecodeError as e:
+                    self._send_response({'error': f'JSON解析错误: {str(e)}'}, 400)
+                except Exception as e:
+                    logging.error(f'处理AI聊天请求时出错: {str(e)}')
+                    self._send_response({'success': False, 'message': f'处理请求时出错: {str(e)}'}, 500)
+                return
+
+            elif self.path == '/ai_health':
+                self._handle_ai_health()
+
+            elif self.path == '/ai_rebuild':
+                self._handle_ai_rebuild()
                 
             content_length = int(self.headers['Content-Length'])
             post_data = self.rfile.read(content_length)
@@ -491,18 +601,21 @@ class MyHandler(BaseHTTPRequestHandler):
             elif self.path == '/generate_new_item':  # 生成新项目 #Done
                 # processed_results,lib_tables_data = export_table_columns_with_foreign_key(database)
                 resulting = generate_new_object_data_structure(processed_results,lib_tables_data,data['tablename'])
+                mark_modification(database,data['tablename'])
                 self._send_response({'success': True, 'output': resulting})
             elif self.path == '/modifyitems':  # 修改项目 #Done
                 data2 = data.get('data')
                 first_key, first_value = next(iter(data2['rowdata'].items()))
                 # processed_results,lib_tables_data = export_table_columns_with_foreign_key(database)
                 resulting = generate_target_object_data_structure(database,processed_results,lib_tables_data,data2['tablename'],first_value,first_key)
+                # mark_modification(database,data2['tablename'])
                 self._send_response({'success': True, 'output': resulting})
             elif self.path == '/deleteitem':  # 删除项目 #Done
                 data2 = data.get('data')
                 first_key, first_value = next(iter(data2['rowdata'].items()))
                 # processed_results, lib_tables_data = export_table_columns_with_foreign_key(database)
                 resulting = perform_group_delete_operation(database,processed_results, lib_tables_data,data2['tablename'],first_value,first_key) 
+                mark_modification(database,data2['tablename'])
                 self._send_response({'success': True, 'output': resulting})
             elif self.path == '/extract_item':  # 提取项目 #Done
                 data2 = data.get('data')
@@ -514,6 +627,7 @@ class MyHandler(BaseHTTPRequestHandler):
                 if deploy_mode == "test":
                     try:
                         resulting = database_manipulate(database,data.get('data'))
+                        mark_modification(database,"")
                         self._send_response({'success': True, 'output': resulting})
                     except Exception as e:
                         logging.error(f"处理数据库操作错误: {str(e)}")
@@ -709,6 +823,9 @@ def main():
     cache_dir = check_and_update_cache()
     logging.info(f"使用缓存目录: {cache_dir}")
     global deploy_mode,server_product_config,server_operation_config,develop_product_config,develop_operation_config,admin_email,serverLocation
+    # 初始化 frontend_path
+    frontend_path = None
+    
     try:
         with open('darker_config.json', 'r', encoding='utf-8') as f:
             config_data = json.load(f)
@@ -722,15 +839,21 @@ def main():
             US_com_port = config_data.get('Server_comPort').get('US')
             test_com_port = config_data.get('test_com_port')
             serverLocation = config_data.get('serverLocation')
+            frontend_path = config_data.get('frontend_develop_folder')
     except FileNotFoundError:
-        print(f"配置文件 adminconfig.json 不存在，使用默认值 'test'")
+        print(f"配置文件 darker_config.json 不存在，使用默认值 'test'")
         deploy_mode = "test"
     except json.JSONDecodeError:
-        print(f"配置文件 adminconfig.json 格式错误，使用默认值 'test'")
+        print(f"配置文件 darker_config.json 格式错误，使用默认值 'test'")
         deploy_mode = "test"
     except Exception as e:
         print(f"读取配置文件时发生错误: {e}，使用默认值 'test'")
         deploy_mode = "test"
+    
+    # 如果 frontend_path 未设置，使用默认路径
+    if not frontend_path:
+        frontend_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'Darker-tech')
+        print(f"使用默认前端路径: {frontend_path}")
 
     if deploy_mode == "test":
         server_address = ('localhost', test_com_port)
@@ -741,6 +864,70 @@ def main():
             server_address = ('0.0.0.0', US_com_port)
         else:
             server_address = ('0.0.0.0', 7000)
+
+        # 初始化AI系统
+    # frontend_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'Darker-tech')
+    print(f"前端路径: {frontend_path}")
+    
+    # 检查前端路径是否存在
+    if not os.path.exists(frontend_path):
+        print(f"⚠️  警告: 前端路径不存在: {frontend_path}")
+        print("AI系统将无法构建索引，但其他功能仍可正常使用")
+        frontend_path = None
+    # 修改：只加载索引，不自动构建
+    backend_dir = os.path.dirname(os.path.abspath(__file__))
+    index_path = os.path.join(backend_dir, 'Python_S', 'LocalAI', 'index_store.pkl')
+
+    print(f"索引文件路径: {index_path}")
+
+    # 检查索引文件是否存在
+    if os.path.exists(index_path):
+        print("✅ 向量索引文件已存在，将加载现有索引")
+        ai_index = VectorIndexManager(frontend_path, store_path=index_path)
+        ai_index.index_built = True
+    else:
+        print("⚠️  向量索引文件不存在，将在首次请求时自动构建")
+        ai_index = VectorIndexManager(frontend_path, store_path=index_path)
+        ai_index.index_built = False
+    
+    # 初始化Ollama客户端
+    print("连接Ollama服务...")
+    # 根据部署模式选择模型
+    if deploy_mode == "full":
+        model_name = "qwen2.5:1.5b"
+        print(f"部署模式: {deploy_mode}，使用模型: {model_name}")
+    else:  # test模式
+        model_name = "qwen2.5:7b"
+        print(f"部署模式: {deploy_mode}，使用模型: {model_name}")
+    
+    ollama_client = OllamaClient(model=model_name)
+    ollama_connected = ollama_client.check_connection()
+    
+    if ollama_connected:
+        print("✅ Ollama服务连接成功")
+        models = ollama_client.list_models()
+        print(f"可用模型: {', '.join(models) if models else '无'}")
+    else:
+        print("❌ Ollama服务连接失败")
+        print("请确保Ollama服务正在运行: ollama serve")
+        print("请下载模型: ollama pull qwen2.5:7b")
+    
+    # 初始化RAG系统
+    ai_rag = LocalAIRAG(ollama_client, ai_index)
+    print("✅ AI RAG系统已初始化")
+    
+    # 检查索引状态
+    if ai_index.index_built:
+        print("✅ 向量索引已存在，将加载现有索引")
+    else:
+        print("⏳ 向量索引不存在，将在首次请求时自动构建")
+    
+    # 创建handler实例
+    handler = MyHandler
+    
+    # 传递AI系统给handler
+    handler.ai_index = ai_index
+    handler.ai_rag = ai_rag
 
     httpd = ThreadingHTTPServer(server_address, MyHandler)
     print(f'Starting DarkerTech backend server on {deploy_mode} mode port {server_address[1]}...')
